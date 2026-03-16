@@ -114,7 +114,7 @@ Distinguishing these classes at scale — across thousands of images, near the d
 
 <!-- Figure: one representative image per class, shown side by side -->
 <p align="center">
-  <img src="assets/fig2_1_sample_images.png" alt="Sample lensing images — No Substructure, Sphere, Vortex" width="700"/>
+  <img src="assets/fig2_1_sample_images.png" alt="Sample lensing images — No Substructure, Sphere, Vortex" width="95%"/>
   <br><em>Figure 2.1 — Representative 150×150 single-channel images for each class. All three share the same Einstein ring morphology; the Sphere knot and Vortex arc asymmetry are subtle perturbations visible only on close inspection.</em>
 </p>
 
@@ -157,7 +157,7 @@ Three properties of the data drive all modelling choices:
 
 <!-- Figure: pixel intensity distributions and ring statistics per class -->
 <p align="center">
-  <img src="assets/fig2_2_eda_statistic.png" alt="EDA: pixel intensity distributions and per-class ring statistics" width="800"/>
+  <img src="assets/fig2_2_eda_statistic.png" alt="EDA: pixel intensity distributions and per-class ring statistics" width="95%"/>
   <br><em>Figure 2.2 — EDA statistics. Left: pixel intensity histograms per class — all three distributions are right-skewed, with background pixels near zero dominating. Right: per-class ring brightness and compactness distributions, showing the systematic difference between Sphere failures and correctly classified images.</em>
 </p>
 
@@ -288,7 +288,7 @@ No Substructure     0.9576    0.9700    0.9638      2500
 
 </details>
 <p align="center">
-  <img src="assets/fig5_1_resnet18_eval.png" alt="ResNet-18 confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_1_resnet18_eval.png" alt="ResNet-18 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.1 — ResNet-18 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right).</em>
 </p>
 
@@ -340,7 +340,7 @@ No Substructure     0.9709    0.9708    0.9709      2500
 
 <!-- Figure: ResNet-50 confusion matrix and curves -->
 <p align="center">
-  <img src="assets/fig5_2_resnet50_eval.png" alt="ResNet-50 confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_2_resnet50_eval.png" alt="ResNet-50 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.2 — ResNet-50 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right).</em>
 </p>
 
@@ -391,7 +391,7 @@ No Substructure     0.9765    0.9800    0.9782      2500
 </details>
 <!-- Figure: DenseNet-121 confusion matrix and curves -->
 <p align="center">
-  <img src="assets/fig5_3_densenet121_eval.png" alt="DenseNet-121 confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_3_densenet121_eval.png" alt="DenseNet-121 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.3 — DenseNet-121 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right). Best overall performance across all metrics.</em>
 </p>
 
@@ -444,7 +444,7 @@ No Substructure     0.9583    0.9716    0.9649      2500
 </details>
 <!-- Figure: EfficientNet-B3 confusion matrix and curves -->
 <p align="center">
-  <img src="assets/fig5_4_efficientnetb3_eval.png" alt="EfficientNet-B3 confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_4_efficientnetb3_eval.png" alt="EfficientNet-B3 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.4 — EfficientNet-B3 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right).</em>
 </p>
 
