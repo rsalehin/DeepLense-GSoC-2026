@@ -1110,13 +1110,13 @@ Decoder: Linear(128) → Unflatten → 4 × (ConvTranspose2d + ReLU/Sigmoid) + s
            ↑ channels: 128 → 64 → 32 → 16 → 1
 ```
 
-The CAE is trained on **No Substructure images only**, learning to reconstruct the smooth lens morphology. Applied to Sphere and Vortex images, the difference (observed − CAE reconstruction) isolates the perturbation.
-
 <!-- Figure: CAE reconstruction examples — original / reconstruction / residual per class -->
 <p align="center">
   <img src="assets/fig9_1_cae_residuals.png" alt="CAE residual visualisation: original, reconstruction, residual per class" width="800"/>
   <br><em>Figure 9.1 — CAE residual visualisation (n=1 example per class). Columns: original image, fitted clean lens (CAE reconstruction), residual full range, residual clipped ±0.1. No Substructure residuals are noise-like (near-zero); Sphere residuals show a compact positive peak at the subhalo location; Vortex residuals show asymmetric arc perturbations.</em>
 </p>
+The CAE is trained on **No Substructure images only**, learning to reconstruct the smooth lens morphology. Applied to Sphere and Vortex images, the difference (observed − CAE reconstruction) isolates the perturbation.
+
 
 **Residual statistics (ring annulus, per class):**
 
