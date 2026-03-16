@@ -1005,12 +1005,25 @@ Sphere prediction flows:
 ─────────────────────────────────────────────────────
 ```
 <p align="center">
-  <img src="assets/fig8_1_universally_misclassified_correct.png" alt="Cross-architecture confusion matrices" width="900"/>
-  <br><em>Figure 8.1 — Confusion matrices for all nine architectures (sorted by macro AUC). The universal pattern — Sphere misclassified predominantly as No Substructure, not Vortex — is visible across every well-converged model. This one-directional confusion is physically interpretable: Sphere perturbations are morphologically similar to smooth arcs.</em>
-The one-directional Sphere→No Sub confusion is *physically interpretable*: spherical subhalos produce compact, approximately symmetric perturbations — morphologically similar to smooth arcs. Models are not failing randomly; they are resolving genuine physical ambiguity at the low-mass end of the subhalo distribution.
+  <img src="assets/fig8_1_universally_misclassified_correct.png" alt="Universally misclassified vs universally correct Sphere images" width="900"/>
+  <br><em>Figure 8.1 — Sphere subhalo images: universally misclassified (top row) vs universally correct (bottom row), 
+  as judged by all 6 ensemble models. Top row: 12 Sphere images predicted as No Substructure by every model — 
+  all show sparse, dimly-lit arcs with no visually apparent compact knot. Bottom row: 12 Sphere images correctly 
+  classified by every model — arcs are brighter and more complete. Raw contrast c = max−min of unnormalised pixels 
+  is identical at 1.0000 for all images in both rows, confirming contrast is uninformative and the failure is 
+  driven by absolute flux (ring brightness), not dynamic range.</em>
+</p>
+
 <p align="center">
-  <img src="assets/fig8_1_sphere_class_difficulty.png" alt="Cross-architecture confusion matrices" width="900"/>
-  <br><em>Figure 8.1 — Confusion matrices for all nine architectures (sorted by macro AUC). The universal pattern — Sphere misclassified predominantly as No Substructure, not Vortex — is visible across every well-converged model. This one-directional confusion is physically interpretable: Sphere perturbations are morphologically similar to smooth arcs.</em>
+  <img src="assets/fig8_1_sphere_class_difficulty.png" alt="Sphere class difficulty: raw image statistics" width="900"/>
+  <br><em>Figure 8.2 — Sphere class difficulty quantified on unnormalised .npy arrays (all correct n=1821, 
+  all wrong n=64). Left: contrast distributions (max−min) — both groups collapse to exactly 1.0, confirming 
+  that per-sample min-max normalisation renders contrast completely uninformative (p=1.0). Centre: raw mean 
+  pixel intensity distributions — wrongly classified images are systematically dimmer, with the wrong group 
+  skewed toward lower values (p≈0.0). Right: boxplot of raw mean pixel intensity — wrongly classified images 
+  have a lower median and compressed upper quartile (Mann-Whitney p=4.46×10⁻⁹), establishing low absolute 
+  ring flux as the primary predictor of universal misclassification.</em>
+</p>
 
 **E-ResNet universally missed images:** 64 Sphere images are misclassified as No Substructure by all 6 ensemble models with near-zero entropy. These images have statistically distinct morphological properties:
 
@@ -1021,8 +1034,15 @@ The one-directional Sphere→No Sub confusion is *physically interpretable*: sph
 
 <!-- Figure: cross-architecture confusion matrices for all 9 models side by side -->
 <p align="center">
-  <img src="assets/fig8_1_cross_arch_confusion.png" alt="Cross-architecture confusion matrices" width="900"/>
-  <br><em>Figure 8.1 — Confusion matrices for all nine architectures (sorted by macro AUC). The universal pattern — Sphere misclassified predominantly as No Substructure, not Vortex — is visible across every well-converged model. This one-directional confusion is physically interpretable: Sphere perturbations are morphologically similar to smooth arcs.</em>
+  <img src="assets/fig8_1_cross_arch_confusion.png" alt="Cross-architecture confusion matrices for all 9 models" width="900"/>
+  <br><em>Figure 8.3 — Confusion matrices for all nine architectures sorted by macro AUC (row-normalised; 
+  raw counts in parentheses). Tier 1 models (green border, AUC > 0.989) achieve Sphere recall of 0.88–0.94 
+  with misclassifications flowing almost exclusively into No Substructure, not Vortex. ViT-Base (orange 
+  border, Tier 2) shows markedly lower Sphere recall (0.78) and the largest Sphere→Vortex leakage (0.10). 
+  Tier 3 models (red border) show near-random Sphere classification — AlexNet recalls only 0.65 of Sphere 
+  images and EfficientNet-D4 only 0.38. The one-directional Sphere→No Substructure confusion pattern is 
+  universal across all well-converged models, consistent with the physical interpretation that compact 
+  symmetric subhalo perturbations are morphologically similar to smooth arcs.</em>
 </p>
 
 ### 8.2 Statistical Characterisation of Failures
