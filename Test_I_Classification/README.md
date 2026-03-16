@@ -1314,11 +1314,11 @@ If you use this work, please cite the ML4SCI DeepLense project and the DeepLense
 
 ```bibtex
 @misc{deeplense_gsoc2026_testi,
-  author       = {[Your Name]},
+  author       = {[Rafiqus Salehin]},
   title        = {ML4SCI DeepLense GSoC 2026 — Common Test I:
                   Multi-Class Classification of Dark Matter Substructure},
   year         = {2026},
-  url          = {https://github.com/your-username/DeepLense-Test-I}
+  url          = {https://github.com/rsalehin/DeepLense-Test-I}
 }
 
 @article{toomey2023deeplensesim,
