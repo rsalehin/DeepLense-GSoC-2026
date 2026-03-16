@@ -25,7 +25,7 @@ using nine architectures — from convolutional baselines to D₄-equivariant re
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 1. [Scientific Background](#1-scientific-background)
 2. [Dataset](#2-dataset)
