@@ -494,7 +494,7 @@ No Substructure     0.4912    0.7836    0.6039      2500
 </details>
 <!-- Figure: AlexNet confusion matrix — demonstrates near-random Sphere behaviour -->
 <p align="center">
-  <img src="assets/fig5_5_alexnet_eval.png" alt="AlexNet confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_5_alexnet_eval.png" alt="AlexNet confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.5 — AlexNet evaluation: the confusion matrix reveals near-random Sphere classification (recall 0.124). Gradient inaccessibility to early feature layers is the primary failure mechanism.</em>
 </p>
 
@@ -548,7 +548,7 @@ No Substructure     0.7748    0.8636    0.8168      2500
 </details>
 <!-- Figure: VGG-16 confusion matrix -->
 <p align="center">
-  <img src="assets/fig5_6_vgg16_eval.png" alt="VGG-16 confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_6_vgg16_eval.png" alt="VGG-16 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.6 — VGG-16 evaluation: Sphere recall of 0.504 despite 134M parameters. Training instability from the absence of batch normalisation is visible in the loss curves.</em>
 </p>
 
@@ -601,7 +601,7 @@ No Substructure     0.9177    0.9600    0.9384      2500
 
 <!-- Figure: ViT attention rollout maps per class -->
 <p align="center">
-  <img src="assets/fig5_7_vit_eval.png" alt="ViT-Base confusion matrix and attention rollout" width="750"/>
+  <img src="assets/fig5_7_vit_eval.png" alt="ViT-Base confusion matrix and attention rollout" width="95%"/>
   <br><em>Figure 5.7 — ViT-Base evaluation: confusion matrix (left), ROC/PR curves (centre), and representative attention rollout maps per class (right). ViT shows class-dependent ring concentration but unstable attention for substructure classes.</em>
 </p>
 
@@ -632,7 +632,7 @@ No Substructure     0.9177    0.9600    0.9384      2500
 **Training:** Trained **from scratch** — no ImageNet pretraining exists for group-equivariant architectures. 50 epochs, lr = 1e-3 (higher LR required for from-scratch training).
 <!-- Figure: ENN (D4) confusion matrix -->
 <p align="center">
-  <img src="assets/fig5_8_enn_eval.png" alt="Equivariant-D4 ENN confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_8_enn_eval.png" alt="Equivariant-D4 ENN confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.8 — Equivariant-D4 (ENN) evaluation: the shallow architecture demonstrates that equivariance alone is insufficient — depth and skip connections are required to bring AUC into the competitive range.</em>
 </p>
 
@@ -706,7 +706,7 @@ No Substructure     0.9413    0.9880    0.9641      2500
 </details>
 <!-- Figure: E-ResNet confusion matrix, ROC/PR curves -->
 <p align="center">
-  <img src="assets/fig5_9_eresnet_eval.png" alt="E-ResNet confusion matrix and evaluation curves" width="750"/>
+  <img src="assets/fig5_9_eresnet_eval.png" alt="E-ResNet confusion matrix and evaluation curves" width="95%"/>
   <br><em>Figure 5.9 — E-ResNet evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right). Second-best macro AUC at 0.39M parameters trained from scratch.</em>
 </p>
 
