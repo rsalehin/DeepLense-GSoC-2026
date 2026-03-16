@@ -1128,6 +1128,13 @@ The CAE is trained on **No Substructure images only**, learning to reconstruct t
 
 ### 9.3 Residual Classifiers
 
+<!-- Figure: residual classifier training curves showing severe overfitting -->
+<p align="center">
+  <img src="assets/fig9_2_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
+   <img src="assets/fig9_3_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
+  <br><em>Figure 9.2 — Residual classifier training dynamics. Left: DenseNet-121 train vs val loss — best checkpoint at epoch 10 (val 0.3946), monotonic val deterioration to 0.8211 by epoch 30, train loss near zero. Right: ResNet-18 train vs val loss — checkpoints at epoch 5 (val 0.4213), remaining 25 epochs progressively worse. The two-order-of-magnitude train/val gap is severe overfitting driven by insufficient signal-to-noise in the residuals.</em>
+</p>
+
 Two classifiers were trained on CAE residuals:
 
 | Model | Input | Macro AUC | Val Accuracy | Training |
@@ -1136,12 +1143,7 @@ Two classifiers were trained on CAE residuals:
 | **DenseNet-121** | CAE residuals | 0.9614 | 84.88% | Scratch |
 | **ResNet-18** | CAE residuals | 0.9543 | 83.80% | Scratch |
 
-<!-- Figure: residual classifier training curves showing severe overfitting -->
-<p align="center">
-  <img src="assets/fig9_2_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
-   <img src="assets/fig9_3_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
-  <br><em>Figure 9.2 — Residual classifier training dynamics. Left: DenseNet-121 train vs val loss — best checkpoint at epoch 10 (val 0.3946), monotonic val deterioration to 0.8211 by epoch 30, train loss near zero. Right: ResNet-18 train vs val loss — checkpoints at epoch 5 (val 0.4213), remaining 25 epochs progressively worse. The two-order-of-magnitude train/val gap is severe overfitting driven by insufficient signal-to-noise in the residuals.</em>
-</p>
+
 
 **Per-class AUC on residuals:**
 
@@ -1303,7 +1305,6 @@ All weights are saved as PyTorch `.pth` checkpoint files. Each file contains `{'
 | AlexNet | 0.6589 | [Download](https://drive.google.com/your-link) |
 | CAE (smooth lens) | — | [Download](https://drive.google.com/your-link) |
 
-> *Replace all `/your-link` placeholders with actual Google Drive file IDs before publishing.*
 
 ---
 
