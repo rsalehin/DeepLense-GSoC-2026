@@ -789,27 +789,31 @@ Macro AUC
 
 ### 6.3 Parameter Efficiency
 
-```
-AUC
-0.9965 ┤    ●                                    ← DenseNet-121 (7.0M, pretrained)
-       │  ▲                                      ← E-ResNet (0.39M, SCRATCH)
-0.9950 ┤    ●   ●                                ← ResNet-50 (23.5M), ResNet-18 (11.2M)
-0.9900 ┤    ●                                    ← EfficientNet-B3 (10.7M)
-0.9800 ┤             ●                           ← ViT (85.4M)
-0.9000 ┤                              ●          ← VGG-16 (134.3M) ← WORST efficiency
-0.7500 ┤▲                                        ← ENN (shallow)
-0.7000 ┤                    ●                    ← AlexNet (57.0M)
-       └──────┬──────┬───────┬───────┬───────┬──
-              0.1   1.0    10.0    100   1000  Params (M, log scale)
-             ▲ from scratch  ● pretrained
-```
 
-**E-ResNet occupies the top-left corner**: highest AUC group, lowest parameter count of any competitive model, trained from scratch. This is the direct consequence of encoding the rotational symmetry of gravitational lensing — parameters are not spent learning what the physics already guarantees.
+
+**E-ResNet occupies the top-left corner** of the efficiency plot — competitive AUC 
+with the best pretrained models, at 0.39M parameters trained entirely from scratch. 
+The contrast with Equivariant-D4 (also from scratch, also tiny, but AUC only 0.73) 
+isolates the contribution of residual connections: equivariance alone is not 
+sufficient without sufficient depth and skip connections. Among pretrained models, 
+the DenseNet-121 / ResNet-18 / EfficientNet-B3 cluster achieves the best 
+AUC-per-parameter trade-off. ViT-Base (85M parameters) sits noticeably below the 
+convolutional cluster despite being the largest model in the pretrained group. 
+AlexNet is the outlier in the opposite direction — large parameter count (60M), 
+worst AUC among pretrained models (0.66).
 
 <!-- Figure: AUC vs parameter count scatter (log scale) -->
 <p align="center">
   <img src="assets/fig6_3_param_efficiency.png" alt="Parameter efficiency scatter: AUC vs parameter count" width="680"/>
-  <br><em>Figure 6.3 — Parameter efficiency scatter plot (log scale). Triangles = trained from scratch; circles = ImageNet pretrained. E-ResNet (triangle, top-left) demonstrates the parameter efficiency of encoding physical symmetry. VGG-16 (circle, bottom-right) is the worst-efficiency model.</em>
+  <br><em>Figure 6.3 — Parameter efficiency scatter (x-axis: parameter count in millions, log scale; 
+  y-axis: macro AUC on the val set). Triangles = trained from scratch; circles = ImageNet pretrained. 
+  E-ResNet (blue triangle, top-left) achieves AUC ≈ 1.00 at 0.39M parameters — the most 
+  parameter-efficient competitive model. Equivariant-D4 (orange triangle, far left) shows that 
+  equivariance alone without depth yields AUC only 0.73. The DenseNet-121, ResNet-18, and 
+  EfficientNet-B3 cluster (7–15M, AUC ≈ 1.00) represents the best pretrained efficiency frontier. 
+  ViT-Base (85M) falls below this frontier despite its large capacity. AlexNet (60M, AUC 0.66) 
+  is the worst-performing pretrained model — demonstrating that parameter count without skip 
+  connections provides no benefit for this task.</em>
 </p>
 
 ### 6.4 Key Takeaways
