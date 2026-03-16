@@ -157,7 +157,7 @@ Three properties of the data drive all modelling choices:
 
 <!-- Figure: pixel intensity distributions and ring statistics per class -->
 <p align="center">
-  <img src="assets/fig2_2_eda_statistics.png" alt="EDA: pixel intensity distributions and per-class ring statistics" width="800"/>
+  <img src="assets/fig2_2_eda_statistic.png" alt="EDA: pixel intensity distributions and per-class ring statistics" width="800"/>
   <br><em>Figure 2.2 — EDA statistics. Left: pixel intensity histograms per class — all three distributions are right-skewed, with background pixels near zero dominating. Right: per-class ring brightness and compactness distributions, showing the systematic difference between Sphere failures and correctly classified images.</em>
 </p>
 
