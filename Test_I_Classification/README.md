@@ -1052,17 +1052,23 @@ Sphere prediction flows:
 ### 8.2 Statistical Characterisation of Failures
 
 **E-ResNet Sphere false negative analysis (Mann-Whitney U test):**
+Sphere true positives: 2306 · Sphere false negatives (→ No Sub): 129
 
-| Feature | False negatives | Correct Sphere | p-value | Interpretation |
-|:--------|:--------------:|:--------------:|:-------:|:---------------|
-| Ring mean flux | 0.1423 | 0.1586 | 6.1×10⁻¹⁰ | SNR-limited detection |
-| Ring compactness | 0.659 | 0.637 | 3.8×10⁻⁸ | Point-like vs extended signal |
+| Feature | False negatives (FN) | True positives (TP) | p-value | Interpretation |
+|:--------|:--------------------:|:-------------------:|:-------:|:---------------|
+| Ring mean flux | 0.1423 | 0.1586 | 6.07×10⁻¹⁰ | SNR-limited detection — FN images are systematically dimmer |
+| Ring flux std (perturbation strength) | 0.1630 | 0.1699 | 2.91×10⁻³ | Weaker substructure perturbation amplitude in FN images |
+| Ring asymmetry | 0.0805 | 0.0782 | 8.99×10⁻¹ | Not significant — arc asymmetry does not predict failure |
 
-**E-ResNet Sphere→Vortex confusion (119 images, 2.4% of substructure val):**
+**E-ResNet Sphere↔Vortex confusion:**
+65 Sphere images predicted as Vortex · 54 Vortex images predicted as Sphere
+(119 total bidirectional confusions — distinct from the 64 universally-missed 
+Sphere images identified by the deep ensemble in Section 7.3, which are 
+misclassified as *No Substructure*, not Vortex)
 
 | Feature | Sphere→Vortex confused | Correctly classified Sphere | Interpretation |
 |:--------|:---------------------:|:---------------------------:|:---------------|
-| Mean elongation | ~1.20 | ~1.20 | Shape-independent |
+| Mean elongation | 1.177 | 1.206 | Confused images are marginally *less* elongated — not more |
 | Ring flux | Lower | Higher | SNR-driven confusion, not morphology-driven |
 
 The Sphere→Vortex confusion is **SNR-driven, not shape-driven**: confused images have nearly identical elongation metrics to correctly classified ones, ruling out morphological ambiguity as the primary cause.
@@ -1208,9 +1214,9 @@ Every well-converged model (AUC > 0.95) shows the same failure pattern: Sphere s
 
 | Architecture | Macro AUC | Parameters |
 |:-------------|:---------:|:----------:|
-| AlexNet (sequential) | 0.659 | 61M |
+| AlexNet (sequential) | 0.659 | 57.0M |
 | VGG-16 (sequential, deep) | 0.894 | 134M |
-| ResNet-18 (skip connections) | 0.993 | 11.7M |
+| ResNet-18 (skip connections) | 0.993 | 11.2M |
 
 The performance gap between sequential and residual architectures is the largest discontinuity in the benchmark. VGG-16 uses 12× more parameters than ResNet-18 yet achieves substantially lower AUC. For low-contrast, low-SNR classification tasks operating near a photon-statistics detection threshold, gradient accessibility to shallow feature detectors is a prerequisite.
 
