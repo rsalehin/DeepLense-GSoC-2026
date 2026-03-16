@@ -1078,8 +1078,7 @@ The Sphere→Vortex confusion is **SNR-driven, not shape-driven**: confused imag
 <!-- Figure: failure mode statistics — flux and compactness distributions, Mann-Whitney results -->
 <p align="center">
   <img src="assets/fig8_2_sphere_failure_statistics.png" alt="Sphere failure mode statistics: ring flux and compactness distributions" width="780"/>
-  <br><em>Figure 8.4 — Sphere TP vs FN morphological statistics (E-ResNet, computed on 
-normalised images). Left: ring mean flux — false negatives have systematically 
+  <br><em>Figure 8.4 — Sphere TP vs FN morphological statistics (computed on per-sample min-max normalised val images, n=2500 Sphere). Left: ring mean flux — false negatives have systematically 
 lower flux (p = 6.07×10⁻¹⁰), confirming SNR-limited detection. Centre: ring flux 
 std as a perturbation strength proxy — false negatives show weaker perturbation 
 signal (p = 2.91×10⁻³). Right: ring asymmetry — no significant difference between 
@@ -1112,7 +1111,10 @@ The 64 universally-missed images consistently fall in the low-flux, high-compact
   <img src="assets/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="760"/>
   <br><em>Figure 8.5 — Sphere classification confidence vs ring mean flux. Left: scatter plot of E-ResNet's Sphere class confidence against ring mean flux — the monotonic positive relationship reveals SNR as the primary detection bottleneck. The 64 silent failures cluster in the bottom-left (low flux, near-zero confidence). Right: calibration curves for all 9 architectures — models in Tier 1 are well-calibrated; AlexNet and ENN are severely under-confident.</em>
 </p>
-
+<p align="center">
+  <img src="assets/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="760"/>
+  <br><em>Figure 8.5 — Sphere classification confidence vs ring mean flux. Left: scatter plot of E-ResNet's Sphere class confidence against ring mean flux — the monotonic positive relationship reveals SNR as the primary detection bottleneck. The 64 silent failures cluster in the bottom-left (low flux, near-zero confidence). Right: calibration curves for all 9 architectures — models in Tier 1 are well-calibrated; AlexNet and ENN are severely under-confident.</em>
+</p> # Compactness figure
 ### 8.4 Physical Interpretation
 
 The Sphere class is systematically harder than Vortex because of a fundamental morphological asymmetry in the simulation:
