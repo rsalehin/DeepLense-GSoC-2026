@@ -891,7 +891,7 @@ ViT's attention shifts with perturbation position (the subhalo can appear anywhe
 
 <!-- Figure 7.2a: spatial attention grid — original / DenseNet Grad-CAM / ViT Rollout -->
 <p align="center">
-  <img src="assets/fig7_2a_spatial_attention_vit_densenet.png" alt="Spatial attention: DenseNet Grad-CAM vs ViT Attention Rollout" width="800"/>
+  <img src="assets/fig7_2a_spatial_attention_vit_densene.png" alt="Spatial attention: DenseNet Grad-CAM vs ViT Attention Rollout" width="800"/>
   <br><em>Figure 7.2a — Spatial attention comparison (rows: No Substructure, Sphere, Vortex; columns: original, DenseNet Grad-CAM, ViT Attention Rollout). DenseNet produces a blob artefact from spatial compression; ViT produces patch-resolution attention maps with class-dependent ring concentration.</em>
 </p>
 
