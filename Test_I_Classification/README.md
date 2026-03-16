@@ -917,6 +917,8 @@ ViT's attention shifts with perturbation position (the subhalo can appear anywhe
   <br><em>Figure 7.2d — ViT attention consistency. Top row: mean attention maps per class. Bottom row: standard deviation maps. Substructure classes show markedly higher std (bright hotspots within the ring), reflecting position-dependent perturbation localisation instability.</em>
 </p>
 
+### 7.3 Predictive Uncertainty — Deep Ensemble
+
 A 6-model deep ensemble (DenseNet-121, ResNet-50, ResNet-18, EfficientNet-B3, ViT-Base, E-ResNet) is used to compute predictive entropy as a proxy for epistemic uncertainty.
 
 ```
@@ -927,8 +929,8 @@ Low H  → consensus prediction  → reliable output
 
 **Key findings:**
 
-- High-entropy images are dominated by Sphere class — consistent with Sphere being the hardest class across all architectures.
-- **62 Sphere images** are misclassified as No Substructure **with near-zero entropy** by all 6 models — confident consensus failures. These constitute the most dangerous failure mode: they pass through any entropy-based triage filter undetected.
+- Sphere has significantly higher entropy than Vortex (p≈0), but not significantly higher than No Substructure (p=1.0). The Sphere distribution is bimodal — most images are easy (low entropy) but the hard tail is larger than for Vortex.
+- **64 Sphere images** are misclassified as No Substructure **with near-zero entropy** by all 6 models — confident consensus failures. These constitute the most dangerous failure mode: they pass through any entropy-based triage filter undetected.
 - Low-entropy failures are morphologically identified as sparse-arc images (low ring mean flux) in Section 8.
 
 <!-- Figure: deep ensemble entropy distribution — per class and per-image scatter -->
@@ -1076,7 +1078,7 @@ The Sphere→Vortex confusion is **SNR-driven, not shape-driven**: confused imag
 <!-- Figure: failure mode statistics — flux and compactness distributions, Mann-Whitney results -->
 <p align="center">
   <img src="assets/fig8_2_sphere_failure_statistics.png" alt="Sphere failure mode statistics: ring flux and compactness distributions" width="780"/>
-  <br><em>Figure 8.2 — Sphere TP vs FN morphological statistics (E-ResNet, computed on 
+  <br><em>Figure 8.4 — Sphere TP vs FN morphological statistics (E-ResNet, computed on 
 normalised images). Left: ring mean flux — false negatives have systematically 
 lower flux (p = 6.07×10⁻¹⁰), confirming SNR-limited detection. Centre: ring flux 
 std as a perturbation strength proxy — false negatives show weaker perturbation 
@@ -1108,7 +1110,7 @@ The 64 universally-missed images consistently fall in the low-flux, high-compact
 <!-- Figure: confidence vs ring brightness scatter and calibration curves -->
 <p align="center">
   <img src="assets/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="760"/>
-  <br><em>Figure 8.3 — Sphere classification confidence vs ring mean flux. Left: scatter plot of E-ResNet's Sphere class confidence against ring mean flux — the monotonic positive relationship reveals SNR as the primary detection bottleneck. The 64 silent failures cluster in the bottom-left (low flux, near-zero confidence). Right: calibration curves for all 9 architectures — models in Tier 1 are well-calibrated; AlexNet and ENN are severely under-confident.</em>
+  <br><em>Figure 8.5 — Sphere classification confidence vs ring mean flux. Left: scatter plot of E-ResNet's Sphere class confidence against ring mean flux — the monotonic positive relationship reveals SNR as the primary detection bottleneck. The 64 silent failures cluster in the bottom-left (low flux, near-zero confidence). Right: calibration curves for all 9 architectures — models in Tier 1 are well-calibrated; AlexNet and ENN are severely under-confident.</em>
 </p>
 
 ### 8.4 Physical Interpretation
@@ -1152,18 +1154,13 @@ The CAE is trained on **No Substructure images only**, learning to reconstruct t
 
 | Class | Mean residual | Std residual | Mean |residual| |
 |:------|:-------------:|:------------:|:-------------------:|
-| No Substructure | ≈ 0 | Low | Low (noise-like) |
-| Sphere | Positive peak | Higher | **Moderate** |
-| Vortex | Asymmetric | Higher | **Moderate** |
+No Substructure:  mean=0.03290, std=0.18149, mean|residual|=0.12398
+Sphere:           mean=0.03915, std=0.15966, mean|residual|=0.10564
+Vortex:           mean=0.04661, std=0.17307, mean|residual|=0.11574
 
 ### 9.3 Residual Classifiers
 
-<!-- Figure: residual classifier training curves showing severe overfitting -->
-<p align="center">
-  <img src="assets/fig9_2_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
-   <img src="assets/fig9_3_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
-  <br><em>Figure 9.2 — Residual classifier training dynamics. Left: DenseNet-121 train vs val loss — best checkpoint at epoch 10 (val 0.3946), monotonic val deterioration to 0.8211 by epoch 30, train loss near zero. Right: ResNet-18 train vs val loss — checkpoints at epoch 5 (val 0.4213), remaining 25 epochs progressively worse. The two-order-of-magnitude train/val gap is severe overfitting driven by insufficient signal-to-noise in the residuals.</em>
-</p>
+
 
 Two classifiers were trained on CAE residuals:
 
@@ -1173,6 +1170,12 @@ Two classifiers were trained on CAE residuals:
 | **DenseNet-121** | CAE residuals | 0.9614 | 84.88% | Scratch |
 | **ResNet-18** | CAE residuals | 0.9543 | 83.80% | Scratch |
 
+<!-- Figure: residual classifier training curves showing severe overfitting -->
+<p align="center">
+  <img src="assets/fig9_2_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
+   <img src="assets/fig9_3_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
+  <br><em>Figure 9.2 — Residual classifier training dynamics. Left: DenseNet-121 train vs val loss — best checkpoint at epoch 10 (val 0.3946), monotonic val deterioration to 0.8211 by epoch 30, train loss near zero. Right: ResNet-18 train vs val loss — checkpoints at epoch 5 (val 0.4213), remaining 25 epochs progressively worse. The two-order-of-magnitude train/val gap is severe overfitting driven by insufficient signal-to-noise in the residuals.</em>
+</p>
 
 
 **Per-class AUC on residuals:**
@@ -1242,7 +1245,7 @@ DenseNet-121 achieves the highest macro AUC (0.9962), Sphere Recall (0.9364), an
 ### 11.2 Model Limitations
 
 - **D₄ covers only 90° multiples:** Real lenses appear at arbitrary position angles. Full continuous SO(2) equivariance requires steerable CNNs.
-- **62 confident failures:** The deep ensemble identifies 62 Sphere images misclassified with high confidence by all models. These pass through any entropy-based triage filter — an operational safety concern for deployed pipelines.
+- **64 confident failures:** The deep ensemble identifies 62 Sphere images misclassified with high confidence by all models. These pass through any entropy-based triage filter — an operational safety concern for deployed pipelines.
 - **CAE bottleneck:** The 128-dimensional CAE bottleneck has not been studied systematically. Too-large → memorises substructure; too-small → fails to capture arc shape variation.
 - **Calibration under distribution shift:** Ensemble entropy analysis assumes val distribution = train distribution. Calibration experiments under controlled PSF/noise/background shifts are needed before deployment.
 
@@ -1262,7 +1265,7 @@ Five research directions are prioritised based on where current architectures fa
 D₄ covers only 90° multiples; real lenses appear at arbitrary angles. Upgrading to SO(2) or C₈ steerable CNNs would provide continuous rotation equivariance at a smaller parameter budget than achieving equivalent invariance through augmentation. The ablation result — augmentation is the dominant driver, not residual connections — directly motivates replacing D₄-plus-augmentation with a tighter architectural prior.
 
 **2. Silent failure detection via anomaly scoring.**
-The 62 silent Sphere failures (confident consensus errors across 6 models) are the most dangerous operational failure mode. The CAE smooth-lens manifold provides a natural one-class anomaly score: the residual norm within the ring annulus, calibrated against the reconstruction noise floor. Testing whether this score identifies silent failures while remaining below false alarm thresholds on true No Substructure images would directly address the operational safety gap.
+The 64 silent Sphere failures (confident consensus errors across 6 models) are the most dangerous operational failure mode. The CAE smooth-lens manifold provides a natural one-class anomaly score: the residual norm within the ring annulus, calibrated against the reconstruction noise floor. Testing whether this score identifies silent failures while remaining below false alarm thresholds on true No Substructure images would directly address the operational safety gap.
 
 **3. Ring-local perturbation detection head.**
 The interpretability analysis establishes that the discriminative challenge is not identifying the ring but *localising a compact perturbation within* the ring. A ring-local detection architecture — a lightweight ring-finder fitting the Einstein ring, followed by a perturbation classifier operating on a polar-reparameterised ring-local patch — would decouple the two tasks. The polar reparameterisation converts perturbation position to a translation problem, making smaller, more data-efficient detectors viable.
@@ -1344,7 +1347,7 @@ If you use this work, please cite the ML4SCI DeepLense project and the DeepLense
 
 ```bibtex
 @misc{deeplense_gsoc2026_testi,
-  author       = {[Rafiqus Salehin]},
+  author       = {Rafiqus Salehin},
   title        = {ML4SCI DeepLense GSoC 2026 — Common Test I:
                   Multi-Class Classification of Dark Matter Substructure},
   year         = {2026},
