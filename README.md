@@ -129,7 +129,7 @@ Masked Autoencoder pre-training builds a general-purpose feature representation 
 
 ---
 
-## 🛠 Common Dependencies
+##  Common Dependencies
 
 All tests use Python 3.10 and PyTorch 2.x. Test-specific requirements are listed in each folder's `requirements.txt`. Shared core dependencies:
 
@@ -151,7 +151,7 @@ For project enquiries: [ml4-sci@cern.ch](mailto:ml4-sci@cern.ch) — *please inc
 
 ---
 
-## 📚 References
+##  References
 
 - Alexander, S., Gleyzer, S., McDonough, E., Toomey, M. W., & Usai, E. (2020). "Deep Learning the Morphology of Dark Matter Substructure." *The Astrophysical Journal*.
 - He, K., Zhang, X., Ren, S., & Sun, J. (2016). "Deep Residual Learning for Image Recognition." *CVPR*.
