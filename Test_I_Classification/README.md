@@ -114,7 +114,7 @@ Distinguishing these classes at scale — across thousands of images, near the d
 
 <!-- Figure: one representative image per class, shown side by side -->
 <p align="center">
-  <img src="figures/fig2_1_sample_images.png" alt="Sample lensing images — No Substructure, Sphere, Vortex" width="700"/>
+  <img src="assets/fig2_1_sample_images.png" alt="Sample lensing images — No Substructure, Sphere, Vortex" width="700"/>
   <br><em>Figure 2.1 — Representative 150×150 single-channel images for each class. All three share the same Einstein ring morphology; the Sphere knot and Vortex arc asymmetry are subtle perturbations visible only on close inspection.</em>
 </p>
 
@@ -157,7 +157,7 @@ Three properties of the data drive all modelling choices:
 
 <!-- Figure: pixel intensity distributions and ring statistics per class -->
 <p align="center">
-  <img src="figures/fig2_2_eda_statistics.png" alt="EDA: pixel intensity distributions and per-class ring statistics" width="800"/>
+  <img src="assets/fig2_2_eda_statistics.png" alt="EDA: pixel intensity distributions and per-class ring statistics" width="800"/>
   <br><em>Figure 2.2 — EDA statistics. Left: pixel intensity histograms per class — all three distributions are right-skewed, with background pixels near zero dominating. Right: per-class ring brightness and compactness distributions, showing the systematic difference between Sphere failures and correctly classified images.</em>
 </p>
 
@@ -300,7 +300,7 @@ No Substructure     0.9576    0.9700    0.9638      2500
 
 <!-- Figure: ResNet-18 confusion matrix and ROC/PR curves -->
 <p align="center">
-  <img src="figures/fig5_1_resnet18_eval.png" alt="ResNet-18 confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_1_resnet18_eval.png" alt="ResNet-18 confusion matrix and curves" width="750"/>
   <br><em>Figure 5.1 — ResNet-18 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right).</em>
 </p>
 
@@ -350,7 +350,7 @@ No Substructure     0.9709    0.9708    0.9709      2500
 
 <!-- Figure: ResNet-50 confusion matrix and curves -->
 <p align="center">
-  <img src="figures/fig5_2_resnet50_eval.png" alt="ResNet-50 confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_2_resnet50_eval.png" alt="ResNet-50 confusion matrix and curves" width="750"/>
   <br><em>Figure 5.2 — ResNet-50 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right).</em>
 </p>
 
@@ -400,7 +400,7 @@ No Substructure     0.9765    0.9800    0.9782      2500
 
 <!-- Figure: DenseNet-121 confusion matrix and curves -->
 <p align="center">
-  <img src="figures/fig5_3_densenet121_eval.png" alt="DenseNet-121 confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_3_densenet121_eval.png" alt="DenseNet-121 confusion matrix and curves" width="750"/>
   <br><em>Figure 5.3 — DenseNet-121 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right). Best overall performance across all metrics.</em>
 </p>
 
@@ -452,7 +452,7 @@ No Substructure     0.9583    0.9716    0.9649      2500
 
 <!-- Figure: EfficientNet-B3 confusion matrix and curves -->
 <p align="center">
-  <img src="figures/fig5_4_efficientnetb3_eval.png" alt="EfficientNet-B3 confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_4_efficientnetb3_eval.png" alt="EfficientNet-B3 confusion matrix and curves" width="750"/>
   <br><em>Figure 5.4 — EfficientNet-B3 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right).</em>
 </p>
 
@@ -503,7 +503,7 @@ No Substructure     0.4912    0.7836    0.6039      2500
 
 <!-- Figure: AlexNet confusion matrix — demonstrates near-random Sphere behaviour -->
 <p align="center">
-  <img src="figures/fig5_5_alexnet_eval.png" alt="AlexNet confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_5_alexnet_eval.png" alt="AlexNet confusion matrix and curves" width="750"/>
   <br><em>Figure 5.5 — AlexNet evaluation: the confusion matrix reveals near-random Sphere classification (recall 0.124). Gradient inaccessibility to early feature layers is the primary failure mechanism.</em>
 </p>
 
@@ -556,7 +556,7 @@ No Substructure     0.7748    0.8636    0.8168      2500
 
 <!-- Figure: VGG-16 confusion matrix -->
 <p align="center">
-  <img src="figures/fig5_6_vgg16_eval.png" alt="VGG-16 confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_6_vgg16_eval.png" alt="VGG-16 confusion matrix and curves" width="750"/>
   <br><em>Figure 5.6 — VGG-16 evaluation: Sphere recall of 0.504 despite 134M parameters. Training instability from the absence of batch normalisation is visible in the loss curves.</em>
 </p>
 
@@ -605,7 +605,7 @@ No Substructure     0.9177    0.9600    0.9384      2500
 
 <!-- Figure: ViT attention rollout maps per class -->
 <p align="center">
-  <img src="figures/fig5_7_vit_eval.png" alt="ViT-Base confusion matrix and attention rollout" width="750"/>
+  <img src="assets/fig5_7_vit_eval.png" alt="ViT-Base confusion matrix and attention rollout" width="750"/>
   <br><em>Figure 5.7 — ViT-Base evaluation: confusion matrix (left), ROC/PR curves (centre), and representative attention rollout maps per class (right). ViT shows class-dependent ring concentration but unstable attention for substructure classes.</em>
 </p>
 
@@ -635,7 +635,7 @@ No Substructure     0.9177    0.9600    0.9384      2500
 
 <!-- Figure: ENN (D4) confusion matrix -->
 <p align="center">
-  <img src="figures/fig5_8_enn_eval.png" alt="Equivariant-D4 ENN confusion matrix and curves" width="750"/>
+  <img src="assets/fig5_8_enn_eval.png" alt="Equivariant-D4 ENN confusion matrix and curves" width="750"/>
   <br><em>Figure 5.8 — Equivariant-D4 (ENN) evaluation: the shallow architecture demonstrates that equivariance alone is insufficient — depth and skip connections are required to bring AUC into the competitive range.</em>
 </p>
 
@@ -710,7 +710,7 @@ No Substructure     0.9413    0.9880    0.9641      2500
 
 <!-- Figure: E-ResNet confusion matrix, ROC/PR curves -->
 <p align="center">
-  <img src="figures/fig5_9_eresnet_eval.png" alt="E-ResNet confusion matrix and evaluation curves" width="750"/>
+  <img src="assets/fig5_9_eresnet_eval.png" alt="E-ResNet confusion matrix and evaluation curves" width="750"/>
   <br><em>Figure 5.9 — E-ResNet evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right). Second-best macro AUC at 0.39M parameters trained from scratch.</em>
 </p>
 
@@ -740,7 +740,7 @@ All nine architectures evaluated on the predefined val partition (7,500 images, 
 
 <!-- Figure: 9-model macro-averaged ROC comparison -->
 <p align="center">
-  <img src="figures/fig6_1_roc_comparison.png" alt="Macro-averaged ROC curves for all 9 architectures" width="720"/>
+  <img src="assets/fig6_1_roc_comparison.png" alt="Macro-averaged ROC curves for all 9 architectures" width="720"/>
   <br><em>Figure 6.1 — Macro-averaged ROC curves for all nine architectures. Three performance tiers are clearly visible. The Tier 1 cluster (DenseNet-121, E-ResNet, ResNet-50, ResNet-18, EfficientNet-B3) sits near the top-left corner with curves nearly indistinguishable at this scale.</em>
 </p>
 
@@ -771,7 +771,7 @@ Macro AUC
 
 <!-- Figure: Sphere-class precision-recall curves -->
 <p align="center">
-  <img src="figures/fig6_2_sphere_pr_curves.png" alt="Sphere-class precision-recall curves for all 9 architectures" width="700"/>
+  <img src="assets/fig6_2_sphere_pr_curves.png" alt="Sphere-class precision-recall curves for all 9 architectures" width="700"/>
   <br><em>Figure 6.2 — Sphere-class precision-recall curves. The PR view reveals differentiation invisible in macro AUC: DenseNet-121 leads at PR-AUC 0.9903, while EfficientNet-B3 trails at 0.9749. AlexNet at 0.4380 is barely above the random baseline of 0.33.</em>
 </p>
 
@@ -796,7 +796,7 @@ AUC
 
 <!-- Figure: AUC vs parameter count scatter (log scale) -->
 <p align="center">
-  <img src="figures/fig6_3_param_efficiency.png" alt="Parameter efficiency scatter: AUC vs parameter count" width="680"/>
+  <img src="assets/fig6_3_param_efficiency.png" alt="Parameter efficiency scatter: AUC vs parameter count" width="680"/>
   <br><em>Figure 6.3 — Parameter efficiency scatter plot (log scale). Triangles = trained from scratch; circles = ImageNet pretrained. E-ResNet (triangle, top-left) demonstrates the parameter efficiency of encoding physical symmetry. VGG-16 (circle, bottom-right) is the worst-efficiency model.</em>
 </p>
 
@@ -831,7 +831,9 @@ Grad-CAM maps (weighted gradient activations at the final conv layer) are compar
 
 <!-- Figure: Grad-CAM comparison grid — ResNet-50 vs E-ResNet, 3 classes -->
 <p align="center">
-  <img src="figures/fig7_1_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="800"/>
+  <img src="assets/fig7_1_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="800"/>
+   <img src="assets/fig7_2_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="800"/>
+   <img src="assets/fig7_3_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="800"/>
   <br><em>Figure 7.1 — Grad-CAM spatial attention comparison. Rows: No Substructure, Sphere, Vortex. Columns: original image, ResNet-50 Grad-CAM, E-ResNet Grad-CAM, difference map (red = E-ResNet higher, blue = ResNet-50 higher). E-ResNet follows the arc perimeter; ResNet-50 partially attends to the dark ring interior.</em>
 </p>
 
@@ -877,25 +879,25 @@ ViT's attention shifts with perturbation position (the subhalo can appear anywhe
 
 <!-- Figure 7.2a: spatial attention grid — original / DenseNet Grad-CAM / ViT Rollout -->
 <p align="center">
-  <img src="figures/fig7_2a_spatial_attention_vit_densenet.png" alt="Spatial attention: DenseNet Grad-CAM vs ViT Attention Rollout" width="800"/>
+  <img src="assets/fig7_2a_spatial_attention_vit_densenet.png" alt="Spatial attention: DenseNet Grad-CAM vs ViT Attention Rollout" width="800"/>
   <br><em>Figure 7.2a — Spatial attention comparison (rows: No Substructure, Sphere, Vortex; columns: original, DenseNet Grad-CAM, ViT Attention Rollout). DenseNet produces a blob artefact from spatial compression; ViT produces patch-resolution attention maps with class-dependent ring concentration.</em>
 </p>
 
 <!-- Figure 7.2b: DenseNet resolution diagnostic -->
 <p align="center">
-  <img src="figures/fig7_2b_densenet_resolution.png" alt="DenseNet Grad-CAM resolution diagnostic" width="800"/>
+  <img src="assets/fig7_2b_densenet_resolution.png" alt="DenseNet Grad-CAM resolution diagnostic" width="800"/>
   <br><em>Figure 7.2b — DenseNet-121 resolution diagnostic. Columns: original (150×150), raw denseblock4 feature map at native ~4×5 pixel resolution (grid lines show actual pixel boundaries), bicubic upsampled map, final Grad-CAM overlay. The blob is entirely explained by the 30× upsampling from 4×5 pixels.</em>
 </p>
 
 <!-- Figure 7.2c: ViT ring concentration by class -->
 <p align="center">
-  <img src="figures/fig7_2c_vit_ring_concentration.png" alt="ViT ring concentration score by class" width="600"/>
+  <img src="assets/fig7_2c_vit_ring_concentration.png" alt="ViT ring concentration score by class" width="600"/>
   <br><em>Figure 7.2c — ViT ring concentration score by class. Substructure classes (Sphere: 0.472, Vortex: 0.475) show significantly higher ring attention than No Substructure (0.369), confirming class-dependent spatial strategy.</em>
 </p>
 
 <!-- Figure 7.2d: ViT attention consistency (mean ± std maps) -->
 <p align="center">
-  <img src="figures/fig7_2d_vit_attention_consistency.png" alt="ViT attention consistency: mean and std maps per class" width="700"/>
+  <img src="assets/fig7_2d_vit_attention_consistency.png" alt="ViT attention consistency: mean and std maps per class" width="700"/>
   <br><em>Figure 7.2d — ViT attention consistency. Top row: mean attention maps per class. Bottom row: standard deviation maps. Substructure classes show markedly higher std (bright hotspots within the ring), reflecting position-dependent perturbation localisation instability.</em>
 </p>
 
@@ -915,7 +917,8 @@ Low H  → consensus prediction  → reliable output
 
 <!-- Figure: deep ensemble entropy distribution — per class and per-image scatter -->
 <p align="center">
-  <img src="figures/fig7_3_ensemble_entropy.png" alt="Deep ensemble predictive entropy distributions" width="760"/>
+  <img src="assets/fig7_3_ensemble_entropy.png" alt="Deep ensemble predictive entropy distributions" width="760"/>
+   <img src="assets/fig7_4_ensemble_entropy.png" alt="Deep ensemble predictive entropy distributions" width="760"/>
   <br><em>Figure 7.3 — Deep ensemble entropy analysis. Left: entropy distributions per class — Sphere images skew toward higher entropy than No Substructure and Vortex. Centre: per-image entropy scatter coloured by ground truth class, highlighting the 62 low-entropy Sphere failures (bottom-left cluster, circled). Right: example images from each quadrant (high/low entropy × correct/incorrect).</em>
 </p>
 
@@ -943,7 +946,7 @@ Four controlled runs isolate the contribution of residual connections and D₄ a
 
 <!-- Figure: ablation training curves — val loss over epochs for all 4 runs -->
 <p align="center">
-  <img src="figures/fig7_4_ablation_training_curves.png" alt="Ablation study training curves for Runs A–D" width="760"/>
+  <img src="assets/fig7_4_ablation_training_curves.png" alt="Ablation study training curves for Runs A–D" width="760"/>
   <br><em>Figure 7.4 — Ablation training dynamics. Left: validation loss curves for Runs A–D showing augmentation's dominant effect on convergence speed and final loss. Centre: macro AUC bar chart comparing the four runs. Right: Sphere recall bar chart — the metric most sensitive to the augmentation vs residual trade-off. Note the val loss spike in Run C (E-ResNet, no aug) at epoch 33, a gradient explosion event that early stopping caught at epoch 34.</em>
 </p>
 
@@ -969,7 +972,7 @@ E-ResNet achieves 2.5× better empirical invariance than an augmented ResNet-50,
 
 <!-- Figure: equivariance verification — L2 divergence bar chart, Stage 1 and Stage 2 -->
 <p align="center">
-  <img src="figures/fig7_5_equivariance_verification.png" alt="Rotation invariance verification: L2 probability divergence" width="720"/>
+  <img src="assets/fig7_5_equivariance_verification.png" alt="Rotation invariance verification: L2 probability divergence" width="720"/>
   <br><em>Figure 7.5 — Rotation invariance verification. Left: Stage 1 (untrained models) — mean L₂ probability divergence under 90°/180°/270° rotations for E-ResNet, EPlainCNN, and ResNet-50. The untrained E-ResNet is 37.3× more stable than ResNet-50. Right: Stage 2 (trained models) — empirical invariance after full training. E-ResNet achieves 2.5× better invariance than augmented ResNet-50.</em>
 </p>
 
@@ -989,8 +992,13 @@ Sphere prediction flows:
                                                 →  Vortex (rare)
 ─────────────────────────────────────────────────────
 ```
-
+<p align="center">
+  <img src="assets/fig8_1_universally_misclassified_correct.png" alt="Cross-architecture confusion matrices" width="900"/>
+  <br><em>Figure 8.1 — Confusion matrices for all nine architectures (sorted by macro AUC). The universal pattern — Sphere misclassified predominantly as No Substructure, not Vortex — is visible across every well-converged model. This one-directional confusion is physically interpretable: Sphere perturbations are morphologically similar to smooth arcs.</em>
 The one-directional Sphere→No Sub confusion is *physically interpretable*: spherical subhalos produce compact, approximately symmetric perturbations — morphologically similar to smooth arcs. Models are not failing randomly; they are resolving genuine physical ambiguity at the low-mass end of the subhalo distribution.
+<p align="center">
+  <img src="assets/fig8_1_sphere_class_difficulty.png" alt="Cross-architecture confusion matrices" width="900"/>
+  <br><em>Figure 8.1 — Confusion matrices for all nine architectures (sorted by macro AUC). The universal pattern — Sphere misclassified predominantly as No Substructure, not Vortex — is visible across every well-converged model. This one-directional confusion is physically interpretable: Sphere perturbations are morphologically similar to smooth arcs.</em>
 
 **E-ResNet universally missed images:** 64 Sphere images are misclassified as No Substructure by all 6 ensemble models with near-zero entropy. These images have statistically distinct morphological properties:
 
@@ -1001,7 +1009,7 @@ The one-directional Sphere→No Sub confusion is *physically interpretable*: sph
 
 <!-- Figure: cross-architecture confusion matrices for all 9 models side by side -->
 <p align="center">
-  <img src="figures/fig8_1_cross_arch_confusion.png" alt="Cross-architecture confusion matrices" width="900"/>
+  <img src="assets/fig8_1_cross_arch_confusion.png" alt="Cross-architecture confusion matrices" width="900"/>
   <br><em>Figure 8.1 — Confusion matrices for all nine architectures (sorted by macro AUC). The universal pattern — Sphere misclassified predominantly as No Substructure, not Vortex — is visible across every well-converged model. This one-directional confusion is physically interpretable: Sphere perturbations are morphologically similar to smooth arcs.</em>
 </p>
 
@@ -1025,8 +1033,14 @@ The Sphere→Vortex confusion is **SNR-driven, not shape-driven**: confused imag
 
 <!-- Figure: failure mode statistics — flux and compactness distributions, Mann-Whitney results -->
 <p align="center">
-  <img src="figures/fig8_2_sphere_failure_statistics.png" alt="Sphere failure mode statistics: ring flux and compactness distributions" width="780"/>
-  <br><em>Figure 8.2 — Sphere false negative analysis. Left: ring mean flux distributions for correctly classified Sphere (blue) vs false negatives (red) — the 9% flux gap is statistically significant at p = 6.1×10⁻¹⁰. Centre: ring compactness distributions — false negatives are more point-like (p = 3.8×10⁻⁸). Right: example false negative images showing sparse-arc morphology with a compact central spike dominating the min-max normalisation.</em>
+  <img src="assets/fig8_2_sphere_failure_statistics.png" alt="Sphere failure mode statistics: ring flux and compactness distributions" width="780"/>
+  <br><em>Figure 8.2 — Sphere TP vs FN morphological statistics (E-ResNet, computed on 
+normalised images). Left: ring mean flux — false negatives have systematically 
+lower flux (p = 6.07×10⁻¹⁰), confirming SNR-limited detection. Centre: ring flux 
+std as a perturbation strength proxy — false negatives show weaker perturbation 
+signal (p = 2.91×10⁻³). Right: ring asymmetry — no significant difference between 
+TP and FN (p = 0.899), ruling out arc asymmetry as a failure predictor. 
+True Positives n=2306, False Negatives n=129.</em>
 </p>
 
 ### 8.3 Confidence vs Ring Brightness
@@ -1051,7 +1065,7 @@ The 64 universally-missed images consistently fall in the low-flux, high-compact
 
 <!-- Figure: confidence vs ring brightness scatter and calibration curves -->
 <p align="center">
-  <img src="figures/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="760"/>
+  <img src="assets/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="760"/>
   <br><em>Figure 8.3 — Sphere classification confidence vs ring mean flux. Left: scatter plot of E-ResNet's Sphere class confidence against ring mean flux — the monotonic positive relationship reveals SNR as the primary detection bottleneck. The 64 silent failures cluster in the bottom-left (low flux, near-zero confidence). Right: calibration curves for all 9 architectures — models in Tier 1 are well-calibrated; AlexNet and ENN are severely under-confident.</em>
 </p>
 
@@ -1088,7 +1102,7 @@ The CAE is trained on **No Substructure images only**, learning to reconstruct t
 
 <!-- Figure: CAE reconstruction examples — original / reconstruction / residual per class -->
 <p align="center">
-  <img src="figures/fig9_1_cae_residuals.png" alt="CAE residual visualisation: original, reconstruction, residual per class" width="800"/>
+  <img src="assets/fig9_1_cae_residuals.png" alt="CAE residual visualisation: original, reconstruction, residual per class" width="800"/>
   <br><em>Figure 9.1 — CAE residual visualisation (n=1 example per class). Columns: original image, fitted clean lens (CAE reconstruction), residual full range, residual clipped ±0.1. No Substructure residuals are noise-like (near-zero); Sphere residuals show a compact positive peak at the subhalo location; Vortex residuals show asymmetric arc perturbations.</em>
 </p>
 
@@ -1112,7 +1126,8 @@ Two classifiers were trained on CAE residuals:
 
 <!-- Figure: residual classifier training curves showing severe overfitting -->
 <p align="center">
-  <img src="figures/fig9_2_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
+  <img src="assets/fig9_2_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
+   <img src="assets/fig9_3_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
   <br><em>Figure 9.2 — Residual classifier training dynamics. Left: DenseNet-121 train vs val loss — best checkpoint at epoch 10 (val 0.3946), monotonic val deterioration to 0.8211 by epoch 30, train loss near zero. Right: ResNet-18 train vs val loss — checkpoints at epoch 5 (val 0.4213), remaining 25 epochs progressively worse. The two-order-of-magnitude train/val gap is severe overfitting driven by insufficient signal-to-noise in the residuals.</em>
 </p>
 
@@ -1133,11 +1148,6 @@ Two classifiers were trained on CAE residuals:
 | DenseNet-121 train/val loss gap at epoch 30 | 0.0013 vs 0.8211 (severe overfitting) |
 | ResNet-18 best checkpoint epoch | Epoch 5 |
 
-<!-- Figure: raw vs residual AUC comparison bar chart and ROC overlay -->
-<p align="center">
-  <img src="figures/fig9_3_raw_vs_residual_auc.png" alt="Raw image vs CAE residual classifier AUC comparison" width="700"/>
-  <br><em>Figure 9.3 — Raw image vs residual classifier comparison. Left: per-class AUC bars for raw DenseNet-121 (pretrained), residual DenseNet-121 (scratch), residual ResNet-18 (scratch). The 0.034 macro AUC gap quantifies the information cost of CAE preprocessing. Right: ROC curves overlaid — residual classifiers fall clearly below the raw-image baseline across all three classes, with Sphere showing the largest gap.</em>
-</p>
 
 **Conclusion:** For this homogeneous simulated dataset, classifying raw images directly is the correct engineering choice. The residual approach demonstrates that isolated perturbation signal contains real discriminative information (AUC well above 0.5), but introduces:
 1. A reconstruction noise penalty from CAE artefacts
