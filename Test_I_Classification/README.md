@@ -1002,14 +1002,14 @@ E-ResNet achieves 2.5× better empirical invariance than an augmented ResNet-50,
 
 The Sphere misclassification pattern is **universal** across all well-converged models:
 
-```
+<pre>
 Sphere prediction flows:
 ─────────────────────────────────────────────────────
   Correctly classified Sphere   ──────────────────→  Sphere
   Misclassified Sphere  ────────────────────────→  No Substructure (dominant)
                                                 →  Vortex (rare)
 ─────────────────────────────────────────────────────
-```
+</pre>
 <p align="center">
   <img src="assets/fig8_1_universally_misclassified_correct.png" alt="Universally misclassified vs universally correct Sphere images" width="900"/>
   <br><em>Figure 8.1 — Sphere subhalo images: universally misclassified (top row) vs universally correct (bottom row), 
