@@ -833,8 +833,7 @@ On macro AUC, DenseNet-121 and E-ResNet are nearly indistinguishable (0.9962 vs 
 
 ### 7.1 Grad-CAM: ResNet-50 vs E-ResNet
 
-Grad-CAM maps (weighted gradient activations at the final conv layer) are compared for ResNet-50 and E-ResNet across all three classes.
-
+Grad-CAM maps (weighted gradient activations at the final conv layer) are compared for ResNet-50 (Classical CAM) and E-ResNet across all three classes.
 **Summary of spatial attention strategies:**
 
 | Class | ResNet-50 attention | E-ResNet attention | Physical correctness |
@@ -847,13 +846,13 @@ Grad-CAM maps (weighted gradient activations at the final conv layer) are compar
 
 <!-- Figure: Grad-CAM comparison grid — ResNet-50 vs E-ResNet, 3 classes -->
 <p align="center">
-  <img src="assets/fig7_1_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="800"/>
-   <img src="assets/fig7_2_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="800"/>
-   <img src="assets/fig7_3_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="800"/>
+  <img src="assets/fig7_1_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="95%"/>
+   <img src="assets/fig7_2_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="95%"/>
+   <img src="assets/fig7_3_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="95%"/>
   <br><em>Figure 7.1 — Grad-CAM spatial attention comparison. Rows: No Substructure, Sphere, Vortex. Columns: original image, ResNet-50 Grad-CAM, E-ResNet Grad-CAM, difference map (red = E-ResNet higher, blue = ResNet-50 higher). E-ResNet follows the arc perimeter; ResNet-50 partially attends to the dark ring interior.</em>
 </p>
 
-**Case analysis (disagreement study, 100-image subsets):**
+**Case analysis — ResNet-50 vs E-ResNet disagreement (full val set, n=7,500):**
 
 | Case | Description | Count | Key finding |
 |:-----|:------------|:-----:|:------------|
@@ -861,6 +860,26 @@ Grad-CAM maps (weighted gradient activations at the final conv layer) are compar
 | E-ResNet wrong only | E-ResNet false alarms (over-sensitivity) | 131 | Over-detection of perturbations not present |
 | ResNet-50 wrong only | ResNet-50 misses localised Sphere | 142 | 87 Sphere misses — imprecise spatial attention |
 | Both wrong | Jointly fail — signal-limited, not attention-limited | ~252 | Both look at arc correctly; signal below threshold |
+
+*Grad-CAM maps below are visualised on a stratified 100-image subset (33 per class). Counts are from the full val set (n=7,500).*
+
+<!-- Case 2: E-ResNet wrong, ResNet-50 correct -->
+<p align="center">
+  <img src="assets/fig6_1_case2_gradcam.png" alt="Case 2: E-ResNet false alarm, ResNet-50 correct" width="95%"/>
+  <br><em>Figure 7.1b — Case 2 (E-ResNet wrong, ResNet-50 correct): E-ResNet over-detects a perturbation that isn't there, while ResNet-50 correctly classifies the image. E-ResNet's arc-following sensitivity, its strength on genuine substructure, here becomes a liability on smooth lenses with arc edge irregularities.</em>
+</p>
+
+<!-- Case 3: ResNet-50 wrong, E-ResNet correct -->
+<p align="center">
+  <img src="assets/fig6_1_case3_gradcam.png" alt="Case 3: E-ResNet correct, ResNet-50 misses Sphere" width="95%"/>
+  <br><em>Figure 7.1c — Case 3 (ResNet-50 wrong, E-ResNet correct): the most direct visual evidence for equivariance. E-ResNet precisely localises the compact Sphere knot on the arc; ResNet-50's attention is diffuse and misses the perturbation entirely. 87 of the 142 ResNet-50-only errors are Sphere images — exactly the class requiring precise arc-position localisation.</em>
+</p>
+
+<!-- Case 4: Both wrong -->
+<p align="center">
+  <img src="assets/fig6_1_case4_gradcam.png" alt="Case 4: Both models wrong" width="95%"/>
+  <br><em>Figure 7.1d — Case 4 (both wrong): both models attend to the correct arc region but fail to cross the decision boundary. These failures are signal-limited rather than attention-limited — the substructure perturbation is below the effective detection threshold of both architectures. This is confirmed in Section 8 via the ring flux analysis (Mann-Whitney p = 6.07×10⁻¹⁰).</em>
+</p>
 
 ### 7.2 ViT Attention Rollout vs DenseNet Grad-CAM
 
