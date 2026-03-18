@@ -447,7 +447,7 @@ No Substructure     0.9576    0.9700    0.9638      2500
 </details>
 
 <p align="center">
-  <img src="assets/assets/fig5_1_resnet18_eval.png" alt="ResNet-18 confusion matrix and curves" width="95%"/>
+  <img src="assets/fig5_1_resnet18_eval.png" alt="ResNet-18 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.3 — ResNet-18 evaluation: confusion matrix (left), ROC curves per class
   (centre), Sphere PR curve (right). The skip-connection gap over AlexNet and VGG-16
   is the largest discontinuity in the benchmark.</em>
