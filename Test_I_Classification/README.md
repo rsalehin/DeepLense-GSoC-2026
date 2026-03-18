@@ -1379,6 +1379,45 @@ show a two-order-of-magnitude train/val loss gap by epoch 30.
   epoch 5 (val loss 0.4213), no further improvement in the remaining 25 epochs.</em>
 </p>
 
+The confusion matrices and ROC curves below show the evaluation of both 
+residual classifiers on the val set.
+
+<p align="center">
+  <img src="assets/fig11f_dn_res_confusion_matrix.png"
+       alt="DenseNet-121 residual classifier confusion matrix" width="95%"/>
+  <br><em>Figure 9.7 — DenseNet-121 residual classifier confusion matrix (raw counts).
+  No Substructure recall: 2378/2500 (0.951). Sphere recall: 1786/2500 (0.714).
+  Vortex recall: 2202/2500 (0.881). Sphere shows the largest off-diagonal leakage,
+  consistent with it having the weakest residual signal.</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig11g_dn_res_roc.png"
+       alt="DenseNet-121 residual classifier ROC curves" width="95%"/>
+  <br><em>Figure 9.8 — DenseNet-121 residual classifier ROC curves. Macro AUC = 0.9614.
+  Per-class: No Substructure 0.9724, Vortex 0.9630, Sphere 0.9488.
+  Sphere has the lowest AUC — consistent across both residual classifiers and the
+  raw-image benchmark.</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig11i_r18_res_confusion_matrix.png"
+       alt="ResNet-18 residual classifier confusion matrix" width="95%"/>
+  <br><em>Figure 9.9 — ResNet-18 residual classifier confusion matrix (raw counts).
+  No Substructure recall: 2316/2500 (0.926). Sphere recall: 1992/2500 (0.797).
+  Vortex recall: 1977/2500 (0.791). Higher Sphere recall than DenseNet-121 residual
+  (0.797 vs 0.714) but lower Vortex recall (0.791 vs 0.881).</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig11j_r18_res_roc.png"
+       alt="ResNet-18 residual classifier ROC curves" width="95%"/>
+  <br><em>Figure 9.10 — ResNet-18 residual classifier ROC curves. Macro AUC = 0.9543.
+  Per-class: No Substructure 0.9683, Vortex 0.9556, Sphere 0.9390.
+  All three per-class AUCs fall below DenseNet-121 residual, consistent with the
+  macro AUC gap of 0.007.</em>
+</p>
+
 **Per-class AUC on residuals:**
 
 | Class | DenseNet-121 (residual) | ResNet-18 (residual) |
