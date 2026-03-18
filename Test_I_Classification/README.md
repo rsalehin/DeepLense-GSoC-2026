@@ -1025,8 +1025,8 @@ Low H  → consensus prediction  → reliable output
 
 <!-- Figure: deep ensemble entropy distribution — per class and per-image scatter -->
 <p align="center">
-  <img src="assets/fig7_3_ensemble_entropy.png" alt="Deep ensemble predictive entropy distributions" width="760"/>
-   <img src="assets/fig7_4_ensemble_entropy.png" alt="Deep ensemble predictive entropy distributions" width="760"/>
+  <img src="assets/fig7_3_ensemble_entropy.png" alt="Deep ensemble predictive entropy distributions" width="95%"/>
+   <img src="assets/fig7_4_ensemble_entropy.png" alt="Deep ensemble predictive entropy distributions" width="95%"/>
   <br><em>Figure 7.3 — Deep ensemble entropy analysis. Left: entropy distributions per class — Sphere images skew toward higher entropy than No Substructure and Vortex. Centre: per-image entropy scatter coloured by ground truth class, highlighting the 62 low-entropy Sphere failures (bottom-left cluster, circled). Right: example images from each quadrant (high/low entropy × correct/incorrect).</em>
 </p>
 
@@ -1054,7 +1054,7 @@ Four controlled runs isolate the contribution of residual connections and D₄ a
 
 <!-- Figure: ablation training curves — val loss over epochs for all 4 runs -->
 <p align="center">
-  <img src="assets/fig7_4_ablation_training_curves.png" alt="Ablation study training curves for Runs A–D" width="760"/>
+  <img src="assets/fig7_4_ablation_training_curves.png" alt="Ablation study training curves for Runs A–D" width="95%"/>
   <br><em>Figure 7.4 — Ablation training dynamics. Left: validation loss curves for Runs A–D showing augmentation's dominant effect on convergence speed and final loss. Centre: macro AUC bar chart comparing the four runs. Right: Sphere recall bar chart — the metric most sensitive to the augmentation vs residual trade-off. Note the val loss spike in Run C (E-ResNet, no aug) at epoch 33, a gradient explosion event that early stopping caught at epoch 34.</em>
 </p>
 
@@ -1080,7 +1080,7 @@ E-ResNet achieves 2.5× better empirical invariance than an augmented ResNet-50,
 
 <!-- Figure: equivariance verification — L2 divergence bar chart, Stage 1 and Stage 2 -->
 <p align="center">
-  <img src="assets/fig7_5_equivariance_verification.png" alt="Rotation invariance verification: L2 probability divergence" width="720"/>
+  <img src="assets/fig7_5_equivariance_verification.png" alt="Rotation invariance verification: L2 probability divergence" width="95%"/>
   <br><em>Figure 7.5 — Rotation invariance verification. Left: Stage 1 (untrained models) — mean L₂ probability divergence under 90°/180°/270° rotations for E-ResNet, EPlainCNN, and ResNet-50. The untrained E-ResNet is 37.3× more stable than ResNet-50. Right: Stage 2 (trained models) — empirical invariance after full training. E-ResNet achieves 2.5× better invariance than augmented ResNet-50.</em>
 </p>
 
@@ -1101,7 +1101,7 @@ Sphere prediction flows:
 ─────────────────────────────────────────────────────
 </pre>
 <p align="center">
-  <img src="assets/fig8_1_universally_misclassified_correct.png" alt="Universally misclassified vs universally correct Sphere images" width="900"/>
+  <img src="assets/fig8_1_universally_misclassified_correct.png" alt="Universally misclassified vs universally correct Sphere images" width="95%"/>
   <br><em>Figure 8.1 — Sphere subhalo images: universally misclassified (top row) vs universally correct (bottom row), 
   as judged by all 6 ensemble models. Top row: 12 Sphere images predicted as No Substructure by every model — 
   all show sparse, dimly-lit arcs with no visually apparent compact knot. Bottom row: 12 Sphere images correctly 
@@ -1111,7 +1111,7 @@ Sphere prediction flows:
 </p>
 
 <p align="center">
-  <img src="assets/fig8_1_sphere_class_difficulty.png" alt="Sphere class difficulty: raw image statistics" width="900"/>
+  <img src="assets/fig8_1_sphere_class_difficulty.png" alt="Sphere class difficulty: raw image statistics" width="95%"/>
   <br><em>Figure 8.2 — Sphere class difficulty quantified on unnormalised .npy arrays (all correct n=1821, 
   all wrong n=64). Left: contrast distributions (max−min) — both groups collapse to exactly 1.0, confirming 
   that per-sample min-max normalisation renders contrast completely uninformative (p=1.0). Centre: raw mean 
@@ -1130,7 +1130,7 @@ Sphere prediction flows:
 
 <!-- Figure: cross-architecture confusion matrices for all 9 models side by side -->
 <p align="center">
-  <img src="assets/fig8_1_cross_arch_confusion.png" alt="Cross-architecture confusion matrices for all 9 models" width="900"/>
+  <img src="assets/fig8_1_cross_arch_confusion.png" alt="Cross-architecture confusion matrices for all 9 models" width="95%"/>
   <br><em>Figure 8.3 — Confusion matrices for all nine architectures sorted by macro AUC (row-normalised; 
   raw counts in parentheses). Tier 1 models (green border, AUC > 0.989) achieve Sphere recall of 0.88–0.94 
   with misclassifications flowing almost exclusively into No Substructure, not Vortex. ViT-Base (orange 
@@ -1167,7 +1167,7 @@ The Sphere→Vortex confusion is **SNR-driven, not shape-driven**: confused imag
 
 <!-- Figure: failure mode statistics — flux and compactness distributions, Mann-Whitney results -->
 <p align="center">
-  <img src="assets/fig8_2_sphere_failure_statistics.png" alt="Sphere failure mode statistics: ring flux and compactness distributions" width="780"/>
+  <img src="assets/fig8_2_sphere_failure_statistics.png" alt="Sphere failure mode statistics: ring flux and compactness distributions" width="95%"/>
   <br><em>Figure 8.4 — Sphere TP vs FN morphological statistics (computed on per-sample min-max normalised val images, n=2500 Sphere). Left: ring mean flux — false negatives have systematically 
 lower flux (p = 6.07×10⁻¹⁰), confirming SNR-limited detection. Centre: ring flux 
 std as a perturbation strength proxy — false negatives show weaker perturbation 
@@ -1198,11 +1198,11 @@ The 64 universally-missed images consistently fall in the low-flux, high-compact
 
 <!-- Figure: confidence vs ring brightness scatter and calibration curves -->
 <p align="center">
-  <img src="assets/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="760"/>
+  <img src="assets/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="95%"/>
   <br><em>Figure 8.5 — Sphere classification confidence vs ring mean flux. Left: scatter plot of E-ResNet's Sphere class confidence against ring mean flux — the monotonic positive relationship reveals SNR as the primary detection bottleneck. The 64 silent failures cluster in the bottom-left (low flux, near-zero confidence). Right: calibration curves for all 9 architectures — models in Tier 1 are well-calibrated; AlexNet and ENN are severely under-confident.</em>
 </p>
 <p align="center">
-  <img src="assets/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="760"/>
+  <img src="assets/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="95%"/>
   <br><em>Figure 8.5 — Sphere classification confidence vs ring mean flux. Left: scatter plot of E-ResNet's Sphere class confidence against ring mean flux — the monotonic positive relationship reveals SNR as the primary detection bottleneck. The 64 silent failures cluster in the bottom-left (low flux, near-zero confidence). Right: calibration curves for all 9 architectures — models in Tier 1 are well-calibrated; AlexNet and ENN are severely under-confident.</em>
 </p> # Compactness figure
 ### 8.4 Physical Interpretation
@@ -1236,7 +1236,7 @@ Decoder: Linear(128) → Unflatten → 4 × (ConvTranspose2d + ReLU/Sigmoid) + s
 
 <!-- Figure: CAE reconstruction examples — original / reconstruction / residual per class -->
 <p align="center">
-  <img src="assets/fig9_1_cae_residuals.png" alt="CAE residual visualisation: original, reconstruction, residual per class" width="800"/>
+  <img src="assets/fig9_1_cae_residuals.png" alt="CAE residual visualisation: original, reconstruction, residual per class" width="95%"/>
   <br><em>Figure 9.1 — CAE residual visualisation (n=1 example per class). Columns: original image, fitted clean lens (CAE reconstruction), residual full range, residual clipped ±0.1. No Substructure residuals are noise-like (near-zero); Sphere residuals show a compact positive peak at the subhalo location; Vortex residuals show asymmetric arc perturbations.</em>
 </p>
 The CAE is trained on **No Substructure images only**, learning to reconstruct the smooth lens morphology. Applied to Sphere and Vortex images, the difference (observed − CAE reconstruction) isolates the perturbation.
@@ -1264,8 +1264,8 @@ Two classifiers were trained on CAE residuals:
 
 <!-- Figure: residual classifier training curves showing severe overfitting -->
 <p align="center">
-  <img src="assets/fig9_2_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
-   <img src="assets/fig9_3_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="740"/>
+  <img src="assets/fig9_2_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="95%"/>
+   <img src="assets/fig9_3_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="95%"/>
   <br><em>Figure 9.2 — Residual classifier training dynamics. Left: DenseNet-121 train vs val loss — best checkpoint at epoch 10 (val 0.3946), monotonic val deterioration to 0.8211 by epoch 30, train loss near zero. Right: ResNet-18 train vs val loss — checkpoints at epoch 5 (val 0.4213), remaining 25 epochs progressively worse. The two-order-of-magnitude train/val gap is severe overfitting driven by insufficient signal-to-noise in the residuals.</em>
 </p>
 
