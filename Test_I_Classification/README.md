@@ -1027,8 +1027,22 @@ Low H  → consensus prediction  → reliable output
 <!-- Figure: deep ensemble entropy distribution — per class and per-image scatter -->
 <p align="center">
   <img src="assets/fig7_3_ensemble_entropy.png" alt="Deep ensemble predictive entropy distributions" width="95%"/>
-   <img src="assets/fig7_4_ensemble_entropy.png" alt="Deep ensemble predictive entropy distributions" width="95%"/>
   <br><em>Figure 7.3 — Deep ensemble entropy analysis. Left: entropy distributions per class — Sphere images skew toward higher entropy than No Substructure and Vortex. Centre: per-image entropy scatter coloured by ground truth class, highlighting the 62 low-entropy Sphere failures (bottom-left cluster, circled). Right: example images from each quadrant (high/low entropy × correct/incorrect).</em>
+</p>
+
+The grid below shows the 12 Sphere images the ensemble is most uncertain 
+about — these are genuinely hard cases where no consensus exists.
+
+<p align="center">
+  <img src="assets/fig7_4_ensemble_entropy.png"
+       alt="Top 12 highest-entropy Sphere images" width="95%"/>
+  <br><em>Figure 7.3b — Top 12 highest-entropy Sphere images (ensemble H = 1.078–1.093, 
+  near the maximum H = 1.099). Each image is annotated with its Shannon entropy and 
+  ensemble majority prediction. Predictions are scattered across all three classes 
+  (Sphere, Vortex, No Substructure), confirming genuine ensemble disagreement. 
+  These high-entropy images are distinct from the 64 silent failures in Section 8.1, 
+  which have near-zero entropy — the ensemble is confidently wrong on those, 
+  but maximally uncertain on these.</em>
 </p>
 
 ### 7.4 Ablation Study — E-ResNet Components
