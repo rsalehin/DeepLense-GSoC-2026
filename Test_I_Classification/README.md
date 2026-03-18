@@ -1172,9 +1172,12 @@ Mann-Whitney U test on normalised val images:
   <img src="assets/fig12a_sphere_false_negatives.png"
        alt="E-ResNet Sphere false negatives sorted by confidence" width="95%"/>
   <br><em>Figure 8.5 — E-ResNet Sphere false negatives (predicted as No Substructure),
-  sorted by descending confidence in the wrong class. Top row annotated with
-  Conf(NoSub) and ring_mean values. Bottom row shows additional FN examples with
-  ring_mean annotations.</em>
+  sorted by descending E-ResNet confidence in the wrong class. Top row (n=6):
+  annotated with Conf(NoSub) ranging 0.978–0.995 and ring_mean ranging 0.1416–0.2256.
+  Bottom row (n=6): additional FN examples annotated with ring_mean (0.1233–0.1695).
+  Ring_mean values are consistently low relative to the TP mean of 0.1586, with the
+  exception of the top-left image (ring_mean=0.2256) — a high-flux false negative
+  suggesting that flux alone does not fully explain all failures.</em>
 </p>
 
 #### E-ResNet Sphere↔Vortex Confusion
