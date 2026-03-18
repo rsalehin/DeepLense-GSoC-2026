@@ -1009,21 +1009,27 @@ Full implementation is planned for the GSoC 2026 project period.*
 
 ### 6.1 Full Benchmark Table
 
-All nine architectures evaluated on the predefined val partition (7,500 images, 2,500 per class). Sorted by macro-averaged AUC.
+### 6.1 Full Benchmark Table
+
+All eleven architectures evaluated on the predefined val partition (7,500 images, 2,500 per class). Sorted by macro-averaged AUC.
 
 | Rank | Architecture | Pretrained | Params (M) | Macro AUC | No Sub AUC | Sphere AUC | Vortex AUC | Sphere PR-AUC | Test Acc. | Sphere Recall |
 |:----:|:-------------|:----------:|:----------:|:---------:|:----------:|:----------:|:----------:|:-------------:|:---------:|:-------------:|
-| 1 | **DenseNet-121** | ✅ | 7.0 | **0.9962** | 0.9963 | 0.9937 | 0.9985 | **0.9903** | 96.88% | **0.9364** |
-| 2 | **E-ResNet** | ❌ | **0.39** | **0.9952** | 0.9960 | 0.9918 | 0.9977 | 0.9871 | 95.96% | 0.9224 |
-| 3 | ResNet-50 | ✅ | 23.5 | 0.9946 | 0.9951 | 0.9909 | 0.9974 | 0.9862 | 96.08% | 0.9180 |
-| 4 | ResNet-18 | ✅ | 11.2 | 0.9927 | 0.9939 | 0.9872 | 0.9966 | 0.9813 | 95.24% | 0.9064 |
-| 5 | EfficientNet-B3 | ✅ | 10.7 | 0.9898 | 0.9915 | 0.9830 | 0.9947 | 0.9749 | 93.87% | 0.8848 |
-| 6 | ViT-Base/16 | ✅ | 85.4 | 0.9761 | 0.9861 | 0.9612 | 0.9805 | 0.9413 | 88.81% | 0.7800 |
-| 7 | VGG-16 | ✅ | 134.3 | 0.8944 | 0.9385 | 0.8659 | 0.8783 | 0.8065 | 72.43% | 0.5044 |
-| 8 | Equivariant-D4 (ENN) | ❌ | ~0.0 | 0.7362 | 0.8391 | 0.7071 | 0.6620 | 0.5363 | 53.76% | 0.3864 |
-| 9 | AlexNet | ✅ | 57.0 | 0.6589 | 0.7358 | 0.6053 | 0.6351 | 0.4380 | 43.65% | 0.1240 |
+| 1 | **EqDenseNet-C8** | ❌ | **0.093** | **0.9974** | 0.9974 | **0.9955** | 0.9990 | **0.9932** | **97.35%** | **0.9448** |
+| 2 | Ensemble-Top6 | Mixed | N/A | 0.9970 | 0.9970 | 0.9949 | 0.9990 | 0.9923 | 97.25% | 0.9360 |
+| 3 | DenseNet-121 | ✅ | 7.0 | 0.9962 | 0.9963 | 0.9937 | 0.9985 | 0.9903 | 96.88% | 0.9364 |
+| 4 | E-ResNet | ❌ | 0.39 | 0.9952 | 0.9960 | 0.9918 | 0.9977 | 0.9871 | 95.96% | 0.9224 |
+| 5 | ResNet-50 | ✅ | 23.5 | 0.9946 | 0.9951 | 0.9909 | 0.9974 | 0.9862 | 96.08% | 0.9180 |
+| 6 | ResNet-18 | ✅ | 11.2 | 0.9927 | 0.9939 | 0.9872 | 0.9966 | 0.9813 | 95.24% | 0.9064 |
+| 7 | EfficientNet-B3 | ✅ | 10.7 | 0.9898 | 0.9915 | 0.9830 | 0.9947 | 0.9749 | 93.87% | 0.8848 |
+| 8 | ViT-Base/16 | ✅ | 85.4 | 0.9761 | 0.9861 | 0.9612 | 0.9805 | 0.9413 | 88.81% | 0.7800 |
+| 9 | VGG-16 | ✅ | 134.3 | 0.8944 | 0.9385 | 0.8659 | 0.8783 | 0.8065 | 72.43% | 0.5044 |
+| 10 | Equivariant-D4 (ENN) | ❌ | ~0.0 | 0.7362 | 0.8391 | 0.7071 | 0.6620 | 0.5363 | 53.76% | 0.3864 |
+| 11 | AlexNet | ✅ | 57.0 | 0.6589 | 0.7358 | 0.6053 | 0.6351 | 0.4380 | 43.65% | 0.1240 |
 
 *All metrics evaluated on the held-out val partition (7,500 images). Sphere Recall and Sphere PR-AUC are the most discriminating metrics for this dataset.*
+*Ensemble-Top6: soft vote across EqDenseNet-C8, DenseNet-121, E-ResNet, ResNet-50, ResNet-18, EfficientNet-B3.*
+*EqDenseNet-C8 surpasses all ten individual architectures — including all seven ImageNet-pretrained models — on every reported metric at 0.093M parameters trained from scratch.*
 
 <!-- Figure: 9-model macro-averaged ROC comparison -->
 <p align="center">
@@ -1036,25 +1042,35 @@ The macro AUC distribution reveals three distinct tiers separated by architectur
 ```
 Macro AUC
 1.000 ┤
-0.995 ┤  ████ DenseNet-121 (0.9962)
-      │  ████ E-ResNet     (0.9952)  ← Tier 1: AUC > 0.989
-0.990 ┤  ████ ResNet-50    (0.9946)    (all with skip connections)
-      │  ████ ResNet-18    (0.9927)
-      │  ████ EffNet-B3    (0.9898)
+0.997 ┤  ████ EqDenseNet-C8  (0.9974)  ← best overall (from scratch, 0.093M)
+      │  ████ Ensemble-Top6  (0.9970)  ← Tier 1: AUC > 0.989
+0.996 ┤  ████ DenseNet-121   (0.9962)    (skip/dense connections)
+      │  ████ E-ResNet        (0.9952)
+0.994 ┤  ████ ResNet-50       (0.9946)
+      │  ████ ResNet-18       (0.9927)
+      │  ████ EffNet-B3       (0.9898)
 0.980 ┤─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Gap 1
-0.976 ┤  ████ ViT-Base     (0.9761)  ← Tier 2: Attention-based
+0.976 ┤  ████ ViT-Base        (0.9761)  ← Tier 2: Attention-based
 0.950 ┤
 0.920 ┤─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Gap 2
-0.900 ┤  ████ VGG-16       (0.8944)
+0.900 ┤  ████ VGG-16          (0.8944)
 0.800 ┤─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Gap 3
-      │  ████ Equiv-D4     (0.7362)  ← Tier 3: No skip connections
-0.700 ┤  ████ AlexNet      (0.6589)    or insufficient depth
+      │  ████ Equiv-D4        (0.7362)  ← Tier 3: No skip connections
+0.700 ┤  ████ AlexNet         (0.6589)    or insufficient depth
 0.600 ┤
 ```
 
-**Gap 1** (EfficientNet-B3 → ViT): Separates convolutional models with skip connections from the attention-based architecture.
-**Gap 2** (ViT → VGG-16): Separates both from architectures without skip connections.
-**Gap 3** (VGG-16 → ENN): Separates architectures with ImageNet pretraining from from-scratch models without sufficient depth.
+**Gap 1** (EfficientNet-B3 → ViT): Separates convolutional models with skip connections
+from the attention-based architecture.
+
+**Gap 2** (ViT → VGG-16): Separates attention-based architectures from sequential
+networks without skip connections.
+
+**Gap 3** (VGG-16 → Equivariant-D4): Separates architectures with ImageNet pretraining
+from from-scratch equivariant models without sufficient depth. Notably, EqDenseNet-C8
+(also from scratch, 0.093M) sits at the top of Tier 1 — demonstrating that the depth
+gap is not inherent to from-scratch training, but specific to architectures that lack
+both depth and skip connections.
 
 <!-- Figure: Sphere-class precision-recall curves -->
 <p align="center">
