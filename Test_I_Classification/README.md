@@ -54,9 +54,9 @@ on every reported metric.
 >
 > However, given the submission deadline and the non-linear nature of exploration and experimentations, EqDenseNet-C8 has not yet received the same
 > depth of analysis as the original nine models. Specifically, failure mode
-> characterisation, and ensemble uncertainty analysis largely reflect the original
+> characterisation largely reflect the original
 > nine-model study. EqDenseNet-C8 appears in the benchmark table, ROC/PR comparisons,
-> parameter efficiency plot, and cross-architecture confusion matrix, CAM-analysis, but its deeper
+> parameter efficiency plot, and cross-architecture confusion matrix, CAM-analysis, ensemble uncertainty analysis but its deeper
 > analysis — including full ablation over {C8, SO(2)} × {residual, dense} and
 > cross-dataset evaluation — is planned for the GSoC 2026 project timeline.
 >
