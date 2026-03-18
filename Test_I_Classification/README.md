@@ -171,6 +171,7 @@ are heavily right-skewed — the vast majority of pixels are near-zero backgroun
 discriminative information concentrated in the bright ring arc pixels. The distributions 
 are visually indistinguishable between classes, confirming that classification requires 
 detecting subtle perturbations within a shared macro-lens morphology.</em>
+</p>
 
 ---
 
@@ -822,7 +823,7 @@ worst AUC among pretrained models (0.66).
   parameter-efficient competitive model. Equivariant-D4 (orange triangle, far left) shows that 
   equivariance alone without depth yields AUC only 0.73. The DenseNet-121, ResNet-18, and 
   EfficientNet-B3 cluster (7–15M, AUC ≈ 1.00) represents the best pretrained efficiency frontier. 
-  ViT-Base (85M) falls below this frontier despite its large capacity. AlexNet (60M, AUC 0.66) 
+  ViT-Base (85M) falls below this frontier despite its large capacity. AlexNet (57M, AUC 0.66) 
   is the worst-performing pretrained model — demonstrating that parameter count without skip 
   connections provides no benefit for this task.</em>
 </p>
@@ -877,13 +878,13 @@ Grad-CAM maps (weighted gradient activations at the final conv layer) are compar
 <!-- Case 2: E-ResNet wrong, ResNet-50 correct -->
 <p align="center">
   <img src="assets/fig6_1_case2_gradcam.png" alt="Case 2: E-ResNet false alarm, ResNet-50 correct" width="95%"/>
-  <br><em>Figure 7.1b — Case 2 (E-ResNet wrong, ResNet-50 correct): E-ResNet over-detects a perturbation that isn't there, while ResNet-50 correctly classifies the image. E-ResNet's arc-following sensitivity, its strength on genuine substructure, here becomes a liability on smooth lenses with arc edge irregularities.</em>
+  <br><em>Figure 7.1b — Case 2 (E-ResNet wrong, ResNet-50 correct): E-ResNet predicts substructure on images where ResNet-50 is correct. 131 such cases occur across the full val set.</em>
 </p>
 
 <!-- Case 3: ResNet-50 wrong, E-ResNet correct -->
 <p align="center">
   <img src="assets/fig6_1_case3_gradcam.png" alt="Case 3: E-ResNet correct, ResNet-50 misses Sphere" width="95%"/>
-  <br><em>Figure 7.1c — Case 3 (ResNet-50 wrong, E-ResNet correct): the most direct visual evidence for equivariance. E-ResNet precisely localises the compact Sphere knot on the arc; ResNet-50's attention is diffuse and misses the perturbation entirely. 87 of the 142 ResNet-50-only errors are Sphere images — exactly the class requiring precise arc-position localisation.</em>
+  <br><em>Figure 7.1c — Case 3 (ResNet-50 wrong, E-ResNet correct): E-ResNet correctly classifies images where ResNet-50 fails. 87 of the 142 ResNet-50-only errors are Sphere images. E-ResNet Grad-CAM shows activation concentrated on the arc region; ResNet-50 activation is more spatially distributed.</em>
 </p>
 
 <!-- Case 4: Both wrong -->
@@ -1081,15 +1082,34 @@ Four controlled runs isolate the contribution of residual connections and D₄ a
 
 | Model | 90° L₂ | 180° L₂ | 270° L₂ | Mean L₂ |
 |:------|:------:|:-------:|:-------:|:-------:|
-| E-ResNet (untrained) | ~0.001 | ~0.001 | ~0.001 | **~0.001** |
-| EPlainCNN (untrained) | ~0.002 | ~0.002 | ~0.002 | ~0.002 |
-| ResNet-50 (untrained) | ~0.037 | ~0.037 | ~0.037 | ~0.037 |
+| E-ResNet (untrained) | 0.00010 | 0.00014 | 0.00011 | **0.00011** |
+| EPlainCNN (untrained) | 0.00004 | 0.00007 | 0.00007 | 0.00006 |
+| ResNet-50 (untrained) | 0.08038 | 0.06392 | 0.06739 | 0.07056 |
 
-> The untrained E-ResNet is **37.3× more rotationally stable** than untrained ResNet-50. This definitively proves the equivariance is architectural — not learned through data memorisation.
+> The untrained E-ResNet is **~641× more rotationally stable** than untrained 
+> ResNet-50 (0.00011 vs 0.07056). This definitively proves the equivariance is 
+> architectural — not learned through data memorisation.
 
 **Stage 2 — Trained models (empirical invariance after training):**
 
-E-ResNet achieves 2.5× better empirical invariance than an augmented ResNet-50, and 4.5× better than an unaugmented plain equivariant CNN, after full training.
+| Model | Theoretical L₂ | Empirical L₂ | Change |
+|:------|:--------------:|:------------:|:------:|
+| E-ResNet (aug) | 0.00011 | 0.01821 | +0.01809 ↑ |
+| EPlainCNN (no aug) | 0.00006 | 0.08133 | +0.08127 ↑ |
+| ResNet-50 (aug) | 0.07056 | 0.04597 | −0.02460 ↓ |
+
+**Pairwise comparison (trained models):**
+- E-ResNet is **2.5×** more invariant than augmented ResNet-50 (0.01821 vs 0.04597)
+- E-ResNet is **4.5×** more invariant than unaugmented EPlainCNN (0.01821 vs 0.08133)
+- ResNet-50 is **1.8×** more invariant than EPlainCNN (0.04597 vs 0.08133)
+
+Two observations worth noting. First, all equivariant models become *less* 
+theoretically invariant after training — empirical L₂ increases from near-zero 
+for both E-ResNet and EPlainCNN. This reflects the gap between the discrete 
+D₄ guarantee on exact 90° grid rotations and the interpolation artefacts 
+introduced by learned weights on a 150×150 pixel grid. Second, ResNet-50 
+becomes *more* invariant after training with augmentation — the augmentation 
+provides empirical invariance that the architecture does not have by construction.
 
 **Note on D₄ coverage:** D₄ equivariance covers only 90° multiples. Real gravitational lenses observed by LSST/Euclid appear at arbitrary position angles. Continuous-group equivariance (SO(2) or C₈ steerable CNNs) would provide coverage at all angles without augmentation — a direct motivation for the first GSoC research direction in Section 12.
 
@@ -1171,6 +1191,7 @@ Mann-Whitney U test on normalised val images:
 |:--------|:-------:|:-------:|:-------:|:-----------:|
 | Ring mean flux | 0.1423 | 0.1586 | 6.07×10⁻¹⁰ | ✅ |
 | Ring flux std | 0.1630 | 0.1699 | 2.91×10⁻³ | ✅ |
+| Ring compactness | 0.6585 | 0.6375 | 3.78×10⁻⁸ | ✅ |
 | Ring asymmetry | 0.0805 | 0.0782 | 8.99×10⁻¹ | ❌ |
 
 <p align="center">
@@ -1267,10 +1288,16 @@ using CAE residual centroids.
 - **Vortex** (axion DM): elongated, asymmetric density field perturbation →
   geometrically distinct from both smooth arcs and Sphere subhalos
 
-The D₄ equivariant filters in E-ResNet average responses across eight symmetry
-orientations. This is effective for arc-following features but introduces a
-systematic weakness on the most compact, sub-pixel-scale Sphere perturbations —
-a fundamental architectural trade-off, not a training artefact.
+The data shows that E-ResNet has lower Sphere recall than DenseNet-121 (0.9224 
+vs 0.9364) despite higher theoretical rotational stability. Whether this gap is 
+attributable to the D₄ symmetry constraint, the absence of ImageNet pretraining, 
+the parameter count difference, or some combination of these factors cannot be 
+isolated from the current experiments. Disentangling these contributions — for 
+example by training a DenseNet-121-scale equivariant network with pretraining, 
+or by evaluating under controlled distribution shift — is a natural direction 
+for the main GSoC project.
+
+---
 ## 9. Residual Image Approach
 
 ### 9.1 Motivation
@@ -1357,9 +1384,12 @@ DenseNet-121 baseline from Section 5.
 
 | Model | Input | Macro AUC | Val Accuracy | Training |
 |:------|:-----:|:---------:|:------------:|:--------:|
-| DenseNet-121 | Raw images | 0.9950 | 96.95% | Pretrained |
+| DenseNet-121 | Raw images | 0.9950 † | 96.95% | Pretrained |
 | DenseNet-121 | CAE residuals | 0.9614 | 84.88% | Scratch |
 | ResNet-18 | CAE residuals | 0.9543 | 83.80% | Scratch |
+
+*† Evaluated in a separate run for this comparison. The authoritative benchmark 
+result from Section 6 is 0.9962, obtained from the primary evaluation pipeline.*
 
 Both residual classifiers exhibit severe overfitting — the training curves below 
 show a two-order-of-magnitude train/val loss gap by epoch 30.
@@ -1528,44 +1558,77 @@ All results use homogeneous simulation with fixed lens mass and ellipticity. The
 ## 13. Repository Structure
 
 ```
-DeepLense-Test-I/
+DeepLense-GSoC-2026/
 │
-├── README.md                          ← This file
-├── Test_I_Classification_final.ipynb  ← Main notebook (all experiments)
-│
-├── figures/                           ← Saved figures (generated by notebook)
-│   ├── fig5_1_roc_comparison.png
-│   ├── fig5_2_sphere_pr_curves.png
-│   ├── fig5_3_param_efficiency.png
-│   ├── fig6_1_gradcam_resnet50_eresnet.png
-│   ├── fig6_2a_spatial_attention_vit_densenet.png
-│   ├── fig6_2b_densenet_resolution.png
-│   ├── fig6_2c_vit_ring_concentration.png
-│   ├── fig6_2d_vit_attention_consistency.png
-│   ├── fig6_2e_ring_concentration_comparison.png
-│   ├── fig6_3_ensemble_entropy.png
-│   ├── fig6_4_ablation_training_curves.png
-│   ├── fig6_5_equivariance_verification.png
-│   ├── fig7_1_cross_arch_sphere_confusion.png
-│   ├── fig7_2_sphere_failure_statistics.png
-│   ├── fig7_3_confidence_vs_brightness.png
-│   ├── fig8_1_cae_architecture.png
-│   ├── fig8_2_residual_visualisation.png
-│   └── fig8_3_residual_classifiers.png
-│
-├── weights/                           ← Model checkpoints (Google Drive links below)
-│   ├── ResNet18_best.pth
-│   ├── ResNet50_best.pth
-│   ├── DenseNet121_best.pth
-│   ├── EfficientNetB3_best.pth
-│   ├── AlexNet_best.pth
-│   ├── VGG16_best.pth
-│   ├── ViT_best.pth
-│   ├── EquivD4_best.pth
-│   ├── E-ResNet_best.pth
-│   └── CAE_best.pth
-│
-└── requirements.txt
+└── Test_I_Classification/
+    │
+    ├── README.md                              ← This file
+    ├── Test_I_Classification_final.ipynb      ← Main notebook (all experiments)
+    ├── requirements.txt
+    │
+    ├── assets/                                ← Figures and saved outputs
+    │   ├── fig2_1_sample_images.png
+    │   ├── fig2_2_eda_statistic.png
+    │   ├── ResNet-18_results.png
+    │   ├── ResNet-50_results.png
+    │   ├── DenseNet-121_results.png
+    │   ├── EfficientNet-B3_results.png
+    │   ├── AlexNet_results.png
+    │   ├── VGG-16_results.png
+    │   ├── ViT-Base_results.png
+    │   ├── Equivariant-D4_results.png
+    │   ├── E-ResNet_results.png
+    │   ├── macro_roc_comparison.png
+    │   ├── sphere_pr_comparison.png
+    │   ├── param_efficiency.png
+    │   ├── gradcam_No_Substructure.png
+    │   ├── gradcam_Sphere.png
+    │   ├── gradcam_Vortex.png
+    │   ├── fig6_1_case2_gradcam.png
+    │   ├── fig6_1_case3_gradcam.png
+    │   ├── fig6_1_case4_gradcam.png
+    │   ├── fig6_2a_attention_grid.png
+    │   ├── fig6_2b_densenet_resolution.png
+    │   ├── fig6_2c_vit_ring_concentration.png
+    │   ├── fig6_2d_vit_attention_consistency.png
+    │   ├── fig6_2e_ring_concentration_comparison.png
+    │   ├── ensemble_uncertainty.png
+    │   ├── sphere_high_entropy_grid.png
+    │   ├── ablation_convergence.png
+    │   ├── fig6_5_rotation_invariance.png
+    │   ├── sphere_contrast_analysis.png
+    │   ├── sphere_misclassified_grid.png
+    │   ├── fig8_1_universally_misclassified_correct.png
+    │   ├── fig8_1_sphere_class_difficulty.png
+    │   ├── fig8_1_cross_arch_confusion.png
+    │   ├── fig12a_sphere_false_negatives.png
+    │   ├── fig12b_sphere_fn_statistics.png
+    │   ├── fig12c_sv_confusion_gallery.png
+    │   ├── fig12d_elongation_distribution.png
+    │   ├── fig12e_confidence_vs_brightness.png
+    │   ├── fig12f_perturbation_position.png
+    │   ├── fig11_cae_training.png
+    │   ├── fig11_cae_residuals.png
+    │   ├── fig11_residual_distributions.png
+    │   ├── fig11_mean_residual_maps.png
+    │   ├── fig11e_dn_res_training.png
+    │   ├── fig11f_dn_res_confusion_matrix.png
+    │   ├── fig11g_dn_res_roc.png
+    │   ├── fig11h_r18_res_training.png
+    │   ├── fig11i_r18_res_confusion_matrix.png
+    │   └── fig11j_r18_res_roc.png
+    │
+    └── weights/                               ← Model checkpoints (Google Drive links below)
+        ├── ResNet18_best.pth
+        ├── ResNet50_best.pth
+        ├── DenseNet121_best.pth
+        ├── EfficientNetB3_best.pth
+        ├── AlexNet_best.pth
+        ├── VGG16_best.pth
+        ├── ViT_best.pth
+        ├── EquivD4_best.pth
+        ├── E-ResNet_best.pth
+        └── CAE_best.pth
 ```
 
 ### Model Weights — Google Drive
@@ -1598,7 +1661,7 @@ If you use this work, please cite the ML4SCI DeepLense project and the DeepLense
   title        = {ML4SCI DeepLense GSoC 2026 — Common Test I:
                   Multi-Class Classification of Dark Matter Substructure},
   year         = {2026},
-  url          = {https://github.com/rsalehin/DeepLense-Test-I}
+  url          = {https://github.com/rsalehin/DeepLense-GSoC-2026}
 }
 
 @article{toomey2023deeplensesim,
