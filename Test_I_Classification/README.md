@@ -890,6 +890,51 @@ Two architectures compared using fundamentally different visualisation tools:
 | **Grad-CAM** | DenseNet-121 | Class-discriminative spatial gradients |
 | **Attention Rollout** | ViT-Base | CLS token attention propagated back through all layers (class-agnostic) |
 
+**The interpretability paradox:** ViT concentrates ~28% more attention on the ring 
+than DenseNet for substructure classes (0.472 vs 0.292), yet DenseNet outperforms 
+ViT by 0.020 macro-AUC. The resolution: attending to the correct spatial region at 
+macro scale ≠ detecting the discriminative *perturbation within* that region. 
+The four figures below build this argument step by step.
+
+---
+
+**Step 1 — What do the attention maps actually look like?**
+
+DenseNet produces a diffuse blob; ViT produces spatially structured patch-level maps.
+Before interpreting either, we need to establish what causes the blob.
+
+<p align="center">
+  <img src="assets/fig7_2a_spatial_attention_vit_densene.png"
+       alt="Spatial attention: DenseNet Grad-CAM vs ViT Attention Rollout" width="95%"/>
+  <br><em>Figure 7.2a — Spatial attention maps (rows: No Substructure, Sphere, Vortex;
+  columns: original, DenseNet Grad-CAM, ViT Attention Rollout). DenseNet produces a
+  diffuse central blob; ViT produces sharper patch-level maps with visible
+  class-dependent structure around the ring.</em>
+</p>
+
+---
+
+**Step 2 — The DenseNet blob is a resolution artefact, not a spatial failure.**
+
+DenseNet-121 compresses to ~4×5 pixels at denseblock4. Upsampling 30× back to
+150×150 cannot produce ring structure regardless of what the model actually learned.
+
+<p align="center">
+  <img src="assets/fig7_2b_densenet_resolution.png"
+       alt="DenseNet Grad-CAM resolution diagnostic" width="95%"/>
+  <br><em>Figure 7.2b — DenseNet resolution diagnostic. Left to right: original image,
+  raw denseblock4 feature map at native ~4×5 pixel resolution (grid lines show actual
+  pixel boundaries), bicubic upsampled map, final Grad-CAM overlay. The blob appearance
+  is entirely explained by 30× spatial upsampling — not by DenseNet ignoring the ring.</em>
+</p>
+
+---
+
+**Step 3 — Does ViT attend to the ring, and does it shift by class?**
+
+ViT's attention is class-agnostic by construction, so we measure ring concentration
+directly across n=50 images per class.
+
 **Ring concentration scores (fraction of attention within Einstein ring annulus):**
 
 | Model | No Substructure | Sphere | Vortex | Class sensitivity |
@@ -898,7 +943,21 @@ Two architectures compared using fundamentally different visualisation tools:
 | ViT | 0.369 ± 0.025 | **0.472 ± 0.052** | **0.475 ± 0.044** | **Present** — substructure classes 28% higher |
 | Random baseline | 0.190 | 0.190 | 0.190 | — |
 
-**The interpretability paradox:** ViT concentrates ~28% more attention on the ring than DenseNet for substructure classes (0.472 vs 0.292), yet DenseNet outperforms ViT by 0.020 macro-AUC. The resolution: attending to the correct spatial region at macro scale ≠ detecting the discriminative *perturbation within* that region. DenseNet's dense local feature reuse detects local flux perturbations at any ring position with translation-invariant sensitivity. ViT finds the ring easily but cannot reliably localise the perturbation within it.
+<p align="center">
+  <img src="assets/fig7_2c_vit_ring_concentration.png"
+       alt="ViT ring concentration score by class" width="95%"/>
+  <br><em>Figure 7.2c — ViT ring concentration score distributions (n=50 per class).
+  No Substructure mean: 0.369. Sphere: 0.472. Vortex: 0.475. ViT attends significantly
+  more to the ring when substructure is present — well above the random baseline of 0.190.</em>
+</p>
+
+---
+
+**Step 4 — If ViT attends to the right region, why does it underperform DenseNet?**
+
+The bottleneck is not *finding* the ring — it is *localising the perturbation within* it.
+ViT's attention is unstable across images of the same class, shifting with perturbation
+position because it lacks translation-invariant local detectors.
 
 **ViT attention stability analysis:**
 
@@ -908,33 +967,35 @@ Two architectures compared using fundamentally different visualisation tools:
 | Sphere | 0.0614 | **Unstable** — 64% higher variance than No Sub |
 | Vortex | 0.0538 | **Unstable** — 44% higher variance than No Sub |
 
-ViT's attention shifts with perturbation position (the subhalo can appear anywhere on the arc), revealing the absence of translation-invariant local detectors. This is a mechanistic explanation of the AUC gap.
-
-> **DenseNet Grad-CAM blob artefact:** The apparent lack of ring structure in DenseNet Grad-CAM maps is a *spatial compression artefact*, not evidence that DenseNet ignores the ring. DenseNet-121 compresses to ~4×5 pixels at denseblock4; bicubic upsampling from 4×5 → 150×150 is a 30× expansion that cannot produce a ring shape regardless of the underlying activations.
-
-<!-- Figure 7.2a: spatial attention grid — original / DenseNet Grad-CAM / ViT Rollout -->
 <p align="center">
-  <img src="assets/fig7_2a_spatial_attention_vit_densene.png" alt="Spatial attention: DenseNet Grad-CAM vs ViT Attention Rollout" width="800"/>
-  <br><em>Figure 7.2a — Spatial attention comparison (rows: No Substructure, Sphere, Vortex; columns: original, DenseNet Grad-CAM, ViT Attention Rollout). DenseNet produces a blob artefact from spatial compression; ViT produces patch-resolution attention maps with class-dependent ring concentration.</em>
+  <img src="assets/fig7_2d_vit_attention_consistency.png"
+       alt="ViT attention consistency: mean and std maps per class" width="95%"/>
+  <br><em>Figure 7.2d — ViT attention consistency (n=20 per class). Top row: mean
+  attention maps. Bottom row: standard deviation maps. No Substructure std = 0.037
+  (stable). Sphere std = 0.061, Vortex std = 0.054 (both unstable). Bright hotspots
+  in the std maps localise exactly where the subhalo perturbation moves across images —
+  ViT's attention shifts with perturbation position rather than converging on a fixed
+  detection strategy.</em>
 </p>
 
-<!-- Figure 7.2b: DenseNet resolution diagnostic -->
+---
+
+**Step 5 — Direct comparison: DenseNet vs ViT ring concentration.**
+
+DenseNet's class-invariant attention alongside ViT's class-sensitive attention makes
+the paradox concrete — higher ring concentration does not translate to better classification.
+
 <p align="center">
-  <img src="assets/fig7_2b_densenet_resolution.png" alt="DenseNet Grad-CAM resolution diagnostic" width="800"/>
-  <br><em>Figure 7.2b — DenseNet-121 resolution diagnostic. Columns: original (150×150), raw denseblock4 feature map at native ~4×5 pixel resolution (grid lines show actual pixel boundaries), bicubic upsampled map, final Grad-CAM overlay. The blob is entirely explained by the 30× upsampling from 4×5 pixels.</em>
+  <img src="assets/fig6_2e_ring_concentration_comparison.png"
+       alt="Ring concentration comparison: DenseNet vs ViT" width="95%"/>
+  <br><em>Figure 7.2e — Ring concentration distributions: DenseNet-121 (blue, Grad-CAM)
+  vs ViT-Base (orange, Attention Rollout), n=50 per class. DenseNet clusters tightly
+  at ~0.28 across all classes — class-invariant. ViT shifts from ~0.37 (No Substructure)
+  to ~0.47–0.48 (Sphere/Vortex) — class-sensitive. Note: the two methods measure
+  different quantities; within-model class sensitivity is the meaningful comparison,
+  not the cross-model gap.</em>
 </p>
 
-<!-- Figure 7.2c: ViT ring concentration by class -->
-<p align="center">
-  <img src="assets/fig7_2c_vit_ring_concentration.png" alt="ViT ring concentration score by class" width="600"/>
-  <br><em>Figure 7.2c — ViT ring concentration score by class. Substructure classes (Sphere: 0.472, Vortex: 0.475) show significantly higher ring attention than No Substructure (0.369), confirming class-dependent spatial strategy.</em>
-</p>
-
-<!-- Figure 7.2d: ViT attention consistency (mean ± std maps) -->
-<p align="center">
-  <img src="assets/fig7_2d_vit_attention_consistency.png" alt="ViT attention consistency: mean and std maps per class" width="700"/>
-  <br><em>Figure 7.2d — ViT attention consistency. Top row: mean attention maps per class. Bottom row: standard deviation maps. Substructure classes show markedly higher std (bright hotspots within the ring), reflecting position-dependent perturbation localisation instability.</em>
-</p>
 
 ### 7.3 Predictive Uncertainty — Deep Ensemble
 
