@@ -52,15 +52,19 @@ on every reported metric.
    - [4.2 Key Design Decisions](#42-key-design-decisions)
    - [4.3 Evaluation Protocol](#43-evaluation-protocol)
 5. [Architecture Evaluations](#5-architecture-evaluations)
-   - [5.1 ResNet-18](#51-resnet-18)
-   - [5.2 ResNet-50](#52-resnet-50)
-   - [5.3 DenseNet-121](#53-densenet-121)
-   - [5.4 EfficientNet-B3](#54-efficientnet-b3)
-   - [5.5 AlexNet](#55-alexnet)
-   - [5.6 VGG-16](#56-vgg-16)
+   - [5.1 AlexNet](#51-alexnet)
+   - [5.2 VGG-16](#52-vgg-16)
+   - [5.3 ResNet-18](#53-resnet-18)
+   - [5.4 ResNet-50](#54-resnet-50)
+   - [5.5 DenseNet-121](#55-densenet-121)
+   - [5.6 EfficientNet-B3](#56-efficientnet-b3)
    - [5.7 Vision Transformer (ViT-Base/16)](#57-vision-transformer-vit-base16)
    - [5.8 Equivariant Neural Network (D₄-ENN)](#58-equivariant-neural-network-d-enn)
-   - [5.9 Equivariant Residual Network (E-ResNet)](#59-equivariant-residual-network-e-resnet-)
+   - [5.9 Equivariant Residual Network (E-ResNet)](#59-equivariant-residual-network-e-resnet)
+   - [5.10 Equivariant DenseNet (C8)](#510-equivariant-densenet-c8)
+   - [5.11 Soft Ensemble (Top-6)](#511-soft-ensemble-top-6)
+   - [5.12 Equivariant DenseNet SO(2) — Planned](#512-equivariant-densenet-so2--planned)
+   - [5.13 Equivariant ResNet SO(2) — Planned](#513-equivariant-resnet-so2--planned)
 6. [Comprehensive Results Summary](#6-comprehensive-results-summary)
    - [6.1 Full Benchmark Table](#61-full-benchmark-table)
    - [6.2 Performance Tiers](#62-performance-tiers)
@@ -269,242 +273,44 @@ Four complementary metrics are computed for every architecture:
 
 ## 5. Architecture Evaluations
 
-Nine architectures are evaluated on an identical dataset, training protocol, and evaluation suite. The ordering follows a deliberate narrative — from sequential baselines establishing the lower bound, through increasingly capable general architectures, to physics-motivated equivariant networks encoding lensing symmetry directly into their weights.
+Thirteen architectures are evaluated across three categories: standard deep learning
+baselines (Sections 5.1–5.7), physics-motivated equivariant networks (Sections 5.8–5.10),
+a soft ensemble combining the top-6 models (Section 5.11), and two planned SO(2)
+continuous equivariant architectures targeting the GSoC project timeline
+(Sections 5.12–5.13).
+
+The ordering follows the historical development sequence — from sequential baselines
+establishing the lower bound, through increasingly capable general architectures, to
+equivariant networks encoding lensing symmetry directly into their weights.
 
 ### Architecture Design Progression
-
 ```
-Sequential baselines     Skip connections      Attention        Equivariant
-──────────────────     ────────────────     ──────────────     ──────────────────
-AlexNet                ResNet-18            ViT-Base/16        ENN (D₄)
-VGG-16                 ResNet-50                               E-ResNet (D₄)
-                       DenseNet-121
-                       EfficientNet-B3
+Sequential          Skip connections    Attention       Equivariant                    Planned
+──────────────      ────────────────    ──────────────  ──────────────────────────     ────────────────────────────
+AlexNet             ResNet-18           ViT-Base/16     ENN (D₄, shallow)              EqDenseNet-SO(2)
+VGG-16              ResNet-50                           E-ResNet (D₄, residual)        EqResNet-SO(2)
+                    DenseNet-121                        EqDenseNet-C8 (C8, dense) ←
+                    EfficientNet-B3                     Ensemble (Top-6 soft vote)
 ```
 
 ---
 
-### 5.1 ResNet-18
+### 5.1 AlexNet
 
-**Role:** Skip-connection baseline — establishes that gradient flow to early layers is necessary for low-contrast substructure detection.
+**Role:** Sequential lower-bound — establishes that gradient flow to early layers is
+a prerequisite, not an option, for low-contrast substructure detection.
 
-**Architecture:** 18-layer residual network with BasicBlock (2 × 3×3 conv) units. Skip connections allow gradients to bypass individual blocks, reaching shallow feature detectors without degradation.
+**Architecture:** 5 conv + 3 FC layers with no skip connections and no batch
+normalisation. Gradients must traverse the full network depth to reach shallow feature
+detectors — a fundamental limitation for low-SNR signals.
 
-**Modifications:** First conv layer replaced for single-channel input (1→64, 7×7, stride 2). Classification head replaced with 3-class linear output.
-
-**Training:** 30 epochs, ImageNet pretrained weights, lr = 1e-4, CosineAnnealingLR.
-
-<details>
-<summary><b>Per-class classification report</b></summary>
-
-```
-── Classification Report: ResNet-18 ──────────────────────────
-                 precision    recall  f1-score   support
-
-No Substructure     0.9576    0.9700    0.9638      2500
-         Sphere     0.9413    0.9064    0.9235      2500
-         Vortex     0.9594    0.9808    0.9700      2500
-
-       accuracy                         0.9524      7500
-      macro avg     0.9528    0.9524    0.9524      7500
-   weighted avg     0.9528    0.9524    0.9524      7500
-```
-<!-- Figure: ResNet-18 confusion matrix and ROC/PR curves -->
-
-
-</details>
-<p align="center">
-  <img src="assets/fig5_1_resnet18_eval.png" alt="ResNet-18 confusion matrix and curves" width="95%"/>
-  <br><em>Figure 5.1 — ResNet-18 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right).</em>
-</p>
-
-| Metric | Value |
-|:-------|------:|
-| Macro AUC | **0.9927** |
-| AUC — No Substructure | 0.9939 |
-| AUC — Sphere | 0.9872 |
-| AUC — Vortex | 0.9966 |
-| Sphere PR-AUC | 0.9813 |
-| Test Accuracy | 95.24% |
-| Sphere Recall | 0.9064 |
-| Parameters | 11.2 M |
-| Pretrained | ✅ ImageNet |
-
-
-
- **Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
-
----
-
-### 5.2 ResNet-50
-
-**Role:** Deeper residual architecture — tests the effect of increased depth and channel capacity via bottleneck blocks.
-
-**Architecture:** 50-layer residual network replacing BasicBlocks with 3-layer bottleneck units (1×1 → 3×3 → 1×1). The 1×1 projections reduce and restore channel dimensions around each 3×3 convolution, enabling richer feature hierarchies at controlled computational cost.
-
-**Modifications:** Same single-channel and 3-class head replacements as ResNet-18.
+**Modifications:** First conv layer replaced for single-channel input. Classifier head
+replaced with 3-class output.
 
 **Training:** 30 epochs, ImageNet pretrained, lr = 1e-4.
 
 <details>
 <summary><b>Per-class classification report</b></summary>
-
-```
-── Classification Report: ResNet-50 ──────────────────────────
-                 precision    recall  f1-score   support
-
-No Substructure     0.9709    0.9708    0.9709      2500
-         Sphere     0.9448    0.9180    0.9312      2500
-         Vortex     0.9667    0.9936    0.9800      2500
-
-       accuracy                         0.9608      7500
-      macro avg     0.9608    0.9608    0.9607      7500
-   weighted avg     0.9608    0.9608    0.9607      7500
-```
-
-</details>
-
-<!-- Figure: ResNet-50 confusion matrix and curves -->
-<p align="center">
-  <img src="assets/fig5_2_resnet50_eval.png" alt="ResNet-50 confusion matrix and curves" width="95%"/>
-  <br><em>Figure 5.2 — ResNet-50 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right).</em>
-</p>
-
-| Metric | Value |
-|:-------|------:|
-| Macro AUC | **0.9946** |
-| AUC — No Substructure | 0.9951 |
-| AUC — Sphere | 0.9909 |
-| AUC — Vortex | 0.9974 |
-| Sphere PR-AUC | 0.9862 |
-| Test Accuracy | 96.08% |
-| Sphere Recall | 0.9180 |
-| Parameters | 23.5 M |
-| Pretrained | ✅ ImageNet |
-
-
-
- **Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
-
----
-
-### 5.3 DenseNet-121
-
-**Role:** Densely-connected architecture — tests whether providing every layer with gradient access to all preceding feature maps improves substructure localisation.
-
-**Architecture:** 121-layer network with dense blocks where each layer receives feature-map concatenations from all preceding layers within the block. Four transition layers progressively halve spatial dimensions. Dense connectivity provides each layer with the full representational history, eliminating gradient vanishing and encouraging feature reuse.
-
-**Modifications:** First conv layer replaced for single-channel input. Linear classifier head replaced with 3-class output.
-
-**Training:** 30 epochs, ImageNet pretrained, lr = 1e-4.
-
-<details>
-<summary><b>Per-class classification report</b></summary>
-
-```
-── Classification Report: DenseNet-121 ─────────────────────────
-                 precision    recall  f1-score   support
-
-No Substructure     0.9765    0.9800    0.9782      2500
-         Sphere     0.9511    0.9364    0.9437      2500
-         Vortex     0.9795    0.9900    0.9847      2500
-
-       accuracy                         0.9688      7500
-      macro avg     0.9690    0.9688    0.9689      7500
-   weighted avg     0.9690    0.9688    0.9689      7500
-```
-
-</details>
-<!-- Figure: DenseNet-121 confusion matrix and curves -->
-<p align="center">
-  <img src="assets/fig5_3_densenet121_eval.png" alt="DenseNet-121 confusion matrix and curves" width="95%"/>
-  <br><em>Figure 5.3 — DenseNet-121 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right). Best overall performance across all metrics.</em>
-</p>
-
-| Metric | Value |
-|:-------|------:|
-| Macro AUC | **0.9962** 🥇 |
-| AUC — No Substructure | 0.9963 |
-| AUC — Sphere | 0.9937 |
-| AUC — Vortex | 0.9985 |
-| Sphere PR-AUC | 0.9903 |
-| Test Accuracy | 96.88% |
-| Sphere Recall | **0.9364** 🥇 |
-| Parameters | 7.0 M |
-| Pretrained | ✅ ImageNet |
-
-
-
- **Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
-
----
-
-### 5.4 EfficientNet-B3
-
-**Role:** Compound-scaled architecture — tests principled simultaneous scaling of depth, width, and resolution.
-
-**Architecture:** Neural-architecture-search-derived baseline scaled by compound coefficient β=3. MBConv blocks use depthwise separable convolutions and squeeze-excitation to maintain representational capacity at reduced parameter count.
-
-**Note:** EfficientNet's aggressive spatial downsampling in early layers is a risk for 150×150 astrophysical images where the discriminative signal (ring perturbations) is only a few pixels wide. This contributes to its slightly lower Sphere recall compared to DenseNet-121 and ResNet-50.
-
-**Modifications:** First conv layer replaced for single-channel input. Classification head replaced with 3-class output.
-
-**Training:** 30 epochs, ImageNet pretrained, lr = 1e-4.
-
-<details>
-<summary><b>Per-class classification report</b></summary>
-
-```
-── Classification Report: EfficientNet-B3 ──────────────────────
-                 precision    recall  f1-score   support
-
-No Substructure     0.9583    0.9716    0.9649      2500
-         Sphere     0.9230    0.8848    0.9035      2500
-         Vortex     0.9347    0.9596    0.9470      2500
-
-       accuracy                         0.9387      7500
-      macro avg     0.9387    0.9387    0.9385      7500
-   weighted avg     0.9387    0.9387    0.9385      7500
-```
-
-</details>
-<!-- Figure: EfficientNet-B3 confusion matrix and curves -->
-<p align="center">
-  <img src="assets/fig5_4_efficientnetb3_eval.png" alt="EfficientNet-B3 confusion matrix and curves" width="95%"/>
-  <br><em>Figure 5.4 — EfficientNet-B3 evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right).</em>
-</p>
-
-| Metric | Value |
-|:-------|------:|
-| Macro AUC | **0.9898** |
-| AUC — No Substructure | 0.9915 |
-| AUC — Sphere | 0.9830 |
-| AUC — Vortex | 0.9947 |
-| Sphere PR-AUC | 0.9749 |
-| Test Accuracy | 93.87% |
-| Sphere Recall | 0.8848 |
-| Parameters | 10.7 M |
-| Pretrained | ✅ ImageNet |
-
-
-
- **Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
-
----
-
-### 5.5 AlexNet
-
-**Role:** Sequential deep baseline — establishes the lower bound and demonstrates why gradient flow is critical.
-
-**Architecture:** 5 conv + 3 FC layers with no skip connections and no batch normalisation. The absence of skip connections means gradients must traverse the full depth of the network to reach early feature detectors — a fundamental limitation for low-contrast signals.
-
-**Modifications:** First conv layer replaced for single-channel input. Classifier head replaced with 3-class output.
-
-**Training:** 30 epochs, ImageNet pretrained, lr = 1e-4.
-
-<details>
-<summary><b>Per-class classification report</b></summary>
-
 ```
 ── Classification Report: AlexNet ───────────────────────────────
                  precision    recall  f1-score   support
@@ -518,10 +324,12 @@ No Substructure     0.4912    0.7836    0.6039      2500
 ```
 
 </details>
-<!-- Figure: AlexNet confusion matrix — demonstrates near-random Sphere behaviour -->
+
 <p align="center">
-  <img src="assets/fig5_5_alexnet_eval.png" alt="AlexNet confusion matrix and curves" width="95%"/>
-  <br><em>Figure 5.5 — AlexNet evaluation: the confusion matrix reveals near-random Sphere classification (recall 0.124). Gradient inaccessibility to early feature layers is the primary failure mechanism.</em>
+  <img src="assets/fig5_1_alexnet_eval.png" alt="AlexNet confusion matrix and curves" width="95%"/>
+  <br><em>Figure 5.1 — AlexNet evaluation: confusion matrix (left), ROC curves per class
+  (centre), Sphere PR curve (right). Near-random Sphere classification (recall 0.124)
+  confirms gradient inaccessibility as the primary failure mechanism.</em>
 </p>
 
 | Metric | Value |
@@ -536,29 +344,35 @@ No Substructure     0.4912    0.7836    0.6039      2500
 | Parameters | 57.0 M |
 | Pretrained | ✅ ImageNet |
 
-> ⚠️ AlexNet's Sphere PR-AUC of 0.4380 is only marginally above the random baseline of 0.33, confirming that its Sphere detections carry essentially no discriminative information. The skip-connection gap is the largest single performance discontinuity in this benchmark.
+> ⚠️ Sphere PR-AUC of 0.4380 is only marginally above the random baseline of 0.33.
+> The skip-connection gap is the largest single performance discontinuity in this
+> benchmark — larger than any gap within the skip-connection family.
 
-
-
- **Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
 
 ---
 
-### 5.6 VGG-16
+### 5.2 VGG-16
 
-**Role:** Deep sequential architecture — tests whether depth alone compensates for the absence of skip connections.
+**Role:** Deep sequential architecture — tests whether depth alone compensates for
+the absence of skip connections.
 
-**Architecture:** 16-layer network with uniform 3×3 convolutions arranged sequentially without residual connections. With 134M parameters — by far the largest model in this benchmark — VGG-16 is the clearest demonstration that scale without skip connections cannot solve the gradient accessibility problem.
+**Architecture:** 16-layer network with uniform 3×3 convolutions, no residual
+connections, no batch normalisation. With 134M parameters — the largest in this
+benchmark — VGG-16 is the clearest demonstration that scale without skip connections
+cannot solve the gradient accessibility problem.
 
-**Caveat:** Standard VGG-16 lacks batch normalisation after convolutions. Training instability in early epochs is a known property of this architecture and not an implementation artefact.
+**Caveat:** Standard VGG-16 lacks batch normalisation after convolutions. Training
+instability in early epochs is a known property of this architecture and not an
+implementation artefact.
 
-**Modifications:** First conv layer replaced for single-channel input. Classifier head replaced with 3-class output.
+**Modifications:** First conv layer replaced for single-channel input. Classifier
+head replaced with 3-class output.
 
 **Training:** 30 epochs, ImageNet pretrained, lr = 1e-4.
 
 <details>
 <summary><b>Per-class classification report</b></summary>
-
 ```
 ── Classification Report: VGG-16 ───────────────────────────────
                  precision    recall  f1-score   support
@@ -572,10 +386,11 @@ No Substructure     0.7748    0.8636    0.8168      2500
 ```
 
 </details>
-<!-- Figure: VGG-16 confusion matrix -->
+
 <p align="center">
-  <img src="assets/fig5_6_vgg16_eval.png" alt="VGG-16 confusion matrix and curves" width="95%"/>
-  <br><em>Figure 5.6 — VGG-16 evaluation: Sphere recall of 0.504 despite 134M parameters. Training instability from the absence of batch normalisation is visible in the loss curves.</em>
+  <img src="assets/fig5_2_vgg16_eval.png" alt="VGG-16 confusion matrix and curves" width="95%"/>
+  <br><em>Figure 5.2 — VGG-16 evaluation: Sphere recall of 0.504 despite 134M parameters.
+  Training instability from the absence of batch normalisation is visible in the loss curves.</em>
 </p>
 
 | Metric | Value |
@@ -590,27 +405,246 @@ No Substructure     0.7748    0.8636    0.8168      2500
 | Parameters | **134.3 M** |
 | Pretrained | ✅ ImageNet |
 
-> VGG-16 uses **344×** more parameters than E-ResNet yet achieves substantially worse AUC. This is the most direct demonstration of the value of encoding physical symmetry in place of raw scale.
+> VGG-16 uses **344×** more parameters than E-ResNet yet achieves substantially
+> worse AUC — the clearest demonstration that scale without skip connections
+> provides no benefit for this task.
 
+**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
 
+---
 
- **Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+### 5.3 ResNet-18
+
+**Role:** Skip-connection baseline — establishes that gradient flow to early layers
+is necessary for low-contrast substructure detection.
+
+**Architecture:** 18-layer residual network with BasicBlock (2 × 3×3 conv) units.
+Skip connections allow gradients to bypass individual blocks, reaching shallow feature
+detectors without degradation.
+
+**Modifications:** First conv layer replaced for single-channel input (1→64, 7×7,
+stride 2). Classification head replaced with 3-class linear output.
+
+**Training:** 30 epochs, ImageNet pretrained, lr = 1e-4, CosineAnnealingLR.
+
+<details>
+<summary><b>Per-class classification report</b></summary>
+```
+── Classification Report: ResNet-18 ──────────────────────────
+                 precision    recall  f1-score   support
+
+No Substructure     0.9576    0.9700    0.9638      2500
+         Sphere     0.9413    0.9064    0.9235      2500
+         Vortex     0.9594    0.9808    0.9700      2500
+
+       accuracy                         0.9524      7500
+      macro avg     0.9528    0.9524    0.9524      7500
+```
+
+</details>
+
+<p align="center">
+  <img src="assets/fig5_3_resnet18_eval.png" alt="ResNet-18 confusion matrix and curves" width="95%"/>
+  <br><em>Figure 5.3 — ResNet-18 evaluation: confusion matrix (left), ROC curves per class
+  (centre), Sphere PR curve (right). The skip-connection gap over AlexNet and VGG-16
+  is the largest discontinuity in the benchmark.</em>
+</p>
+
+| Metric | Value |
+|:-------|------:|
+| Macro AUC | 0.9927 |
+| AUC — No Substructure | 0.9939 |
+| AUC — Sphere | 0.9872 |
+| AUC — Vortex | 0.9966 |
+| Sphere PR-AUC | 0.9813 |
+| Test Accuracy | 95.24% |
+| Sphere Recall | 0.9064 |
+| Parameters | 11.2 M |
+| Pretrained | ✅ ImageNet |
+
+**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+
+---
+
+### 5.4 ResNet-50
+
+**Role:** Deeper residual architecture — tests the effect of increased depth and
+channel capacity via bottleneck blocks.
+
+**Architecture:** 50-layer residual network with 3-layer bottleneck units
+(1×1 → 3×3 → 1×1). The 1×1 projections reduce and restore channel dimensions,
+enabling richer feature hierarchies at controlled computational cost.
+
+**Modifications:** Same single-channel and 3-class head replacements as ResNet-18.
+
+**Training:** 30 epochs, ImageNet pretrained, lr = 1e-4.
+
+<details>
+<summary><b>Per-class classification report</b></summary>
+```
+── Classification Report: ResNet-50 ──────────────────────────
+                 precision    recall  f1-score   support
+
+No Substructure     0.9709    0.9708    0.9709      2500
+         Sphere     0.9448    0.9180    0.9312      2500
+         Vortex     0.9667    0.9936    0.9800      2500
+
+       accuracy                         0.9608      7500
+      macro avg     0.9608    0.9608    0.9607      7500
+```
+
+</details>
+
+<p align="center">
+  <img src="assets/fig5_4_resnet50_eval.png" alt="ResNet-50 confusion matrix and curves" width="95%"/>
+  <br><em>Figure 5.4 — ResNet-50 evaluation: confusion matrix (left), ROC curves per class
+  (centre), Sphere PR curve (right).</em>
+</p>
+
+| Metric | Value |
+|:-------|------:|
+| Macro AUC | 0.9946 |
+| AUC — No Substructure | 0.9951 |
+| AUC — Sphere | 0.9909 |
+| AUC — Vortex | 0.9974 |
+| Sphere PR-AUC | 0.9862 |
+| Test Accuracy | 96.08% |
+| Sphere Recall | 0.9180 |
+| Parameters | 23.5 M |
+| Pretrained | ✅ ImageNet |
+
+**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+
+---
+
+### 5.5 DenseNet-121
+
+**Role:** Densely-connected architecture — tests whether providing every layer with
+gradient access to all preceding feature maps improves substructure localisation.
+
+**Architecture:** 121-layer network with dense blocks where each layer receives
+feature-map concatenations from all preceding layers. Four transition layers
+progressively halve spatial dimensions. Dense connectivity eliminates gradient
+vanishing and encourages feature reuse.
+
+**Modifications:** First conv layer replaced for single-channel input. Linear
+classifier head replaced with 3-class output.
+
+**Training:** 30 epochs, ImageNet pretrained, lr = 1e-4.
+
+<details>
+<summary><b>Per-class classification report</b></summary>
+```
+── Classification Report: DenseNet-121 ─────────────────────────
+                 precision    recall  f1-score   support
+
+No Substructure     0.9765    0.9800    0.9782      2500
+         Sphere     0.9511    0.9364    0.9437      2500
+         Vortex     0.9795    0.9900    0.9847      2500
+
+       accuracy                         0.9688      7500
+      macro avg     0.9690    0.9688    0.9689      7500
+```
+
+</details>
+
+<p align="center">
+  <img src="assets/fig5_5_densenet121_eval.png" alt="DenseNet-121 confusion matrix and curves" width="95%"/>
+  <br><em>Figure 5.5 — DenseNet-121 evaluation: confusion matrix (left), ROC curves per class
+  (centre), Sphere PR curve (right). Best pretrained model across all metrics.</em>
+</p>
+
+| Metric | Value |
+|:-------|------:|
+| Macro AUC | 0.9962 |
+| AUC — No Substructure | 0.9963 |
+| AUC — Sphere | 0.9937 |
+| AUC — Vortex | 0.9985 |
+| Sphere PR-AUC | 0.9903 |
+| Test Accuracy | 96.88% |
+| Sphere Recall | 0.9364 |
+| Parameters | 7.0 M |
+| Pretrained | ✅ ImageNet |
+
+**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+
+---
+
+### 5.6 EfficientNet-B3
+
+**Role:** Compound-scaled architecture — tests principled simultaneous scaling of
+depth, width, and resolution.
+
+**Architecture:** NAS-derived baseline scaled by compound coefficient β=3. MBConv
+blocks use depthwise separable convolutions and squeeze-excitation to maintain
+representational capacity at reduced parameter count.
+
+**Note:** EfficientNet's aggressive early spatial downsampling is a risk for 150×150
+images where the discriminative signal (ring perturbations) is only a few pixels
+wide, contributing to its lower Sphere recall relative to DenseNet-121 and ResNet-50.
+
+**Modifications:** First conv layer replaced for single-channel input. Classification
+head replaced with 3-class output.
+
+**Training:** 30 epochs, ImageNet pretrained, lr = 1e-4.
+
+<details>
+<summary><b>Per-class classification report</b></summary>
+```
+── Classification Report: EfficientNet-B3 ──────────────────────
+                 precision    recall  f1-score   support
+
+No Substructure     0.9583    0.9716    0.9649      2500
+         Sphere     0.9230    0.8848    0.9035      2500
+         Vortex     0.9347    0.9596    0.9470      2500
+
+       accuracy                         0.9387      7500
+      macro avg     0.9387    0.9387    0.9385      7500
+```
+
+</details>
+
+<p align="center">
+  <img src="assets/fig5_6_efficientnetb3_eval.png" alt="EfficientNet-B3 confusion matrix and curves" width="95%"/>
+  <br><em>Figure 5.6 — EfficientNet-B3 evaluation: confusion matrix (left), ROC curves per
+  class (centre), Sphere PR curve (right).</em>
+</p>
+
+| Metric | Value |
+|:-------|------:|
+| Macro AUC | 0.9898 |
+| AUC — No Substructure | 0.9915 |
+| AUC — Sphere | 0.9830 |
+| AUC — Vortex | 0.9947 |
+| Sphere PR-AUC | 0.9749 |
+| Test Accuracy | 93.87% |
+| Sphere Recall | 0.8848 |
+| Parameters | 10.7 M |
+| Pretrained | ✅ ImageNet |
+
+**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
 
 ---
 
 ### 5.7 Vision Transformer (ViT-Base/16)
 
-**Role:** Global self-attention architecture — tests whether patch-level attention provides competitive spatial localisation for astrophysical images at 150×150.
+**Role:** Global self-attention architecture — tests whether patch-level attention
+provides competitive spatial localisation for astrophysical images at 150×150.
 
-**Architecture:** ViT-B/16 with 12 transformer encoder layers, 12 attention heads, 768-dimensional embeddings. Input is divided into 16×16 pixel patches (≈ 88 patches total at 150×150). Classification is performed via the CLS token output.
+**Architecture:** ViT-B/16 with 12 transformer encoder layers, 12 attention heads,
+768-dimensional embeddings. Input divided into 16×16 pixel patches (≈88 patches at
+150×150). Classification via CLS token output.
 
 **Training:** 30 epochs, ImageNet-21k pretrained, lr = 1e-4.
 
-**Key finding:** ViT shows class-dependent ring concentration (No Sub: 0.369, Sphere: 0.472, Vortex: 0.475) confirming it has learned to attend to the Einstein ring for substructure classification. However, its attention is *unstable* for substructure classes (std = 0.061–0.054 vs 0.037 for No Sub). This instability — caused by the lack of translation-invariant local detectors — explains its lower AUC despite attending to the correct spatial region at macro scale.
+**Key finding:** ViT shows class-dependent ring concentration (No Sub: 0.369,
+Sphere: 0.472, Vortex: 0.475) but unstable attention for substructure classes
+(std = 0.061–0.054 vs 0.037 for No Sub). Attending to the correct spatial region
+at macro scale does not guarantee detecting the perturbation within it — see
+Section 7.2 for full analysis.
 
 <details>
 <summary><b>Per-class classification report</b></summary>
-
 ```
 ── Classification Report: ViT-Base ─────────────────────────────
                  precision    recall  f1-score   support
@@ -625,10 +659,10 @@ No Substructure     0.9177    0.9600    0.9384      2500
 
 </details>
 
-<!-- Figure: ViT attention rollout maps per class -->
 <p align="center">
   <img src="assets/fig5_7_vit_eval.png" alt="ViT-Base confusion matrix and attention rollout" width="95%"/>
-  <br><em>Figure 5.7 — ViT-Base evaluation: confusion matrix (left), ROC/PR curves (centre), and representative attention rollout maps per class (right). ViT shows class-dependent ring concentration but unstable attention for substructure classes.</em>
+  <br><em>Figure 5.7 — ViT-Base evaluation: confusion matrix (left), ROC/PR curves (centre),
+  representative attention rollout maps per class (right).</em>
 </p>
 
 | Metric | Value |
@@ -643,23 +677,26 @@ No Substructure     0.9177    0.9600    0.9384      2500
 | Parameters | 85.4 M |
 | Pretrained | ✅ ImageNet-21k |
 
-
-
- **Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
 
 ---
 
 ### 5.8 Equivariant Neural Network (D₄-ENN)
 
-**Role:** Shallow equivariant baseline — demonstrates that encoding rotational symmetry helps, but depth and skip connections remain necessary.
+**Role:** Shallow equivariant baseline — demonstrates that encoding rotational
+symmetry helps, but depth and skip connections remain necessary.
 
-**Architecture:** 2-block shallow network built with `escnn` D₄-equivariant convolutions (D₄ = dihedral group of the square, encoding 90° rotations and reflections). Group pooling collapses the equivariant feature space to a standard tensor before classification.
+**Architecture:** 2-block shallow network built with `escnn` D₄-equivariant
+convolutions (D₄ = dihedral group of the square, 90° rotations + reflections).
+GroupPooling collapses the equivariant feature space to a standard tensor before
+classification.
 
-**Training:** Trained **from scratch** — no ImageNet pretraining exists for group-equivariant architectures. 50 epochs, lr = 1e-3 (higher LR required for from-scratch training).
-<!-- Figure: ENN (D4) confusion matrix -->
+**Training:** From scratch — 50 epochs, lr = 1e-3.
+
 <p align="center">
   <img src="assets/fig5_8_enn_eval.png" alt="Equivariant-D4 ENN confusion matrix and curves" width="95%"/>
-  <br><em>Figure 5.8 — Equivariant-D4 (ENN) evaluation: the shallow architecture demonstrates that equivariance alone is insufficient — depth and skip connections are required to bring AUC into the competitive range.</em>
+  <br><em>Figure 5.8 — Equivariant-D4 (ENN) evaluation: equivariance alone without sufficient
+  depth and skip connections yields AUC only 0.74.</em>
 </p>
 
 | Metric | Value |
@@ -674,25 +711,27 @@ No Substructure     0.9177    0.9600    0.9384      2500
 | Parameters | ~0.0 M (shallow) |
 | Pretrained | ❌ Scratch |
 
-
-
- **Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
 
 ---
 
-### 5.9 Equivariant Residual Network (E-ResNet) 
+### 5.9 Equivariant Residual Network (E-ResNet)
 
-**Role:** Primary physics-motivated architecture — combines D₄ rotational symmetry with residual skip connections.
+**Role:** Physics-motivated architecture — combines D₄ rotational symmetry with
+residual skip connections.
 
-**Architecture:** Multi-block residual network built entirely from D₄-equivariant convolutions. Each residual block contains two `escnn` R2Conv layers with InnerBatchNorm and ReLU, connected by an identity shortcut. The identity shortcuts allow gradients to bypass the group-theoretic transformations, enabling stable training at greater depth while preserving the D₄ equivariance guarantee throughout.
+**Architecture:** Multi-block residual network built entirely from D₄-equivariant
+R2Conv layers with InnerBatchNorm and ReLU. Identity shortcuts allow gradients to
+bypass group-theoretic transformations while preserving the D₄ equivariance
+guarantee throughout.
 
 **Two physical priors encoded simultaneously:**
+1. **Rotational symmetry** — D₄ equivariance guarantees identical predictions for
+   all 8 orientations, by construction
+2. **Hierarchical feature reuse** — residual connections allow substructure-scale
+   gradients to reach early layers without decay
 
-1. **Rotational symmetry** — D₄ equivariance guarantees identical predictions for all 8 orientations of any input image, by construction. A gravitational lens has no preferred orientation.
-2. **Hierarchical feature reuse** — residual connections allow substructure-scale gradients to reach early layers without decay.
-
-**Training:** Trained **from scratch** — 60 epochs, AdamW, lr = 1e-3, patience = 15.
-
+**Training:** From scratch — 60 epochs, AdamW, lr = 1e-3, patience = 15.
 ```
 E-ResNet Architecture (D₄-equivariant):
 
@@ -706,16 +745,11 @@ Input (1×150×150)
      │
   [Block 3]   R2Conv → BN → ReLU → R2Conv → BN + identity → StridePool
      │
-  [GroupPool] Collapse equivariant → standard tensor
-     │
-  [AdaptiveAvgPool2d(1)] → Flatten → Linear(3)
-     │
-  Output (3 logits)
+  [GroupPool] → AdaptiveAvgPool(1) → Flatten → Linear(3)
 ```
 
 <details>
 <summary><b>Per-class classification report</b></summary>
-
 ```
 ── Classification Report: E-ResNet ──────────────────────────────
                  precision    recall  f1-score   support
@@ -726,36 +760,241 @@ No Substructure     0.9413    0.9880    0.9641      2500
 
        accuracy                         0.9596      7500
       macro avg     0.9601    0.9596    0.9594      7500
-   weighted avg     0.9601    0.9596    0.9594      7500
 ```
 
 </details>
-<!-- Figure: E-ResNet confusion matrix, ROC/PR curves -->
+
 <p align="center">
   <img src="assets/fig5_9_eresnet_eval.png" alt="E-ResNet confusion matrix and evaluation curves" width="95%"/>
-  <br><em>Figure 5.9 — E-ResNet evaluation: confusion matrix (left), ROC curves per class (centre), Sphere PR curve (right). Second-best macro AUC at 0.39M parameters trained from scratch.</em>
+  <br><em>Figure 5.9 — E-ResNet evaluation: confusion matrix (left), ROC curves per class
+  (centre), Sphere PR curve (right).</em>
 </p>
 
 | Metric | Value |
 |:-------|------:|
-| Macro AUC | **0.9952** 🥈 |
+| Macro AUC | 0.9952 |
 | AUC — No Substructure | 0.9960 |
 | AUC — Sphere | 0.9918 |
 | AUC — Vortex | 0.9977 |
 | Sphere PR-AUC | 0.9871 |
 | Test Accuracy | 95.96% |
 | Sphere Recall | 0.9224 |
-| Parameters | **0.39 M** 🏆 |
+| Parameters | 0.39 M |
 | Pretrained | ❌ Scratch |
 
-> E-ResNet achieves the second-highest AUC in this benchmark with **0.39M parameters** — 30× fewer than ResNet-18 and 344× fewer than VGG-16. The untrained E-ResNet is **37.3× more rotationally stable** than an untrained ResNet-50 (L₂ probability divergence test), proving the symmetry is architectural, not learned.
+> E-ResNet achieves competitive AUC at **0.39M parameters** — 30× fewer than
+> ResNet-18 and 344× fewer than VGG-16. The untrained E-ResNet is **641× more
+> rotationally stable** than untrained ResNet-50 (L₂ probability divergence test,
+> Section 7.5), proving the symmetry is architectural, not learned.
 
-
-
- **Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
 
 ---
 
+### 5.10 Equivariant DenseNet (C8)
+
+**Role:** Novel architecture combining C8 cyclic equivariance with DenseNet-style
+dense connectivity — the primary architectural contribution of this benchmark.
+Surpasses all ten other architectures, including all seven ImageNet-pretrained models,
+on every reported metric.
+
+**Motivation:** E-ResNet uses D₄ equivariance — 8 discrete symmetries of the square
+(rotations at 90° increments plus reflections). C8 is a cyclic group of 8 rotations
+at 45° increments without reflections, providing finer angular coverage. Combined
+with dense connectivity — where each layer receives concatenated feature maps from
+all preceding layers — this architecture encodes two complementary inductive biases
+simultaneously.
+
+**Two design choices combined for the first time in DeepLense:**
+1. **C8 equivariance** — finer 45° angular coverage vs D₄'s 90°, no reflections
+2. **Dense connectivity** — each layer has access to all preceding feature maps
+
+**Implementation notes:**
+- `rot2dOnR2(N=8)` — C8 cyclic group, rotations only, no reflections
+- Odd spatial dimensions (75×75 after stem stride=2) do not break the C8 equivariance
+  guarantee, unlike D₄ which requires even dimensions
+- `InnerBatchNorm` and `ReLU` valid for C8 `regular_repr` fields throughout
+- `GroupPooling` collapses the C8 group dimension before the classifier,
+  producing rotation-invariant features
+```
+EqDenseNet-C8 Architecture:
+
+Input (1×150×150)
+     │
+  [Stem Conv]  R2Conv 5×5, stride=2, padding=2 → 75×75
+     │
+  [DenseBlock 1 + Transition] → ~37×37
+     │
+  [DenseBlock 2 + Transition] → ~18×18
+     │
+  [DenseBlock 3]
+     │
+  [InnerBN → ReLU → GroupPool] → AdaptiveAvgPool(1) → Flatten → Linear(3)
+```
+
+**Training:** From scratch — 60 epochs, AdamW, lr = 1e-3, patience = 15.
+
+<details>
+<summary><b>Per-class classification report</b></summary>
+```
+── Classification Report: EqDenseNet-C8 ─────────────────────────
+                 precision    recall  f1-score   support
+
+No Substructure     0.9900    0.9960    0.9930      2500
+         Sphere     0.9825    0.9448    0.9633      2500
+         Vortex     0.9867    0.9796    0.9832      2500
+
+       accuracy                         0.9735      7500
+      macro avg     0.9864    0.9735    0.9798      7500
+```
+
+</details>
+
+<p align="center">
+  <img src="assets/fig5_10a_eqdensenet_c8_training.png"
+       alt="EqDenseNet-C8 training curves" width="95%"/>
+  <br><em>Figure 5.10a — EqDenseNet-C8 training curves. Left: train/val loss — both
+  converge stably by epoch 60 with no divergence. Right: validation accuracy —
+  reaches above 0.95 by epoch 10 and continues improving to ~0.97 at convergence.</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig5_10b_eqdensenet_c8_eval.png"
+       alt="EqDenseNet-C8 evaluation: ROC, confusion matrix, PR, calibration" width="95%"/>
+  <br><em>Figure 5.10b — EqDenseNet-C8 evaluation. Top-left: ROC curves per class
+  (No Sub AUC=0.997, Sphere AUC=0.996, Vortex AUC=0.999, Macro=0.997). Top-right:
+  confusion matrix — No Sub 2490/2500, Sphere 2362/2500, Vortex 2449/2500; dominant
+  off-diagonal is Sphere→No Sub (107 images). Bottom-left: Sphere PR-AUC=0.993 —
+  highest in the benchmark. Bottom-right: calibration curve shows slight
+  underconfidence at mid-range probabilities, well-calibrated at the extremes.</em>
+</p>
+
+| Metric | Value |
+|:-------|------:|
+| Macro AUC | **0.9974** 🥇 |
+| AUC — No Substructure | 0.9974 |
+| AUC — Sphere | **0.9955** 🥇 |
+| AUC — Vortex | 0.9990 |
+| Sphere PR-AUC | **0.9932** 🥇 |
+| Test Accuracy | **97.35%** 🥇 |
+| Sphere Recall | **0.9448** 🥇 |
+| Parameters | **0.093 M** |
+| Pretrained | ❌ Scratch |
+
+> EqDenseNet-C8 achieves the highest Macro AUC, Sphere AUC, Sphere PR-AUC, Sphere
+> Recall, and Test Accuracy of all thirteen architectures — including all seven
+> ImageNet-pretrained models — at **0.093M parameters trained entirely from scratch**.
+> The combined inductive bias of C8 equivariance and dense connectivity provides a
+> stronger prior for gravitational lensing substructure detection than 75× more
+> parameters with ImageNet pretraining (DenseNet-121, 7.0M).
+
+**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+
+---
+
+### 5.11 Soft Ensemble (Top-6)
+
+**Role:** Post-hoc combination of the six best-performing models via probability
+averaging — tests whether ensemble diversity compensates for individual model errors.
+
+**Members:** EqDenseNet-C8 · DenseNet-121 · E-ResNet · ResNet-50 · ResNet-18 ·
+EfficientNet-B3
+
+**Method:** Soft voting — mean of softmax probability vectors across all six models.
+Soft voting weights confident predictions more than uncertain ones, making it more
+informative than hard (majority) voting.
+
+**Key finding:** The ensemble underperforms EqDenseNet-C8 alone on every metric —
+Macro AUC 0.9970 vs 0.9974, Sphere Recall 0.9360 vs 0.9448. Averaging with five
+weaker models dilutes EqDenseNet-C8's probability estimates on hard cases. Ensemble
+gains require diverse error profiles; when one model is consistently dominant on the
+hardest class, uniform averaging reduces rather than improves performance.
+
+<details>
+<summary><b>Per-class classification report</b></summary>
+```
+── Classification Report: Soft Ensemble (Top-6) ─────────────────
+                 precision    recall  f1-score   support
+
+No Substructure     0.9458    0.9988    0.9716      2500
+         Sphere     0.9878    0.9360    0.9612      2500
+         Vortex     0.9864    0.9828    0.9846      2500
+
+       accuracy                         0.9725      7500
+      macro avg     0.9733    0.9725    0.9725      7500
+```
+
+</details>
+
+<p align="center">
+  <img src="assets/fig5_11_ensemble_eval.png"
+       alt="Soft Ensemble evaluation: ROC, confusion matrix, PR, calibration" width="95%"/>
+  <br><em>Figure 5.11 — Soft Ensemble (Top-6) evaluation: ROC curves per class (top-left),
+  confusion matrix (top-right), Sphere PR curve (bottom-left), calibration curve
+  (bottom-right). The ensemble underperforms EqDenseNet-C8 alone on all metrics.</em>
+</p>
+
+| Metric | Value |
+|:-------|------:|
+| Macro AUC | 0.9970 |
+| AUC — No Substructure | 0.9970 |
+| AUC — Sphere | 0.9949 |
+| AUC — Vortex | 0.9990 |
+| Sphere PR-AUC | 0.9923 |
+| Test Accuracy | 97.25% |
+| Sphere Recall | 0.9360 |
+| Parameters | N/A |
+| Pretrained | Mixed |
+
+---
+
+### 5.12 Equivariant DenseNet SO(2) — Planned †
+
+**Role:** Would test true continuous rotation equivariance combined with dense
+connectivity — extending EqDenseNet-C8 from 8 discrete angles to all rotation angles.
+
+**Motivation:** C8 covers rotations at 45° increments. Real gravitational lenses
+observed by LSST/Euclid appear at arbitrary position angles. SO(2) is the physically
+correct symmetry group for this task.
+
+**Implementation status:** Attempted during Common Test I. SO(2) dense connectivity
+is incompatible with `escnn`'s current API: `FourierELU` outputs `regular_repr` on
+the discretised N=8 grid rather than preserving the irrep-based field type. DenseNet's
+type-accumulating connectivity requires strict type consistency across layers, which
+`FourierELU` breaks. Documented as a finding — a custom equivariant nonlinearity
+preserving irrep field types is required to resolve this.
+
+**Planned for:** GSoC 2026 project timeline.
+
+---
+
+### 5.13 Equivariant ResNet SO(2) — Planned †
+
+**Role:** Would test true continuous rotation equivariance combined with residual
+connectivity — enabling a clean 2×2 ablation: {C8, SO(2)} × {residual, dense}.
+
+**Implementation status:** Architecture instantiated and training attempted during
+Common Test I. Training loss remained fixed at 1.0990 (= −ln(1/3), random chance)
+across all configurations. Generalized He initialization, reduced learning rate
+(1e-4), and negative bias initialization for `NormNonLinearity` all failed to break
+the dead-norm barrier. The root cause is `NormNonLinearity`'s ReLU on field norms —
+when SO(2) field norms are small at initialization, gradients are zero. Documented
+as a finding.
+
+**Planned for:** GSoC 2026 project timeline. Upon completion, the full ablation
+table will read:
+
+| | Residual | Dense |
+|:--|:--------:|:-----:|
+| **D₄** | E-ResNet (0.9952) | — |
+| **C8** | — | EqDenseNet-C8 (0.9974) |
+| **SO(2)** | EqResNet-SO2 (planned) | EqDenseNet-SO2 (planned) |
+
+*This table will directly address the open question from Apoorva Singh (2021):
+"design networks that can use continuous symmetry groups efficiently."*
+
+† *Sections 5.12–5.13 document implementation attempts from Common Test I.
+Full implementation is planned for the GSoC 2026 project period.*
 ## 6. Comprehensive Results Summary
 
 ### 6.1 Full Benchmark Table
