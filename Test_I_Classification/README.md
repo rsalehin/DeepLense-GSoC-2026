@@ -1324,6 +1324,34 @@ Two classifiers were trained on CAE residuals:
   <br><em>Figure 9.2 — Residual classifier training dynamics. Left: DenseNet-121 train vs val loss — best checkpoint at epoch 10 (val 0.3946), monotonic val deterioration to 0.8211 by epoch 30, train loss near zero. Right: ResNet-18 train vs val loss — checkpoints at epoch 5 (val 0.4213), remaining 25 epochs progressively worse. The two-order-of-magnitude train/val gap is severe overfitting driven by insufficient signal-to-noise in the residuals.</em>
 </p>
 
+<p align="center">
+  <img src="assets/fig11_cae_training.png"
+       alt="CAE training curve" width="95%"/>
+  <br><em>Figure 9.2 — CAE training curve (trained on No Substructure images only,
+  60 epochs). Train and val MSE loss converge by epoch 3 and track closely
+  throughout, with no divergence. Final MSE near zero confirms the CAE
+  reliably reconstructs the smooth lens morphology.</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig11_residual_distributions.png"
+       alt="Residual distributions inside ring annulus per class" width="95%"/>
+  <br><em>Figure 9.3 — Residual value distributions inside the Einstein ring annulus
+  per class. No Substructure std = 0.01492. Sphere std = 0.01722.
+  Vortex std = 0.01646. Substructure classes show wider distributions,
+  consistent with unreconstucted perturbation signal remaining in the residual.</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig11_mean_residual_maps.png"
+       alt="Mean and std residual maps per class" width="95%"/>
+  <br><em>Figure 9.4 — Mean residual maps (top row) and pixel-wise std maps
+  (bottom row) per class, n=50 images each. Mean pixel std: No Substructure
+  0.00760, Sphere 0.00843, Vortex 0.00802. No Substructure mean map shows
+  noise with no coherent spatial structure. Sphere and Vortex std maps show
+  elevated variance concentrated in the ring annulus region.</em>
+</p>
+
 
 **Per-class AUC on residuals:**
 
@@ -1331,7 +1359,7 @@ Two classifiers were trained on CAE residuals:
 |:------|:----------------------:|:--------------------:|
 | No Substructure | 0.9724 | 0.9683 |
 | Vortex | 0.9630 | 0.9556 |
-| **Sphere** | 0.9488 | 0.9390 |
+| Sphere ⚠️ | 0.9488 | 0.9390 |
 
 ### 9.4 Summary & Interpretation
 
