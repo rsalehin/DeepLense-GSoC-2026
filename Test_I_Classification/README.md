@@ -1275,83 +1275,109 @@ a fundamental architectural trade-off, not a training artefact.
 
 ### 9.1 Motivation
 
-A physically motivated hypothesis: if the smooth lens morphology can be subtracted from each image, the residual should contain only the substructure perturbation signal — a potentially cleaner input for classification. This approach would be most valuable in a heterogeneous lens population where macro-lens morphology varies strongly, making the raw image a noisier discriminant.
+A physically motivated hypothesis: if the smooth lens morphology can be subtracted 
+from each image, the residual should contain only the substructure perturbation 
+signal — a potentially cleaner input for classification. This approach would be most 
+valuable in a heterogeneous lens population where macro-lens morphology varies 
+strongly, making the raw image a noisier discriminant.
 
 ### 9.2 Convolutional Autoencoder
 
-An analytical fitting approach (using `lenstronomy` to fit SIE + shear parameters) was attempted but abandoned due to parameter degeneracy and slow convergence per image. A **Convolutional Autoencoder (CAE)** was trained instead.
+An analytical fitting approach (using `lenstronomy` to fit SIE + shear parameters) 
+was attempted but abandoned due to parameter degeneracy and slow convergence per 
+image. A **Convolutional Autoencoder (CAE)** was trained instead, exclusively on 
+No Substructure images — forcing it to learn only the smooth lens morphology. 
+Applied to Sphere and Vortex images, the difference (observed − reconstruction) 
+isolates the perturbation signal.
 
 **CAE architecture:**
 ```
 Encoder: 4 × (Conv2d + ReLU + MaxPool) → Flatten → Linear(128)
            ↓ channels: 1 → 16 → 32 → 64 → 128
-Decoder: Linear(128) → Unflatten → 4 × (ConvTranspose2d + ReLU/Sigmoid) + skip skips
+Decoder: Linear(128) → Unflatten → 4 × (ConvTranspose2d + ReLU/Sigmoid)
            ↑ channels: 128 → 64 → 32 → 16 → 1
 ```
 
-<!-- Figure: CAE reconstruction examples — original / reconstruction / residual per class -->
-<p align="center">
-  <img src="assets/fig9_1_cae_residuals.png" alt="CAE residual visualisation: original, reconstruction, residual per class" width="95%"/>
-  <br><em>Figure 9.1 — CAE residual visualisation (n=1 example per class). Columns: original image, fitted clean lens (CAE reconstruction), residual full range, residual clipped ±0.1. No Substructure residuals are noise-like (near-zero); Sphere residuals show a compact positive peak at the subhalo location; Vortex residuals show asymmetric arc perturbations.</em>
-</p>
-The CAE is trained on **No Substructure images only**, learning to reconstruct the smooth lens morphology. Applied to Sphere and Vortex images, the difference (observed − CAE reconstruction) isolates the perturbation.
-
-
-**Residual statistics (ring annulus, per class):**
-
-| Class | Mean residual | Std residual | Mean |residual| |
-|:------|:-------------:|:------------:|:-------------------:|
-No Substructure:  mean=0.03290, std=0.18149, mean|residual|=0.12398
-Sphere:           mean=0.03915, std=0.15966, mean|residual|=0.10564
-Vortex:           mean=0.04661, std=0.17307, mean|residual|=0.11574
-
-### 9.3 Residual Classifiers
-
-
-
-Two classifiers were trained on CAE residuals:
-
-| Model | Input | Macro AUC | Val Accuracy | Training |
-|:------|:-----:|:---------:|:------------:|:--------:|
-| DenseNet-121 | Raw images | 0.9950 | 96.95% | Pretrained |
-| **DenseNet-121** | CAE residuals | 0.9614 | 84.88% | Scratch |
-| **ResNet-18** | CAE residuals | 0.9543 | 83.80% | Scratch |
-
-<!-- Figure: residual classifier training curves showing severe overfitting -->
-<p align="center">
-  <img src="assets/fig9_2_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="95%"/>
-   <img src="assets/fig9_3_residual_classifier_training.png" alt="Residual classifier training curves — severe overfitting" width="95%"/>
-  <br><em>Figure 9.2 — Residual classifier training dynamics. Left: DenseNet-121 train vs val loss — best checkpoint at epoch 10 (val 0.3946), monotonic val deterioration to 0.8211 by epoch 30, train loss near zero. Right: ResNet-18 train vs val loss — checkpoints at epoch 5 (val 0.4213), remaining 25 epochs progressively worse. The two-order-of-magnitude train/val gap is severe overfitting driven by insufficient signal-to-noise in the residuals.</em>
-</p>
+The training curve below confirms the CAE converged stably on the smooth lens 
+reconstruction task before being applied to substructure images.
 
 <p align="center">
   <img src="assets/fig11_cae_training.png"
        alt="CAE training curve" width="95%"/>
-  <br><em>Figure 9.2 — CAE training curve (trained on No Substructure images only,
-  60 epochs). Train and val MSE loss converge by epoch 3 and track closely
-  throughout, with no divergence. Final MSE near zero confirms the CAE
-  reliably reconstructs the smooth lens morphology.</em>
+  <br><em>Figure 9.1 — CAE training curve (No Substructure images only, 60 epochs). 
+  Train and val MSE loss converge by epoch 3 and track closely throughout with no 
+  divergence. Final MSE near zero.</em>
+</p>
+
+The three figures below characterise the residual quality — whether the CAE 
+subtraction leaves interpretable substructure signal or noise.
+
+<p align="center">
+  <img src="assets/fig9_1_cae_residuals.png"
+       alt="CAE residual visualisation: original, reconstruction, residual per class" width="95%"/>
+  <br><em>Figure 9.2 — CAE residual visualisation (n=1 example per class). Columns: 
+  original image, CAE reconstruction, residual full range, residual clipped ±0.1. 
+  No Substructure residuals are near-zero; Sphere and Vortex residuals show 
+  localised structure in the ring region.</em>
 </p>
 
 <p align="center">
   <img src="assets/fig11_residual_distributions.png"
        alt="Residual distributions inside ring annulus per class" width="95%"/>
-  <br><em>Figure 9.3 — Residual value distributions inside the Einstein ring annulus
-  per class. No Substructure std = 0.01492. Sphere std = 0.01722.
-  Vortex std = 0.01646. Substructure classes show wider distributions,
-  consistent with unreconstucted perturbation signal remaining in the residual.</em>
+  <br><em>Figure 9.3 — Residual value distributions inside the Einstein ring annulus 
+  per class. No Substructure std = 0.01492. Sphere std = 0.01722. 
+  Vortex std = 0.01646. Substructure classes show wider distributions, consistent 
+  with unreconstucted perturbation signal remaining in the residual.</em>
 </p>
 
 <p align="center">
   <img src="assets/fig11_mean_residual_maps.png"
        alt="Mean and std residual maps per class" width="95%"/>
-  <br><em>Figure 9.4 — Mean residual maps (top row) and pixel-wise std maps
-  (bottom row) per class, n=50 images each. Mean pixel std: No Substructure
-  0.00760, Sphere 0.00843, Vortex 0.00802. No Substructure mean map shows
-  noise with no coherent spatial structure. Sphere and Vortex std maps show
-  elevated variance concentrated in the ring annulus region.</em>
+  <br><em>Figure 9.4 — Mean residual maps (top row) and pixel-wise std maps (bottom 
+  row), n=50 images per class. Mean pixel std: No Substructure 0.00760, Sphere 
+  0.00843, Vortex 0.00802. No Substructure mean map shows no coherent spatial 
+  structure. Sphere and Vortex std maps show elevated variance concentrated in 
+  the ring annulus.</em>
 </p>
 
+**Residual statistics (ring annulus, per class):**
+
+| Class | Mean residual | Std residual | Mean \|residual\| |
+|:------|:-------------:|:------------:|:-----------------:|
+| No Substructure | 0.03290 | 0.18149 | 0.12398 |
+| Sphere | 0.03915 | 0.15966 | 0.10564 |
+| Vortex | 0.04661 | 0.17307 | 0.11574 |
+
+---
+
+### 9.3 Residual Classifiers
+
+Two classifiers were trained on CAE residuals and compared against the raw-image 
+DenseNet-121 baseline from Section 5.
+
+| Model | Input | Macro AUC | Val Accuracy | Training |
+|:------|:-----:|:---------:|:------------:|:--------:|
+| DenseNet-121 | Raw images | 0.9950 | 96.95% | Pretrained |
+| DenseNet-121 | CAE residuals | 0.9614 | 84.88% | Scratch |
+| ResNet-18 | CAE residuals | 0.9543 | 83.80% | Scratch |
+
+Both residual classifiers exhibit severe overfitting — the training curves below 
+show a two-order-of-magnitude train/val loss gap by epoch 30.
+
+<p align="center">
+  <img src="assets/fig9_2_residual_classifier_training.png"
+       alt="DenseNet-121 residual classifier training curve" width="95%"/>
+  <br><em>Figure 9.5 — DenseNet-121 residual classifier training. Best checkpoint 
+  at epoch 10 (val loss 0.3946), monotonic val deterioration to 0.8211 by epoch 30, 
+  train loss near zero.</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig9_3_residual_classifier_training.png"
+       alt="ResNet-18 residual classifier training curve" width="95%"/>
+  <br><em>Figure 9.6 — ResNet-18 residual classifier training. Best checkpoint at 
+  epoch 5 (val loss 0.4213), no further improvement in the remaining 25 epochs.</em>
+</p>
 
 **Per-class AUC on residuals:**
 
@@ -1361,24 +1387,31 @@ Two classifiers were trained on CAE residuals:
 | Vortex | 0.9630 | 0.9556 |
 | Sphere ⚠️ | 0.9488 | 0.9390 |
 
+---
+
 ### 9.4 Summary & Interpretation
 
 | Finding | Value |
 |:--------|:------|
 | AUC gap (raw → residual DenseNet-121) | −0.034 |
 | DenseNet-121 best checkpoint epoch | Epoch 10 |
-| DenseNet-121 train/val loss gap at epoch 30 | 0.0013 vs 0.8211 (severe overfitting) |
+| DenseNet-121 train/val loss gap at epoch 30 | 0.0013 vs 0.8211 |
 | ResNet-18 best checkpoint epoch | Epoch 5 |
 
+**Conclusion:** For this homogeneous simulated dataset, classifying raw images 
+directly is the correct engineering choice. The residual approach demonstrates 
+that isolated perturbation signal contains real discriminative information 
+(AUC well above 0.5), but introduces:
 
-**Conclusion:** For this homogeneous simulated dataset, classifying raw images directly is the correct engineering choice. The residual approach demonstrates that isolated perturbation signal contains real discriminative information (AUC well above 0.5), but introduces:
 1. A reconstruction noise penalty from CAE artefacts
-2. Loss of macro-lens morphology cues (arc geometry, ring brightness) that carry discriminative information on a homogeneous lens population
+2. Loss of macro-lens morphology cues that carry discriminative information on 
+   a homogeneous lens population
 3. Severe overfitting risk when training a 7M-parameter model from scratch on residuals
 
-The residual approach would become competitive in a **heterogeneous lens population** (variable mass, ellipticity, redshift) where macro-lens morphology varies strongly across images, making isolated perturbation signals relatively more discriminative than full-image features.
-
----
+The residual approach would become competitive in a **heterogeneous lens population** 
+(variable mass, ellipticity, redshift) where macro-lens morphology varies strongly 
+across images, making isolated perturbation signals relatively more discriminative 
+than full-image features.
 
 ## 10. Discussion
 
