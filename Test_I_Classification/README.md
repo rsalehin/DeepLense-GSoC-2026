@@ -61,8 +61,9 @@ using nine architectures — from convolutional baselines to D₄-equivariant re
 8. [Failure Mode Analysis](#8-failure-mode-analysis)
    - [8.1 Cross-Architecture Sphere Confusion](#81-cross-architecture-sphere-confusion)
    - [8.2 Statistical Characterisation of Failures](#82-statistical-characterisation-of-failures)
-   - [8.3 Confidence vs Ring Brightness](#83-confidence-vs-ring-brightness)
-   - [8.4 Physical Interpretation](#84-physical-interpretation)
+   - [8.3 Confidence and Accuracy vs Ring Brightness](#83-confidence-and-accuracy-vs-ring-brightness)
+   - [8.4 Perturbation Position Analysis](#84-perturbation-position-analysis)
+   - [8.5 Physical Interpretation](#85-physical-interpretation)
 9. [Residual Image Approach](#9-residual-image-approach)
    - [9.1 Motivation](#91-motivation)
    - [9.2 Convolutional Autoencoder](#92-convolutional-autoencoder)
@@ -1090,7 +1091,8 @@ E-ResNet achieves 2.5× better empirical invariance than an augmented ResNet-50,
 
 ### 8.1 Cross-Architecture Sphere Confusion
 
-The Sphere misclassification pattern is **universal** across all well-converged models:
+The Sphere misclassification pattern is universal across all well-converged models — 
+misclassified Sphere images flow predominantly into No Substructure, not Vortex.
 
 <pre>
 Sphere prediction flows:
@@ -1100,122 +1102,158 @@ Sphere prediction flows:
                                                 →  Vortex (rare)
 ─────────────────────────────────────────────────────
 </pre>
+
+**Universally missed Sphere images (all 6 ensemble models wrong simultaneously): 64**
+These 64 images are misclassified as No Substructure by every model with near-zero
+entropy — they pass through any entropy-based triage filter undetected.
+
+| Feature | Universally missed (n=64) | Universally correct (n=1821) | p-value |
+|:--------|:-------------------------:|:----------------------------:|:-------:|
+| Raw mean pixel intensity | 0.0575 | 0.0635 | 4.46×10⁻⁹ |
+| Raw pixel std | 0.1103 | 0.1184 | < 0.001 |
+
+*Statistics computed on unnormalised .npy arrays. Raw contrast (max−min) = 1.0000
+for both groups — uninformative due to per-sample normalisation (p = 1.0).*
+
 <p align="center">
-  <img src="assets/fig8_1_universally_misclassified_correct.png" alt="Universally misclassified vs universally correct Sphere images" width="95%"/>
-  <br><em>Figure 8.1 — Sphere subhalo images: universally misclassified (top row) vs universally correct (bottom row), 
-  as judged by all 6 ensemble models. Top row: 12 Sphere images predicted as No Substructure by every model — 
-  all show sparse, dimly-lit arcs with no visually apparent compact knot. Bottom row: 12 Sphere images correctly 
-  classified by every model — arcs are brighter and more complete. Raw contrast c = max−min of unnormalised pixels 
-  is identical at 1.0000 for all images in both rows, confirming contrast is uninformative and the failure is 
-  driven by absolute flux (ring brightness), not dynamic range.</em>
+  <img src="assets/fig8_1_universally_misclassified_correct.png"
+       alt="Universally misclassified vs universally correct Sphere images" width="95%"/>
+  <br><em>Figure 8.1 — Sphere images universally misclassified (top, n=12 shown) vs
+  universally correct (bottom, n=12 shown) across all 6 ensemble models. Raw contrast
+  c = max−min of unnormalised pixels is 1.0000 for all images in both rows.</em>
 </p>
 
 <p align="center">
-  <img src="assets/fig8_1_sphere_class_difficulty.png" alt="Sphere class difficulty: raw image statistics" width="95%"/>
-  <br><em>Figure 8.2 — Sphere class difficulty quantified on unnormalised .npy arrays (all correct n=1821, 
-  all wrong n=64). Left: contrast distributions (max−min) — both groups collapse to exactly 1.0, confirming 
-  that per-sample min-max normalisation renders contrast completely uninformative (p=1.0). Centre: raw mean 
-  pixel intensity distributions — wrongly classified images are systematically dimmer, with the wrong group 
-  skewed toward lower values (p≈0.0). Right: boxplot of raw mean pixel intensity — wrongly classified images 
-  have a lower median and compressed upper quartile (Mann-Whitney p=4.46×10⁻⁹), establishing low absolute 
-  ring flux as the primary predictor of universal misclassification.</em>
+  <img src="assets/fig8_1_sphere_class_difficulty.png"
+       alt="Sphere class difficulty: raw image statistics" width="95%"/>
+  <br><em>Figure 8.2 — Raw image statistics for universally wrong (n=64) vs universally
+  correct (n=1821) Sphere images. Left: contrast — both groups at exactly 1.0 (p=1.0,
+  uninformative). Centre: raw mean pixel intensity distributions — wrong group
+  systematically lower. Right: boxplot confirming lower median and compressed upper
+  quartile for wrong group (Mann-Whitney p=4.46×10⁻⁹).</em>
 </p>
 
-**E-ResNet universally missed images:** 64 Sphere images are misclassified as No Substructure by all 6 ensemble models with near-zero entropy. These images have statistically distinct morphological properties:
-
-| Feature | Universally missed | Universally correct | p-value |
-|:--------|:-----------------:|:-------------------:|:-------:|
-| Mean pixel intensity | 0.0575 | 0.0635 | < 0.001 |
-| Pixel standard deviation | 0.1103 | 0.1184 | < 0.001 |
-
-<!-- Figure: cross-architecture confusion matrices for all 9 models side by side -->
 <p align="center">
-  <img src="assets/fig8_1_cross_arch_confusion.png" alt="Cross-architecture confusion matrices for all 9 models" width="95%"/>
-  <br><em>Figure 8.3 — Confusion matrices for all nine architectures sorted by macro AUC (row-normalised; 
-  raw counts in parentheses). Tier 1 models (green border, AUC > 0.989) achieve Sphere recall of 0.88–0.94 
-  with misclassifications flowing almost exclusively into No Substructure, not Vortex. ViT-Base (orange 
-  border, Tier 2) shows markedly lower Sphere recall (0.78) and the largest Sphere→Vortex leakage (0.10). 
-  Tier 3 models (red border) show near-random Sphere classification — AlexNet recalls only 0.65 of Sphere 
-  images and EfficientNet-D4 only 0.38. The one-directional Sphere→No Substructure confusion pattern is 
-  universal across all well-converged models, consistent with the physical interpretation that compact 
-  symmetric subhalo perturbations are morphologically similar to smooth arcs.</em>
+  <img src="assets/fig8_1_cross_arch_confusion.png"
+       alt="Cross-architecture confusion matrices for all 9 models" width="95%"/>
+  <br><em>Figure 8.3 — Confusion matrices for all nine architectures sorted by macro
+  AUC (row-normalised; raw counts in parentheses). Tier 1 models (green border)
+  achieve Sphere recall 0.88–0.94. ViT-Base (orange border) shows the lowest Sphere
+  recall (0.78) and largest Sphere→Vortex leakage (0.10). Tier 3 models (red border):
+  AlexNet Sphere recall 0.65, Equivariant-D4 recall 0.38.</em>
 </p>
-
-### 8.2 Statistical Characterisation of Failures
-
-**E-ResNet Sphere false negative analysis (Mann-Whitney U test):**
-Sphere true positives: 2306 · Sphere false negatives (→ No Sub): 129
-
-| Feature | False negatives (FN) | True positives (TP) | p-value | Interpretation |
-|:--------|:--------------------:|:-------------------:|:-------:|:---------------|
-| Ring mean flux | 0.1423 | 0.1586 | 6.07×10⁻¹⁰ | SNR-limited detection — FN images are systematically dimmer |
-| Ring flux std (perturbation strength) | 0.1630 | 0.1699 | 2.91×10⁻³ | Weaker substructure perturbation amplitude in FN images |
-| Ring asymmetry | 0.0805 | 0.0782 | 8.99×10⁻¹ | Not significant — arc asymmetry does not predict failure |
-
-**E-ResNet Sphere↔Vortex confusion:**
-65 Sphere images predicted as Vortex · 54 Vortex images predicted as Sphere
-(119 total bidirectional confusions — distinct from the 64 universally-missed 
-Sphere images identified by the deep ensemble in Section 7.3, which are 
-misclassified as *No Substructure*, not Vortex)
-
-| Feature | Sphere→Vortex confused | Correctly classified Sphere | Interpretation |
-|:--------|:---------------------:|:---------------------------:|:---------------|
-| Mean elongation | 1.177 | 1.206 | Confused images are marginally *less* elongated — not more |
-| Ring flux | Lower | Higher | SNR-driven confusion, not morphology-driven |
-
-The Sphere→Vortex confusion is **SNR-driven, not shape-driven**: confused images have nearly identical elongation metrics to correctly classified ones, ruling out morphological ambiguity as the primary cause.
-
-<!-- Figure: failure mode statistics — flux and compactness distributions, Mann-Whitney results -->
-<p align="center">
-  <img src="assets/fig8_2_sphere_failure_statistics.png" alt="Sphere failure mode statistics: ring flux and compactness distributions" width="95%"/>
-  <br><em>Figure 8.4 — Sphere TP vs FN morphological statistics (computed on per-sample min-max normalised val images, n=2500 Sphere). Left: ring mean flux — false negatives have systematically 
-lower flux (p = 6.07×10⁻¹⁰), confirming SNR-limited detection. Centre: ring flux 
-std as a perturbation strength proxy — false negatives show weaker perturbation 
-signal (p = 2.91×10⁻³). Right: ring asymmetry — no significant difference between 
-TP and FN (p = 0.899), ruling out arc asymmetry as a failure predictor. 
-True Positives n=2306, False Negatives n=129.</em>
-</p>
-
-### 8.3 Confidence vs Ring Brightness
-
-```
-Correct Sphere classification confidence
-1.00 ┤                                  ●●●●●●●●●
-     │                            ●●●●●●
-0.90 ┤                      ●●●●●●
-     │                ●●●●●●
-0.80 ┤          ●●●●●●
-     │    ●●●●●●
-0.70 ┤●●●●●
-     │     detection threshold ≈ ring brightness
-     └──────────────────────────────────────────
-     Low ring flux                   High ring flux
-```
-
-There is a monotonic positive relationship between ring mean flux and classification confidence. Lower ring flux → lower effective SNR → lower model confidence. This is the direct signature of the log-uniform exposure time distribution creating a ~3× SNR range across the dataset.
-
-The 64 universally-missed images consistently fall in the low-flux, high-compactness region — a single compact high-mass spike dominates the min-max normalisation, suppressing the rest of the ring to lower normalised values and making the global perturbation amplitude below the network's effective detection threshold.
-
-<!-- Figure: confidence vs ring brightness scatter and calibration curves -->
-<p align="center">
-  <img src="assets/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="95%"/>
-  <br><em>Figure 8.5 — Sphere classification confidence vs ring mean flux. Left: scatter plot of E-ResNet's Sphere class confidence against ring mean flux — the monotonic positive relationship reveals SNR as the primary detection bottleneck. The 64 silent failures cluster in the bottom-left (low flux, near-zero confidence). Right: calibration curves for all 9 architectures — models in Tier 1 are well-calibrated; AlexNet and ENN are severely under-confident.</em>
-</p>
-<p align="center">
-  <img src="assets/fig8_3_confidence_vs_brightness.png" alt="Sphere classification confidence vs ring mean flux" width="95%"/>
-  <br><em>Figure 8.5 — Sphere classification confidence vs ring mean flux. Left: scatter plot of E-ResNet's Sphere class confidence against ring mean flux — the monotonic positive relationship reveals SNR as the primary detection bottleneck. The 64 silent failures cluster in the bottom-left (low flux, near-zero confidence). Right: calibration curves for all 9 architectures — models in Tier 1 are well-calibrated; AlexNet and ENN are severely under-confident.</em>
-</p> # Compactness figure
-### 8.4 Physical Interpretation
-
-The Sphere class is systematically harder than Vortex because of a fundamental morphological asymmetry in the simulation:
-
-- **Sphere** (CDM subhalo): compact, approximately symmetric perturbation → hard to distinguish from smooth arc edge effects
-- **Vortex** (axion DM): elongated, asymmetric perturbation to the density field → geometrically distinct from both smooth arcs and Sphere subhalos
-
-The E-ResNet's D₄ equivariant filters — which average responses across eight symmetry orientations — are particularly challenged by sub-pixel-scale anomalies from Sphere subhalos. The architecture's global rotational symmetry constraint, its strength on arc-following features, becomes a weakness on the most compact subhalo perturbations. This is a fundamental trade-off in the D₄ equivariant design, not a training artefact.
 
 ---
 
+### 8.2 Statistical Characterisation of Failures
+
+#### E-ResNet Sphere False Negatives
+
+**E-ResNet:** Sphere true positives: 2306 · Sphere false negatives (→ No Sub): 129
+
+Mann-Whitney U test on normalised val images:
+
+| Feature | FN mean | TP mean | p-value | Significant |
+|:--------|:-------:|:-------:|:-------:|:-----------:|
+| Ring mean flux | 0.1423 | 0.1586 | 6.07×10⁻¹⁰ | ✅ |
+| Ring flux std | 0.1630 | 0.1699 | 2.91×10⁻³ | ✅ |
+| Ring asymmetry | 0.0805 | 0.0782 | 8.99×10⁻¹ | ❌ |
+
+<p align="center">
+  <img src="assets/fig8_2_sphere_failure_statistics.png"
+       alt="Sphere TP vs FN morphological statistics" width="95%"/>
+  <br><em>Figure 8.4 — E-ResNet Sphere TP (n=2306) vs FN (n=129) morphological
+  statistics. Left: ring mean flux (p=6.07×10⁻¹⁰). Centre: ring flux std,
+  perturbation strength proxy (p=2.91×10⁻³). Right: ring asymmetry (p=0.899,
+  not significant).</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig12a_sphere_false_negatives.png"
+       alt="E-ResNet Sphere false negatives sorted by confidence" width="95%"/>
+  <br><em>Figure 8.5 — E-ResNet Sphere false negatives (predicted as No Substructure),
+  sorted by descending confidence in the wrong class. Top row annotated with
+  Conf(NoSub) and ring_mean values. Bottom row shows additional FN examples with
+  ring_mean annotations.</em>
+</p>
+
+#### E-ResNet Sphere↔Vortex Confusion
+
+65 Sphere predicted as Vortex · 54 Vortex predicted as Sphere
+*(119 total — distinct from the 64 universally-missed Sphere images in Section 8.1,
+which are misclassified as No Substructure, not Vortex)*
+
+| Feature | Sphere→Vortex (n=65) | Sphere TP (n=2306) | Vortex→Sphere (n=54) | Vortex TP (n=2421) |
+|:--------|:--------------------:|:------------------:|:--------------------:|:-----------------:|
+| Mean elongation | 1.177 | 1.206 | 1.231 | 1.204 |
+| Ring flux | Lower | Higher | Lower | Higher |
+
+<p align="center">
+  <img src="assets/fig12c_sv_confusion_gallery.png"
+       alt="Sphere-Vortex confusion gallery" width="95%"/>
+  <br><em>Figure 8.6 — Sphere↔Vortex confusion gallery. Row 1: correctly classified
+  Sphere. Row 2: Sphere misclassified as Vortex (n=65). Row 3: Vortex misclassified
+  as Sphere (n=54).</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig12d_elongation_distribution.png"
+       alt="Elongation distributions by confusion type" width="95%"/>
+  <br><em>Figure 8.7 — Residual elongation distributions by confusion type. Sphere TP
+  (green, n=2306), Sphere→Vortex (red, n=65), Vortex TP (blue, n=2421),
+  Vortex→Sphere (orange, n=54). Confused and correctly classified populations
+  show substantially overlapping elongation distributions — confusion is not
+  driven by morphological similarity between Sphere and Vortex.</em>
+</p>
+
+---
+
+### 8.3 Confidence and Accuracy vs Ring Brightness
+
+Classification accuracy and model confidence both increase monotonically with ring
+mean flux across all three classes. The effect is strongest for Sphere.
+
+<p align="center">
+  <img src="assets/fig12e_confidence_vs_brightness.png"
+       alt="Classification accuracy and confidence vs ring mean flux" width="95%"/>
+  <br><em>Figure 8.8 — Classification accuracy (solid) and mean confidence (dashed)
+  vs ring mean flux, binned by brightness percentile (E-ResNet, val set). Sphere
+  accuracy falls from ~1.0 at high flux to ~0.5 at the lowest flux bin. No
+  Substructure and Vortex show the same trend with a higher floor. The 64
+  universally-missed Sphere images originate from the low-flux tail.</em>
+</p>
+
+---
+
+### 8.4 Perturbation Position Analysis
+
+Perturbation position along the Einstein ring is tested as a predictor of failure
+using CAE residual centroids.
+
+<p align="center">
+  <img src="assets/fig12f_perturbation_position.png"
+       alt="CAE residual centroid positions by classification outcome" width="95%"/>
+  <br><em>Figure 8.9 — CAE residual centroid positions by classification outcome. Each
+  point is the spatial position of the peak substructure signal for one image. Top
+  row: Sphere — correct (n=330), →No Sub (n=129), →Vortex (n=65). Bottom row:
+  Vortex — correct (n=303), →No Sub (n=25), →Sphere (n=54). All six scatter plots
+  are tightly clustered near the image centre with no angular separation between
+  correct and failed classifications.</em>
+</p>
+
+---
+
+### 8.5 Physical Interpretation
+
+- **Sphere** (CDM subhalo): compact, approximately symmetric perturbation →
+  morphologically similar to smooth arc edge effects
+- **Vortex** (axion DM): elongated, asymmetric density field perturbation →
+  geometrically distinct from both smooth arcs and Sphere subhalos
+
+The D₄ equivariant filters in E-ResNet average responses across eight symmetry
+orientations. This is effective for arc-following features but introduces a
+systematic weakness on the most compact, sub-pixel-scale Sphere perturbations —
+a fundamental architectural trade-off, not a training artefact.
 ## 9. Residual Image Approach
 
 ### 9.1 Motivation
