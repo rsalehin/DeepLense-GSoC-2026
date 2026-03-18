@@ -310,7 +310,9 @@ replaced with 3-class output.
 **Training:** 30 epochs, ImageNet pretrained, lr = 1e-4.
 
 <details>
+   
 <summary><b>Per-class classification report</b></summary>
+
 ```
 ── Classification Report: AlexNet ───────────────────────────────
                  precision    recall  f1-score   support
@@ -318,7 +320,6 @@ replaced with 3-class output.
 No Substructure     0.4912    0.7836    0.6039      2500
          Sphere     0.4034    0.1240    0.1895      2500
          Vortex     0.4337    0.3820    0.4062      2500
-
        accuracy                         0.4365      7500
       macro avg     0.4428    0.4299    0.4665      7500
 ```
@@ -373,6 +374,7 @@ head replaced with 3-class output.
 
 <details>
 <summary><b>Per-class classification report</b></summary>
+   
 ```
 ── Classification Report: VGG-16 ───────────────────────────────
                  precision    recall  f1-score   support
@@ -429,6 +431,7 @@ stride 2). Classification head replaced with 3-class linear output.
 
 <details>
 <summary><b>Per-class classification report</b></summary>
+   
 ```
 ── Classification Report: ResNet-18 ──────────────────────────
                  precision    recall  f1-score   support
@@ -481,6 +484,7 @@ enabling richer feature hierarchies at controlled computational cost.
 
 <details>
 <summary><b>Per-class classification report</b></summary>
+   
 ```
 ── Classification Report: ResNet-50 ──────────────────────────
                  precision    recall  f1-score   support
@@ -534,6 +538,7 @@ classifier head replaced with 3-class output.
 
 <details>
 <summary><b>Per-class classification report</b></summary>
+   
 ```
 ── Classification Report: DenseNet-121 ─────────────────────────
                  precision    recall  f1-score   support
@@ -590,6 +595,7 @@ head replaced with 3-class output.
 
 <details>
 <summary><b>Per-class classification report</b></summary>
+   
 ```
 ── Classification Report: EfficientNet-B3 ──────────────────────
                  precision    recall  f1-score   support
@@ -645,6 +651,7 @@ Section 7.2 for full analysis.
 
 <details>
 <summary><b>Per-class classification report</b></summary>
+   
 ```
 ── Classification Report: ViT-Base ─────────────────────────────
                  precision    recall  f1-score   support
@@ -750,6 +757,7 @@ Input (1×150×150)
 
 <details>
 <summary><b>Per-class classification report</b></summary>
+   
 ```
 ── Classification Report: E-ResNet ──────────────────────────────
                  precision    recall  f1-score   support
@@ -836,6 +844,7 @@ Input (1×150×150)
 
 <details>
 <summary><b>Per-class classification report</b></summary>
+   
 ```
 ── Classification Report: EqDenseNet-C8 ─────────────────────────
                  precision    recall  f1-score   support
@@ -912,6 +921,7 @@ hardest class, uniform averaging reduces rather than improves performance.
 
 <details>
 <summary><b>Per-class classification report</b></summary>
+   
 ```
 ── Classification Report: Soft Ensemble (Top-6) ─────────────────
                  precision    recall  f1-score   support
