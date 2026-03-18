@@ -38,6 +38,34 @@ on every reported metric.
 </div>
 
 ---
+> **Important Note on Scope and Development Timeline**
+>
+> This notebook was originally prepared with nine architectures — spanning sequential
+> CNNs, residual networks, dense connectivity, attention-based transformers, and
+> D₄-equivariant networks. The full analysis suite (interpretability, ablation,
+> failure mode analysis, residual image approach, deep ensemble uncertainty) was
+> designed around and applied to these nine models.
+>
+> During the course of preparing this submission, a novel architecture —
+> **EqDenseNet-C8** — emerged from combining C8 cyclic equivariance with DenseNet-style
+> dense connectivity. It was trained, evaluated, and included in Section 5.10, where
+> it achieves the best results across every reported metric, surpassing all nine
+> original architectures including all seven ImageNet-pretrained models.
+>
+> However, given the submission deadline and the non-linear nature of exploration and experimentations, EqDenseNet-C8 has not yet received the same
+> depth of analysis as the original nine models. Specifically, failure mode
+> characterisation, and ensemble uncertainty analysis largely reflect the original
+> nine-model study. EqDenseNet-C8 appears in the benchmark table, ROC/PR comparisons,
+> parameter efficiency plot, and cross-architecture confusion matrix, CAM-analysis, but its deeper
+> analysis — including full ablation over {C8, SO(2)} × {residual, dense} and
+> cross-dataset evaluation — is planned for the GSoC 2026 project timeline.
+>
+> The comprehensive analyses shown throughout Sections 6–9 therefore serve a dual
+> purpose: rigorous evaluation of the nine-model benchmark, and a foundation for
+> targeted follow-up work on EqDenseNet-C8 and its SO(2) extensions during the main
+> GSoC project.
+
+---
 
 ##  Table of Contents
 
