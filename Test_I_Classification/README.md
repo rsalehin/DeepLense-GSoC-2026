@@ -327,7 +327,7 @@ No Substructure     0.4912    0.7836    0.6039      2500
 </details>
 
 <p align="center">
-  <img src="assets/fig5_1_alexnet_eval.png" alt="AlexNet confusion matrix and curves" width="95%"/>
+  <img src="assets/fig5_5_alexnet_eval.png" alt="AlexNet confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.1 — AlexNet evaluation: confusion matrix (left), ROC curves per class
   (centre), Sphere PR curve (right). Near-random Sphere classification (recall 0.124)
   confirms gradient inaccessibility as the primary failure mechanism.</em>
@@ -390,7 +390,7 @@ No Substructure     0.7748    0.8636    0.8168      2500
 </details>
 
 <p align="center">
-  <img src="assets/fig5_2_vgg16_eval.png" alt="VGG-16 confusion matrix and curves" width="95%"/>
+  <img src="assets/fig5_6_vgg16_eval.png" alt="VGG-16 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.2 — VGG-16 evaluation: Sphere recall of 0.504 despite 134M parameters.
   Training instability from the absence of batch normalisation is visible in the loss curves.</em>
 </p>
@@ -447,7 +447,7 @@ No Substructure     0.9576    0.9700    0.9638      2500
 </details>
 
 <p align="center">
-  <img src="assets/fig5_3_resnet18_eval.png" alt="ResNet-18 confusion matrix and curves" width="95%"/>
+  <img src="assets/assets/fig5_1_resnet18_eval.png" alt="ResNet-18 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.3 — ResNet-18 evaluation: confusion matrix (left), ROC curves per class
   (centre), Sphere PR curve (right). The skip-connection gap over AlexNet and VGG-16
   is the largest discontinuity in the benchmark.</em>
@@ -500,7 +500,7 @@ No Substructure     0.9709    0.9708    0.9709      2500
 </details>
 
 <p align="center">
-  <img src="assets/fig5_4_resnet50_eval.png" alt="ResNet-50 confusion matrix and curves" width="95%"/>
+  <img src="assets/fig5_2_resnet50_eval.png" alt="ResNet-50 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.4 — ResNet-50 evaluation: confusion matrix (left), ROC curves per class
   (centre), Sphere PR curve (right).</em>
 </p>
@@ -554,7 +554,7 @@ No Substructure     0.9765    0.9800    0.9782      2500
 </details>
 
 <p align="center">
-  <img src="assets/fig5_5_densenet121_eval.png" alt="DenseNet-121 confusion matrix and curves" width="95%"/>
+  <img src="assets/fig5_3_densenet121_eval.png" alt="DenseNet-121 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.5 — DenseNet-121 evaluation: confusion matrix (left), ROC curves per class
   (centre), Sphere PR curve (right). Best pretrained model across all metrics.</em>
 </p>
@@ -611,7 +611,7 @@ No Substructure     0.9583    0.9716    0.9649      2500
 </details>
 
 <p align="center">
-  <img src="assets/fig5_6_efficientnetb3_eval.png" alt="EfficientNet-B3 confusion matrix and curves" width="95%"/>
+  <img src="assets/fig5_4_efficientnetb3_eval.png" alt="EfficientNet-B3 confusion matrix and curves" width="95%"/>
   <br><em>Figure 5.6 — EfficientNet-B3 evaluation: confusion matrix (left), ROC curves per
   class (centre), Sphere PR curve (right).</em>
 </p>
