@@ -13,13 +13,27 @@
 <br>
 
 **Classifying dark matter substructure in simulated strong gravitational lensing images**
-using nine architectures — from convolutional baselines to D₄-equivariant residual networks.
+using eleven architectures — from convolutional baselines to physics-motivated equivariant
+networks encoding the rotational symmetry of gravitational lensing directly into their weights.
+
+Nine architectures establish a comprehensive benchmark spanning sequential CNNs, residual
+networks, dense connectivity, attention-based transformers, and D₄-equivariant networks.
+A novel **C8-equivariant DenseNet (EqDenseNet-C8)**, combining 8-fold discrete rotational
+equivariance with DenseNet-style dense connectivity and trained entirely from scratch,
+surpasses all nine benchmarked architectures — including seven ImageNet-pretrained models —
+on every reported metric.
 
 <br>
 
-|  Best AUC |  Best Efficiency |  Task |  Input |
-|:-----------:|:------------------:|:-------:|:--------:|
-| **0.9962** (DenseNet-121) | **0.39M params** (E-ResNet, AUC 0.9952) | 3-class classification | 150 × 150 × 1 |
+| | |
+|:-:|:-:|
+| **Best Macro AUC** | **0.9974** — EqDenseNet-C8 (0.093M params, from scratch) |
+| **Best Sphere Recall** | **0.9448** — EqDenseNet-C8 |
+| **Best Sphere PR-AUC** | **0.9932** — EqDenseNet-C8 |
+| **Best Pretrained AUC** | 0.9962 — DenseNet-121 (7.0M params, ImageNet) |
+| **Best Efficiency** | **0.093M params** — EqDenseNet-C8 (AUC 0.9974) |
+| **Task** | 3-class classification (No Sub / Sphere / Vortex) |
+| **Input** | 150 × 150 × 1 (single-channel simulated lensing images) |
 
 </div>
 
