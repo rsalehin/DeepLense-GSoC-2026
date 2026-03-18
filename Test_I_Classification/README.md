@@ -894,11 +894,11 @@ Two architectures compared using fundamentally different visualisation tools:
 than DenseNet for substructure classes (0.472 vs 0.292), yet DenseNet outperforms 
 ViT by 0.020 macro-AUC. The resolution: attending to the correct spatial region at 
 macro scale ≠ detecting the discriminative *perturbation within* that region. 
-The four figures below build this argument step by step.
+I have tried to explain this through some analyses which are shown below:
 
 ---
 
-**Step 1 — What do the attention maps actually look like?**
+**What do the attention maps actually look like?**
 
 DenseNet produces a diffuse blob; ViT produces spatially structured patch-level maps.
 Before interpreting either, we need to establish what causes the blob.
@@ -914,7 +914,7 @@ Before interpreting either, we need to establish what causes the blob.
 
 ---
 
-**Step 2 — The DenseNet blob is a resolution artefact, not a spatial failure.**
+**The DenseNet blob is a resolution artefact, not a spatial failure.**
 
 DenseNet-121 compresses to ~4×5 pixels at denseblock4. Upsampling 30× back to
 150×150 cannot produce ring structure regardless of what the model actually learned.
@@ -930,7 +930,7 @@ DenseNet-121 compresses to ~4×5 pixels at denseblock4. Upsampling 30× back to
 
 ---
 
-**Step 3 — Does ViT attend to the ring, and does it shift by class?**
+**Does ViT attend to the ring, and does it shift by class?**
 
 ViT's attention is class-agnostic by construction, so we measure ring concentration
 directly across n=50 images per class.
@@ -953,7 +953,7 @@ directly across n=50 images per class.
 
 ---
 
-**Step 4 — If ViT attends to the right region, why does it underperform DenseNet?**
+**If ViT attends to the right region, why does it underperform DenseNet?**
 
 The bottleneck is not *finding* the ring — it is *localising the perturbation within* it.
 ViT's attention is unstable across images of the same class, shifting with perturbation
@@ -980,7 +980,7 @@ position because it lacks translation-invariant local detectors.
 
 ---
 
-**Step 5 — Direct comparison: DenseNet vs ViT ring concentration.**
+**Direct comparison: DenseNet vs ViT ring concentration.**
 
 DenseNet's class-invariant attention alongside ViT's class-sensitive attention makes
 the paradox concrete — higher ring concentration does not translate to better classification.
