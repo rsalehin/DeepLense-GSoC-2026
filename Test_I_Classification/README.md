@@ -1218,7 +1218,7 @@ mean flux across all three classes. The effect is strongest for Sphere.
        alt="Classification accuracy and confidence vs ring mean flux" width="95%"/>
   <br><em>Figure 8.8 — Classification accuracy (solid) and mean confidence (dashed)
   vs ring mean flux, binned by brightness percentile (E-ResNet, val set). Sphere
-  accuracy falls from ~1.0 at high flux to ~0.5 at the lowest flux bin. No
+  accuracy falls from ~1.0 at high flux to around 0.5 at the lowest flux bin. No
   Substructure and Vortex show the same trend with a higher floor. The 64
   universally-missed Sphere images originate from the low-flux tail.</em>
 </p>
