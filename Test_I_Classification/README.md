@@ -153,13 +153,23 @@ Three properties of the data drive all modelling choices:
 
 **2. Heavy right-skewed pixel intensity.** The vast majority of pixels are near-zero background. The small fraction of bright pixels along the ring arc carries essentially *all* discriminative information. This motivates per-sample min-max normalisation, not dataset-level standardisation.
 
-**3. Sphere is the physically hardest class.** Spherical CDM subhalos produce compact, approximately symmetric perturbations — morphologically similar to smooth arcs. Vortex perturbations are elongated and asymmetric, more geometrically distinct. **Sphere Recall is the most discriminating single metric** on this dataset; macro AUC is dominated by the easier No Substructure/Vortex boundary.
+**3. Sphere is the physically hardest class.** Spherical CDM subhalos produce 
+compact, approximately symmetric perturbations — morphologically similar to smooth 
+arcs. Vortex perturbations are elongated and asymmetric, more geometrically distinct. 
+**Sphere Recall is the most discriminating single metric** on this dataset; macro AUC 
+is dominated by the easier No Substructure/Vortex boundary. This asymmetry is 
+confirmed empirically across all nine architectures in Sections 6–8, and targeted 
+architectural improvements — such as ring-local perturbation detectors and continuous 
+SO(2) equivariance — are identified as the primary research directions in Section 12.
 
 <!-- Figure: pixel intensity distributions and ring statistics per class -->
 <p align="center">
   <img src="assets/fig2_2_eda_statistic.png" alt="EDA: pixel intensity distributions and per-class ring statistics" width="95%"/>
-  <br><em>Figure 2.2 — EDA statistics. Left: pixel intensity histograms per class — all three distributions are right-skewed, with background pixels near zero dominating. Right: per-class ring brightness and compactness distributions, showing the systematic difference between Sphere failures and correctly classified images.</em>
-</p>
+  <br><em>Figure 2.2 — EDA pixel intensity statistics per class. All three distributions 
+are heavily right-skewed — the vast majority of pixels are near-zero background, with 
+discriminative information concentrated in the bright ring arc pixels. The distributions 
+are visually indistinguishable between classes, confirming that classification requires 
+detecting subtle perturbations within a shared macro-lens morphology.</em>
 
 ---
 
