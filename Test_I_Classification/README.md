@@ -1061,7 +1061,7 @@ All eleven architectures evaluated on the predefined val partition (7,500 images
 
 <!-- Figure: 9-model macro-averaged ROC comparison -->
 <p align="center">
-  <img src="assets/fig6_1_roc_comparison.png" alt="Macro-averaged ROC curves for all 9 architectures" width="720"/>
+  <img src="assets/fig6_1_roc_comparison.png" alt="Macro-averaged ROC curves for all 9 architectures" width="95%"/>
   <br><em>Figure 6.1 — Macro-averaged ROC curves for all nine architectures. Three performance tiers are clearly visible. The Tier 1 cluster (DenseNet-121, E-ResNet, ResNet-50, ResNet-18, EfficientNet-B3) sits near the top-left corner with curves nearly indistinguishable at this scale.</em>
 </p>
 
@@ -1102,7 +1102,7 @@ both depth and skip connections.
 
 <!-- Figure: Sphere-class precision-recall curves -->
 <p align="center">
-  <img src="assets/fig6_2_sphere_pr_curves.png" alt="Sphere-class precision-recall curves for all 9 architectures" width="700"/>
+  <img src="assets/fig6_2_sphere_pr_curves.png" alt="Sphere-class precision-recall curves for all 9 architectures" width="95%"/>
   <br><em>Figure 6.2 — Sphere-class precision-recall curves. The PR view reveals differentiation invisible in macro AUC: DenseNet-121 leads at PR-AUC 0.9903, while EfficientNet-B3 trails at 0.9749. AlexNet at 0.4380 is barely above the random baseline of 0.33.</em>
 </p>
 
@@ -1123,7 +1123,7 @@ worst AUC among pretrained models (0.66).
 
 <!-- Figure: AUC vs parameter count scatter (log scale) -->
 <p align="center">
-  <img src="assets/fig6_3_param_efficiency.png" alt="Parameter efficiency scatter: AUC vs parameter count" width="680"/>
+  <img src="assets/fig6_3_param_efficiency.png" alt="Parameter efficiency scatter: AUC vs parameter count" width="95%"/>
   <br><em>Figure 6.3 — Parameter efficiency scatter (x-axis: parameter count in millions, log scale; 
   y-axis: macro AUC on the val set). Triangles = trained from scratch; circles = ImageNet pretrained. 
   E-ResNet (blue triangle, top-left) achieves AUC ≈ 1.00 at 0.39M parameters — the most 
