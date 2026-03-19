@@ -1959,20 +1959,21 @@ DeepLense-GSoC-2026/
 
 ### Model Weights — Google Drive
 
-All weights are saved as PyTorch `.pth` checkpoint files. Each file contains `{'model_state_dict': ..., 'val_loss': ..., 'epoch': ...}`.
+All weights are saved as raw PyTorch state dicts via torch.save(model.state_dict(), path). Load with model.load_state_dict(torch.load(path, map_location=device)) directly — no key unpacking needed.
 
 | Model | AUC | Drive Link |
 |:------|:---:|:----------:|
-| DenseNet-121 | 0.9962 | [Download](https://drive.google.com/your-link) |
-| E-ResNet | 0.9952 | [Download](https://drive.google.com/your-link) |
-| ResNet-50 | 0.9946 | [Download](https://drive.google.com/your-link) |
-| ResNet-18 | 0.9927 | [Download](https://drive.google.com/your-link) |
-| EfficientNet-B3 | 0.9898 | [Download](https://drive.google.com/your-link) |
-| ViT-Base/16 | 0.9761 | [Download](https://drive.google.com/your-link) |
-| VGG-16 | 0.8944 | [Download](https://drive.google.com/your-link) |
-| Equivariant-D4 (ENN) | 0.7362 | [Download](https://drive.google.com/your-link) |
-| AlexNet | 0.6589 | [Download](https://drive.google.com/your-link) |
-| CAE (smooth lens) | — | [Download](https://drive.google.com/your-link) |
+| EqDenseNet-C8 | 0.9974 | [Download](https://drive.google.com/file/d/108P4VtKzX7agb9jeRPM5xGSCqITmA5kQ/view?usp=sharing) |
+| DenseNet-121 | 0.9962 | [Download](https://drive.google.com/file/d/1A-3ghbzmvuOIs5EZg8HITDRBWMEmQXTn/view?usp=sharing) |
+| E-ResNet | 0.9952 | [Download](https://drive.google.com/file/d/11KBV8v5_pXaUsrvin8uWFB6o0jqX65SB/view?usp=sharing) |
+| ResNet-50 | 0.9946 | [Download](https://drive.google.com/file/d/1D0DC-M3HzY8J2Rmz01OcJplzbG5Zz3Rq/view?usp=sharing) |
+| ResNet-18 | 0.9927 | [Download](https://drive.google.com/file/d/1cRMRDweT49wT09Fu9wDVLrGTqvn5Nh-q/view?usp=sharing) |
+| EfficientNet-B3 | 0.9898 | [Download](https://drive.google.com/file/d/1IOim4Px37em7PMdYW3rKLfpTAy2Usq5A/view?usp=sharing) |
+| ViT-Base/16 | 0.9761 | [Download](https://drive.google.com/file/d/1DgXgMUY5hit5lI7_rtetaJ3eIAzsujCO/view?usp=sharing) |
+| VGG-16 | 0.8944 | [Download](https://drive.google.com/file/d/1DgXgMUY5hit5lI7_rtetaJ3eIAzsujCO/view?usp=sharing) |
+| Equivariant-D4 (ENN) | 0.7362 | [Download](https://drive.google.com/file/d/1UYCFOdl_TEqnV8iYnuzLuNalViNkK-qg/view?usp=sharing) |
+| AlexNet | 0.6589 | [Download](https://drive.google.com/file/d/13d5yiDvb9LcVxVXu5DmxkVQC0r5s8O9_/view?usp=sharing) |
+| CAE (smooth lens) | — | [Download](https://drive.google.com/file/d/1hQsnWvwOzBHeOozeuBiqHacK4SI5nWQa/view?usp=sharing) |
 
 
 ---
