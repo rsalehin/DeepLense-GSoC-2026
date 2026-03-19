@@ -104,6 +104,7 @@ on every reported metric.
    - [7.3 Predictive Uncertainty — Deep Ensemble](#73-predictive-uncertainty--deep-ensemble)
    - [7.4 Ablation Study — E-ResNet Components](#74-ablation-study--e-resnet-components)
    - [7.5 Equivariance Verification](#75-equivariance-verification)
+   - [7.6 Class Activation Maps — EqDenseNet-C8](#76-class-activation-maps--eqdensenet-c8)
 8. [Failure Mode Analysis](#8-failure-mode-analysis)
    - [8.1 Cross-Architecture Sphere Confusion](#81-cross-architecture-sphere-confusion)
    - [8.2 Statistical Characterisation of Failures](#82-statistical-characterisation-of-failures)
@@ -1035,7 +1036,6 @@ table will read:
 Full implementation is planned for the GSoC 2026 project period.*
 ## 6. Comprehensive Results Summary
 
-### 6.1 Full Benchmark Table
 
 ### 6.1 Full Benchmark Table
 
