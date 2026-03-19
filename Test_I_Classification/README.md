@@ -1110,41 +1110,74 @@ both depth and skip connections.
 
 
 
-**E-ResNet occupies the top-left corner** of the efficiency plot — competitive AUC 
-with the best pretrained models, at 0.39M parameters trained entirely from scratch. 
-The contrast with Equivariant-D4 (also from scratch, also tiny, but AUC only 0.73) 
-isolates the contribution of residual connections: equivariance alone is not 
-sufficient without sufficient depth and skip connections. Among pretrained models, 
-the DenseNet-121 / ResNet-18 / EfficientNet-B3 cluster achieves the best 
-AUC-per-parameter trade-off. ViT-Base (85M parameters) sits noticeably below the 
-convolutional cluster despite being the largest model in the pretrained group. 
-AlexNet is the outlier in the opposite direction — large parameter count (60M), 
-worst AUC among pretrained models (0.66).
+**EqDenseNet-C8 occupies the top-left corner** of the efficiency plot — the highest
+AUC in the entire benchmark at 0.093M parameters trained entirely from scratch.
+E-ResNet sits just to its right at 0.39M parameters with AUC 0.9952, establishing
+that the equivariant family as a whole dominates the efficiency frontier. The contrast
+between EqDenseNet-C8 and Equivariant-D4 (also from scratch, also tiny, but AUC only
+0.73) isolates the contribution of depth and dense connectivity: equivariance alone
+is not sufficient without sufficient architectural capacity. The gap between
+EqDenseNet-C8 (0.093M) and DenseNet-121 (7.0M, AUC 0.9962) — 75× more parameters,
+ImageNet pretrained, yet lower AUC — is the single most striking result in the
+efficiency plot. Among pretrained models, the DenseNet-121 / ResNet-18 /
+EfficientNet-B3 cluster achieves the best AUC-per-parameter trade-off but sits
+below the equivariant frontier. ViT-Base (85M parameters) falls noticeably below
+this pretrained cluster despite being the largest model in the group. AlexNet is the
+outlier in the opposite direction — 57M parameters, worst AUC at 0.66 — the clearest
+demonstration that parameter count without skip connections provides no benefit for
+this task.
 
 <!-- Figure: AUC vs parameter count scatter (log scale) -->
 <p align="center">
-  <img src="assets/fig6_3_param_efficiency.png" alt="Parameter efficiency scatter: AUC vs parameter count" width="95%"/>
-  <br><em>Figure 6.3 — Parameter efficiency scatter (x-axis: parameter count in millions, log scale; 
-  y-axis: macro AUC on the val set). Triangles = trained from scratch; circles = ImageNet pretrained. 
-  E-ResNet (blue triangle, top-left) achieves AUC ≈ 1.00 at 0.39M parameters — the most 
-  parameter-efficient competitive model. Equivariant-D4 (orange triangle, far left) shows that 
-  equivariance alone without depth yields AUC only 0.73. The DenseNet-121, ResNet-18, and 
-  EfficientNet-B3 cluster (7–15M, AUC ≈ 1.00) represents the best pretrained efficiency frontier. 
-  ViT-Base (85M) falls below this frontier despite its large capacity. AlexNet (57M, AUC 0.66) 
-  is the worst-performing pretrained model — demonstrating that parameter count without skip 
-  connections provides no benefit for this task.</em>
+  <img src="assets/fig6_3_param_efficiency.png"
+       alt="Parameter efficiency scatter: AUC vs parameter count" width="95%"/>
+  <br><em>Figure 6.3 — Parameter efficiency scatter (x-axis: parameter count in
+  millions, log scale; y-axis: macro AUC on the val set). Triangles = trained from
+  scratch; circles = ImageNet pretrained. EqDenseNet-C8 (cyan triangle, far top-left)
+  achieves AUC 0.9974 at 0.093M parameters — the most parameter-efficient model in
+  the benchmark. E-ResNet (blue triangle) achieves AUC 0.9952 at 0.39M — the second
+  most efficient. Both sit above the entire pretrained cluster, establishing the
+  equivariant family as the dominant efficiency frontier. Equivariant-D4 (orange
+  triangle, far left) shows that equivariance without depth yields AUC only 0.73.
+  The DenseNet-121, ResNet-18, and EfficientNet-B3 cluster (7–85M, AUC 0.99–1.00)
+  represents the best pretrained trade-off. ViT-Base (85M) falls below this cluster
+  despite its large capacity. AlexNet (57M, AUC 0.66) is the worst pretrained model
+  — parameter count without skip connections provides no benefit for this task.</em>
 </p>
 
 ### 6.4 Key Takeaways
 
 **1. Skip connections are necessary, not optional.**
-The AUC gap between {AlexNet, VGG-16} and the ResNet family is the largest discontinuity in the benchmark — larger than any gap among architectures with skip connections. Gradient accessibility to shallow feature detectors is a prerequisite for low-SNR substructure detection.
+The AUC gap between {AlexNet, VGG-16} and the ResNet family is the largest
+discontinuity in the benchmark — larger than any gap among architectures with skip
+connections. Gradient accessibility to shallow feature detectors is a prerequisite
+for low-SNR substructure detection.
 
 **2. Physical symmetry beats scale.**
-E-ResNet (0.39M, scratch) achieves comparable AUC to DenseNet-121 (7.0M, pretrained) and ResNet-50 (23.5M, pretrained). Encoding the D₄ rotational symmetry of gravitational lensing eliminates the need to learn that symmetry from data, freeing parameter capacity for the actual classification task.
+EqDenseNet-C8 (0.093M, scratch) surpasses every ImageNet-pretrained model including
+DenseNet-121 (7.0M), ResNet-50 (23.5M), and ViT-Base (85.4M) on every reported
+metric. Encoding the rotational symmetry of gravitational lensing directly into the
+architecture — and combining it with dense connectivity — eliminates the need to
+learn that symmetry from data, freeing parameter capacity entirely for the
+classification task. The 75× parameter gap between EqDenseNet-C8 and DenseNet-121,
+in favour of the from-scratch equivariant model, is the central result of this
+benchmark.
 
 **3. The Sphere class is the true benchmark.**
-On macro AUC, DenseNet-121 and E-ResNet are nearly indistinguishable (0.9962 vs 0.9952). On **Sphere Recall** — the physically meaningful metric — DenseNet-121 leads (0.9364 vs 0.9224). The difference reflects the residual advantage of 18× more parameters and ImageNet pretraining on the hardest classification boundary.
+On macro AUC, DenseNet-121 and E-ResNet are nearly indistinguishable (0.9962 vs
+0.9952). On **Sphere Recall** — the physically meaningful metric — EqDenseNet-C8
+leads decisively (0.9448) over DenseNet-121 (0.9364) and E-ResNet (0.9224). Sphere
+Recall is where the equivariant advantage is most visible: the C8 inductive bias
+provides finer angular coverage than D₄, and dense connectivity ensures that
+substructure-scale gradients reach all layers. The hardest class exposes the
+architecture most cleanly.
+
+**4. Ensembles do not always win.**
+The Top-6 soft ensemble (Macro AUC 0.9970) underperforms EqDenseNet-C8 alone
+(0.9974) on every metric. When one model is consistently dominant on the hardest
+class, uniform probability averaging dilutes rather than improves performance.
+Ensemble gains require diverse error profiles — a condition not met when a single
+architecture has a structurally superior inductive bias for the task.
 
 ---
 
@@ -1318,40 +1351,74 @@ the paradox concrete — higher ring concentration does not translate to better 
 
 ### 7.3 Predictive Uncertainty — Deep Ensemble
 
-A 6-model deep ensemble (DenseNet-121, ResNet-50, ResNet-18, EfficientNet-B3, ViT-Base, E-ResNet) is used to compute predictive entropy as a proxy for epistemic uncertainty.
-
+A 7-model deep ensemble (EqDenseNet-C8, DenseNet-121, ResNet-50, ResNet-18,
+EfficientNet-B3, ViT-Base, E-ResNet) is used to compute predictive entropy as a
+proxy for epistemic uncertainty.
 ```
 Shannon entropy H = −Σᵢ pᵢ log pᵢ
 High H → ensemble disagreement → uncertain prediction → flag for human review
 Low H  → consensus prediction  → reliable output
 ```
 
+**Per-class entropy statistics (M=7):**
+
+| Class | Mean H | Median H | p95 H |
+|:------|:------:|:--------:|:-----:|
+| No Substructure | 0.197 | 0.121 | 0.599 |
+| Sphere | 0.209 | 0.056 | 0.806 |
+| Vortex | 0.143 | 0.023 | 0.683 |
+
 **Key findings:**
 
-- Sphere has significantly higher entropy than Vortex (p≈0), but not significantly higher than No Substructure (p=1.0). The Sphere distribution is bimodal — most images are easy (low entropy) but the hard tail is larger than for Vortex.
-- **64 Sphere images** are misclassified as No Substructure **with near-zero entropy** by all 6 models — confident consensus failures. These constitute the most dangerous failure mode: they pass through any entropy-based triage filter undetected.
-- Low-entropy failures are morphologically identified as sparse-arc images (low ring mean flux) in Section 8.
+- Sphere has significantly higher entropy than Vortex (p=0.000) but not
+  significantly higher than No Substructure (p=1.000). The Sphere distribution
+  is strongly bimodal — the median H=0.056 confirms most Sphere images are
+  classified easily, but the hard tail extends to maximum entropy (H=1.099) well
+  beyond Vortex's tail.
+
+- **55 Sphere images** are misclassified as No Substructure by all 7 models
+  with near-zero entropy — confident consensus failures. These are the most
+  dangerous operational failure mode: they pass through any entropy-based triage
+  filter undetected. Low ring mean flux drives this failure (Section 8.1).
+
+- **The high-entropy and silent-failure populations are completely orthogonal.**
+  The top-12 highest-entropy Sphere images share zero overlap with the 55
+  universally-misclassified images (0/12). These are structurally distinct
+  failure modes: the ensemble is maximally uncertain about unusual arc
+  morphologies, and maximally confident about low-flux images it incorrectly
+  classifies as smooth lenses. An entropy-based triage filter catches the former
+  and misses the latter entirely.
 
 <!-- Figure: deep ensemble entropy distribution — per class and per-image scatter -->
 <p align="center">
-  <img src="assets/fig7_3_ensemble_entropy.png" alt="Deep ensemble predictive entropy distributions" width="95%"/>
-  <br><em>Figure 7.3 — Deep ensemble entropy analysis. Left: entropy distributions per class — Sphere images skew toward higher entropy than No Substructure and Vortex. Centre: per-image entropy scatter coloured by ground truth class, highlighting the 62 low-entropy Sphere failures (bottom-left cluster, circled). Right: example images from each quadrant (high/low entropy × correct/incorrect).</em>
+  <img src="assets/fig7_3_ensemble_entropy.png"
+       alt="Deep ensemble predictive entropy distributions" width="95%"/>
+  <br><em>Figure 7.3 — Deep ensemble entropy analysis (M=7 models). Left: entropy
+  distributions per class — Sphere shows a bimodal distribution with a low-entropy
+  peak (easy cases) and a long high-entropy tail (hard cases); Vortex is more
+  concentrated at low entropy. Centre: entropy histogram per class confirming the
+  Sphere tail extends to maximum entropy H=1.099. Right: per-image confidence vs
+  entropy scatter — the 55 silent Sphere failures cluster at high confidence /
+  near-zero entropy (bottom-right), invisible to any entropy-based triage filter.</em>
 </p>
 
-The grid below shows the 12 Sphere images the ensemble is most uncertain 
-about — these are genuinely hard cases where no consensus exists.
+The grid below shows the 12 Sphere images the ensemble is most uncertain about —
+genuinely ambiguous cases where no model consensus exists.
 
 <p align="center">
   <img src="assets/fig7_4_ensemble_entropy.png"
        alt="Top 12 highest-entropy Sphere images" width="95%"/>
-  <br><em>Figure 7.3b — Top 12 highest-entropy Sphere images (ensemble H = 1.078–1.093, 
-  near the maximum H = 1.099). Each image is annotated with its Shannon entropy and 
-  ensemble majority prediction. Predictions are scattered across all three classes 
-  (Sphere, Vortex, No Substructure), confirming genuine ensemble disagreement. 
-  These high-entropy images are distinct from the 64 silent failures in Section 8.1, 
-  which have near-zero entropy — the ensemble is confidently wrong on those, 
-  but maximally uncertain on these.</em>
+  <br><em>Figure 7.3b — Top 12 highest-entropy Sphere images (ensemble H = 1.077–1.099,
+  near the maximum H = 1.099). Each image is annotated with its Shannon entropy and
+  ensemble majority prediction. Predictions scatter across all three classes,
+  confirming genuine ensemble disagreement. These images show unusual arc morphologies
+  — partial arcs, off-axis sources, asymmetric geometries — distinct from the typical
+  Sphere signature. Critically, these 12 images share zero overlap with the 55
+  silent failures in Section 8.1: the ensemble is maximally uncertain about these,
+  but maximally confident about the ones it gets wrong.</em>
 </p>
+
+---
 
 ### 7.4 Ablation Study — E-ResNet Components
 
@@ -1812,9 +1879,23 @@ than full-image features.
 
 ### The Sphere Class Is Systematically Harder — Physical Interpretation
 
-Every well-converged model (AUC > 0.95) shows the same failure pattern: Sphere subhalos are misclassified predominantly as No Substructure, not as Vortex. This one-directional confusion is physically interpretable. Spherical CDM subhalos produce compact, approximately symmetric perturbations to the lensing potential. Vortex substructure produces elongated, asymmetric perturbations that are geometrically distinct. Models detect this geometric similarity correctly — they are not failing randomly; they are resolving genuine physical ambiguity at the low-mass end of the subhalo distribution.
+Every well-converged model (AUC > 0.95) shows the same failure pattern: Sphere subhalos
+are misclassified predominantly as No Substructure, not as Vortex. This one-directional
+confusion is physically interpretable. Spherical CDM subhalos produce compact,
+approximately symmetric perturbations to the lensing potential. Vortex substructure
+produces elongated, asymmetric perturbations that are geometrically distinct. Models
+detect this geometric similarity correctly — they are not failing randomly; they are
+resolving genuine physical ambiguity at the low-mass end of the subhalo distribution.
 
-**Macro AUC understates difficulty.** Macro AUC is dominated by the easier No Substructure/Vortex boundary. Sphere PR-AUC is the more discriminating metric: DenseNet-121 leads at 0.9903 while EfficientNet-B3 trails at 0.9749 — a spread of 0.015 invisible in the macro AUC comparison. A model that appears competitive on macro AUC but underperforms on Sphere PR-AUC has learned to classify No Substructure and Vortex well while failing on the class requiring the most subtle detection.
+**Macro AUC understates difficulty.** Macro AUC is dominated by the easier No
+Substructure/Vortex boundary. Sphere PR-AUC is the more discriminating metric:
+EqDenseNet-C8 leads at 0.9932 while EfficientNet-B3 trails at 0.9749 — a spread
+of 0.018 invisible in the macro AUC comparison. A model that appears competitive
+on macro AUC but underperforms on Sphere PR-AUC has learned to classify No
+Substructure and Vortex well while failing on the class requiring the most subtle
+detection.
+
+---
 
 ### Skip Connections Are Necessary, Not Merely Beneficial
 
@@ -1824,15 +1905,55 @@ Every well-converged model (AUC > 0.95) shows the same failure pattern: Sphere s
 | VGG-16 (sequential, deep) | 0.894 | 134M |
 | ResNet-18 (skip connections) | 0.993 | 11.2M |
 
-The performance gap between sequential and residual architectures is the largest discontinuity in the benchmark. VGG-16 uses 12× more parameters than ResNet-18 yet achieves substantially lower AUC. For low-contrast, low-SNR classification tasks operating near a photon-statistics detection threshold, gradient accessibility to shallow feature detectors is a prerequisite.
+The performance gap between sequential and residual architectures is the largest
+discontinuity in the benchmark. VGG-16 uses 12× more parameters than ResNet-18 yet
+achieves substantially lower AUC. For low-contrast, low-SNR classification tasks
+operating near a photon-statistics detection threshold, gradient accessibility to
+shallow feature detectors is a prerequisite.
 
-### The Equivariance Advantage Is Real but Bounded
+---
 
-E-ResNet achieves 37.3× better theoretical rotational stability than ResNet-50 at initialisation, and 2.5× better empirical invariance after training. The ablation study confirms that augmentation is the dominant performance driver within the equivariant family, but the efficiency argument — competitive AUC at 0.39M parameters — holds regardless. The architectural inductive bias genuinely reduces the sample and parameter cost of learning the rotational symmetry of gravitational lensing.
+### The Equivariance Advantage Is Real and Decisive
 
-### DenseNet-121 Is the Overall Winner on This Dataset
+E-ResNet achieves 37.3× better theoretical rotational stability than ResNet-50 at
+initialisation, and 2.5× better empirical invariance after training. The ablation
+study confirms that augmentation is the dominant performance driver within the
+equivariant family, but the efficiency argument — competitive AUC at 0.39M
+parameters — holds regardless. The architectural inductive bias genuinely reduces
+the sample and parameter cost of learning the rotational symmetry of gravitational
+lensing.
 
-DenseNet-121 achieves the highest macro AUC (0.9962), Sphere Recall (0.9364), and Sphere PR-AUC (0.9903). Its dense connectivity — providing each layer with gradient access to all preceding feature maps — offers the best combination of gradient flow and local feature reuse on this task. ImageNet pretraining initialises the network with rich feature representations that can be efficiently adapted to astrophysical textures. The 7M parameter count is modest relative to the performance return.
+EqDenseNet-C8 extends this advantage further by combining C8 cyclic equivariance
+with dense connectivity. The result — surpassing every ImageNet-pretrained model at
+0.093M parameters trained entirely from scratch — demonstrates that the equivariance
+advantage scales with architectural depth and feature reuse, not just symmetry
+encoding alone.
+
+---
+
+### EqDenseNet-C8 Is the Overall Winner on This Benchmark
+
+EqDenseNet-C8 achieves the highest Macro AUC (0.9974), Sphere AUC (0.9955), Sphere
+PR-AUC (0.9932), Sphere Recall (0.9448), and Test Accuracy (97.35%) of all eleven
+architectures — including all seven ImageNet-pretrained models.
+
+| Architecture | Macro AUC | Sphere PR-AUC | Params | Pretrained |
+|:-------------|:---------:|:-------------:|:------:|:----------:|
+| EqDenseNet-C8 | **0.9974** | **0.9932** | **0.093M** | ❌ Scratch |
+| DenseNet-121  | 0.9962 | 0.9903 | 7.0M | ✅ ImageNet |
+| E-ResNet      | 0.9952 | 0.9871 | 0.39M | ❌ Scratch |
+
+The combined inductive bias of C8 equivariance and dense connectivity provides a
+stronger prior for gravitational lensing substructure detection than 75× more
+parameters with ImageNet pretraining. DenseNet-121 remains the strongest pretrained
+baseline — its dense connectivity and 7M ImageNet-initialised parameters place it
+second overall — but EqDenseNet-C8's result reframes the central question of the
+benchmark: the physically correct symmetry group, encoded architecturally, is more
+valuable than learned feature representations from natural images.
+
+The soft ensemble (Top-6 soft vote) ranks second overall at Macro AUC 0.9970 but
+underperforms EqDenseNet-C8 alone on every metric, confirming that uniform averaging
+dilutes a dominant model's signal on hard cases rather than compensating for it.
 
 ---
 
