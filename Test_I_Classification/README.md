@@ -1518,58 +1518,74 @@ prediction per class.
 
 ### 8.1 Cross-Architecture Sphere Confusion
 
-The Sphere misclassification pattern is universal across all well-converged models — 
+The Sphere misclassification pattern is universal across all well-converged models —
 misclassified Sphere images flow predominantly into No Substructure, not Vortex.
-
-<pre>
+```
 Sphere prediction flows:
 ─────────────────────────────────────────────────────
-  Correctly classified Sphere   ──────────────────→  Sphere
-  Misclassified Sphere  ────────────────────────→  No Substructure (dominant)
-                                                →  Vortex (rare)
+  Correctly classified Sphere  ───────────────────→  Sphere       (n=1817)
+  Misclassified Sphere  ──────────────────────────→  No Substructure (dominant)
+                                                  →  Vortex (rare)
 ─────────────────────────────────────────────────────
-</pre>
+```
 
-**Universally missed Sphere images (all 6 ensemble models wrong simultaneously): 64**
-These 64 images are misclassified as No Substructure by every model with near-zero
-entropy — they pass through any entropy-based triage filter undetected.
+**Per-model Sphere → No Substructure misclassification rate:**
 
-| Feature | Universally missed (n=64) | Universally correct (n=1821) | p-value |
+| Model | Sphere→No Sub | Rate |
+|:------|:-------------:|:----:|
+| EqDenseNet-C8 | 107 / 2500 | 4.3% |
+| DenseNet-121 | 105 / 2500 | 4.2% |
+| E-ResNet | 129 / 2500 | 5.2% |
+| ResNet-50 | 135 / 2500 | 5.4% |
+| ResNet-18 | 153 / 2500 | 6.1% |
+| EfficientNet-B3 | 193 / 2500 | 7.7% |
+| ViT-Base | 309 / 2500 | 12.4% |
+
+**Universally missed Sphere images (all 7 models wrong simultaneously): 55**
+These 55 images are misclassified as No Substructure by every model with near-zero
+entropy — they pass through any entropy-based triage filter undetected. Adding
+EqDenseNet-C8 as a seventh model reduced this count from 64 (6-model ensemble) to
+55, confirming that EqDenseNet-C8's error profile is partially complementary to
+the original six models on the hardest Sphere cases.
+
+| Feature | Universally missed (n=55) | Universally correct (n=1817) | p-value |
 |:--------|:-------------------------:|:----------------------------:|:-------:|
-| Raw mean pixel intensity | 0.0575 | 0.0635 | 4.46×10⁻⁹ |
-| Raw pixel std | 0.1103 | 0.1184 | < 0.001 |
+| Raw mean pixel intensity | 0.0580 | 0.0635 | < 0.001 ✅ |
+| Raw pixel std | 0.1113 | 0.1185 | 0.001 ✅ |
+| Raw contrast (max−min) | 1.0000 | 1.0000 | 1.000 ❌ |
 
-*Statistics computed on unnormalised .npy arrays. Raw contrast (max−min) = 1.0000
-for both groups — uninformative due to per-sample normalisation (p = 1.0).*
+*Statistics computed on unnormalised .npy arrays. Raw contrast = 1.0000 for both
+groups — uninformative due to per-sample min-max normalisation (p = 1.0).*
 
 <p align="center">
   <img src="assets/fig8_1_universally_misclassified_correct.png"
        alt="Universally misclassified vs universally correct Sphere images" width="95%"/>
   <br><em>Figure 8.1 — Sphere images universally misclassified (top, n=12 shown) vs
-  universally correct (bottom, n=12 shown) across all 6 ensemble models. Raw contrast
-  c = max−min of unnormalised pixels is 1.0000 for all images in both rows.</em>
+  universally correct (bottom, n=12 shown) across all 7 models. Raw contrast
+  c = max−min of unnormalised pixels is 1.0000 for all images in both rows —
+  the failure mode is driven by low overall flux, not low dynamic range.</em>
 </p>
 
 <p align="center">
   <img src="assets/fig8_1_sphere_class_difficulty.png"
        alt="Sphere class difficulty: raw image statistics" width="95%"/>
-  <br><em>Figure 8.2 — Raw image statistics for universally wrong (n=64) vs universally
-  correct (n=1821) Sphere images. Left: contrast — both groups at exactly 1.0 (p=1.0,
-  uninformative). Centre: raw mean pixel intensity distributions — wrong group
-  systematically lower. Right: boxplot confirming lower median and compressed upper
-  quartile for wrong group (Mann-Whitney p=4.46×10⁻⁹).</em>
+  <br><em>Figure 8.2 — Raw image statistics for universally wrong (n=55) vs universally
+  correct (n=1817) Sphere images. Left: contrast — both groups at exactly 1.0
+  (p=1.0, uninformative). Centre: raw mean pixel intensity distributions — wrong
+  group systematically lower (p&lt;0.001). Right: boxplot confirming lower median
+  and compressed upper quartile for the wrong group.</em>
 </p>
 
 <p align="center">
   <img src="assets/fig8_1_cross_arch_confusion.png"
-       alt="Cross-architecture confusion matrices for all 9 models" width="95%"/>
-  <br><em>Figure 8.3 — Confusion matrices for all nine architectures sorted by macro
+       alt="Cross-architecture confusion matrices for all 11 models" width="95%"/>
+  <br><em>Figure 8.3 — Confusion matrices for all eleven architectures sorted by macro
   AUC (row-normalised; raw counts in parentheses). Tier 1 models (green border)
-  achieve Sphere recall 0.88–0.94. ViT-Base (orange border) shows the lowest Sphere
-  recall (0.78) and largest Sphere→Vortex leakage (0.10). Tier 3 models (red border):
-  AlexNet Sphere recall 0.65, Equivariant-D4 recall 0.38.</em>
+  achieve Sphere recall 0.88–0.94, with EqDenseNet-C8 leading at 0.9448.
+  ViT-Base (orange border) shows the lowest Sphere recall among Tier 1–2 models
+  (0.78) and the largest Sphere→Vortex leakage. Tier 3 models (red border):
+  AlexNet Sphere recall 0.124, Equivariant-D4 recall 0.386.</em>
 </p>
-
 ---
 
 ### 8.2 Statistical Characterisation of Failures
