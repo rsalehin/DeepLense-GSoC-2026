@@ -1427,6 +1427,25 @@ provides empirical invariance that the architecture does not have by constructio
 </p>
 
 ---
+### 7.6 Class Activation Maps — EqDenseNet-C8
+
+Classic CAM applied to EqDenseNet-C8's `group_pool` output, using
+`classifier[2]` weights. Six cases shown: one correct and one incorrect
+prediction per class.
+
+<p align="center">
+  <img src="assets/eqdensenet_c8_cam.png"
+       alt="EqDenseNet-C8 CAM — correct vs wrong per class" width="75%"/>
+  <br><em>Figure 7.6 — EqDenseNet-C8 Class Activation Maps. Rows: No Substructure
+  (correct / wrong), Sphere (correct / wrong), Vortex (correct / wrong). Green
+  border = correct prediction; red border = incorrect. Correct predictions show
+  activation distributed along the Einstein ring arc. Failures show diffuse or
+  off-arc activation — the model attends to the wrong spatial region when it
+  errs.</em>
+</p>
+
+---
+
 
 ## 8. Failure Mode Analysis
 
