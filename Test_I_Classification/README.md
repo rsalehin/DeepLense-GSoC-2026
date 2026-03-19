@@ -377,7 +377,7 @@ No Substructure     0.4912    0.7836    0.6039      2500
 > The skip-connection gap is the largest single performance discontinuity in this
 > benchmark — larger than any gap within the skip-connection family.
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/13d5yiDvb9LcVxVXu5DmxkVQC0r5s8O9_/view?usp=sharing).
 
 ---
 
@@ -439,7 +439,7 @@ No Substructure     0.7748    0.8636    0.8168      2500
 > worse AUC — the clearest demonstration that scale without skip connections
 > provides no benefit for this task.
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/1DgXgMUY5hit5lI7_rtetaJ3eIAzsujCO/view?usp=sharing)
 
 ---
 
@@ -493,7 +493,7 @@ No Substructure     0.9576    0.9700    0.9638      2500
 | Parameters | 11.2 M |
 | Pretrained | ✅ ImageNet |
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/1cRMRDweT49wT09Fu9wDVLrGTqvn5Nh-q/view?usp=sharing)
 
 ---
 
@@ -545,7 +545,7 @@ No Substructure     0.9709    0.9708    0.9709      2500
 | Parameters | 23.5 M |
 | Pretrained | ✅ ImageNet |
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/1D0DC-M3HzY8J2Rmz01OcJplzbG5Zz3Rq/view?usp=sharing)
 
 ---
 
@@ -599,7 +599,7 @@ No Substructure     0.9765    0.9800    0.9782      2500
 | Parameters | 7.0 M |
 | Pretrained | ✅ ImageNet |
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/1A-3ghbzmvuOIs5EZg8HITDRBWMEmQXTn/view?usp=sharing)
 
 ---
 
@@ -656,7 +656,7 @@ No Substructure     0.9583    0.9716    0.9649      2500
 | Parameters | 10.7 M |
 | Pretrained | ✅ ImageNet |
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/1IOim4Px37em7PMdYW3rKLfpTAy2Usq5A/view?usp=sharing)
 
 ---
 
@@ -712,7 +712,7 @@ No Substructure     0.9177    0.9600    0.9384      2500
 | Parameters | 85.4 M |
 | Pretrained | ✅ ImageNet-21k |
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/1DgXgMUY5hit5lI7_rtetaJ3eIAzsujCO/view?usp=sharing)
 
 ---
 
@@ -746,7 +746,7 @@ classification.
 | Parameters | ~0.0 M (shallow) |
 | Pretrained | ❌ Scratch |
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/1UYCFOdl_TEqnV8iYnuzLuNalViNkK-qg/view?usp=sharing)
 
 ---
 
@@ -823,7 +823,7 @@ No Substructure     0.9413    0.9880    0.9641      2500
 > rotationally stable** than untrained ResNet-50 (L₂ probability divergence test,
 > Section 7.5), proving the symmetry is architectural, not learned.
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/11KBV8v5_pXaUsrvin8uWFB6o0jqX65SB/view?usp=sharing)
 
 ---
 
@@ -925,7 +925,7 @@ No Substructure     0.9900    0.9960    0.9930      2500
 > stronger prior for gravitational lensing substructure detection than 75× more
 > parameters with ImageNet pretraining (DenseNet-121, 7.0M).
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/your-link-here) *(replace with actual link)*
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/108P4VtKzX7agb9jeRPM5xGSCqITmA5kQ/view?usp=sharing)
 
 ---
 
