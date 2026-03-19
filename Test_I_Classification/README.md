@@ -1034,6 +1034,9 @@ table will read:
 
 † *Sections 5.12–5.13 document implementation attempts from Common Test I.
 Full implementation is planned for the GSoC 2026 project period.*
+
+---
+
 ## 6. Comprehensive Results Summary
 
 
