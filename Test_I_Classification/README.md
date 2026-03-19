@@ -1984,16 +1984,23 @@ dilutes a dominant model's signal on hard cases rather than compensating for it.
 
 ### 11.2 Model Limitations
 
-- **D₄ covers only 90° multiples:** Real lenses appear at arbitrary position angles. Full continuous SO(2) equivariance requires steerable CNNs.
-- **64 confident failures:** The deep ensemble identifies 62 Sphere images misclassified with high confidence by all models. These pass through any entropy-based triage filter — an operational safety concern for deployed pipelines.
-- **CAE bottleneck:** The 128-dimensional CAE bottleneck has not been studied systematically. Too-large → memorises substructure; too-small → fails to capture arc shape variation.
-- **Calibration under distribution shift:** Ensemble entropy analysis assumes val distribution = train distribution. Calibration experiments under controlled PSF/noise/background shifts are needed before deployment.
+- **D₄ covers only 90° multiples:** Real lenses appear at arbitrary position angles.
+  Full continuous SO(2) equivariance requires steerable CNNs.
 
-### 11.3 Detection and Estimation Extensions
+- **55 silent confident failures:** The 7-model deep ensemble identifies 55 Sphere
+  images misclassified as No Substructure with near-zero entropy — unanimous,
+  confident, wrong. These pass through any entropy-based triage filter undetected,
+  constituting an operational safety concern for deployed pipelines. These are
+  entirely distinct from the 12 high-entropy cases the ensemble flags as uncertain
+  (zero overlap), meaning uncertainty estimation catches the wrong failure mode.
 
-- **Subhalo mass regression:** Extend from classification to continuous mass prediction with calibrated uncertainty. The monotonic confidence–brightness relationship (Section 8.3) suggests calibrated mass estimates from single-band images are achievable above the detection threshold.
-- **Anomaly detection framing:** Reframe substructure detection as one-class anomaly detection. The CAE smooth-lens manifold provides a natural reference representation; the residual norm within the ring annulus could serve as an anomaly score.
-- **Density field regression for Vortex:** Vortex substructure represents a dark matter density field perturbation; a regression target for the vortex density parameter would provide richer physical outputs than a binary label.
+- **CAE bottleneck:** The 128-dimensional CAE bottleneck has not been studied
+  systematically. Too-large → memorises substructure; too-small → fails to capture
+  arc shape variation.
+
+- **Calibration under distribution shift:** Ensemble entropy analysis assumes val
+  distribution = train distribution. Calibration experiments under controlled
+  PSF/noise/background shifts are needed before deployment.
 
 ---
 
