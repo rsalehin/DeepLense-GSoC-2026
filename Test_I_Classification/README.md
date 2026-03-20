@@ -16,7 +16,7 @@
 using eleven architectures — from convolutional baselines to physics-motivated equivariant
 networks encoding the rotational symmetry of gravitational lensing directly into their weights.
 
-Nine architectures establish a comprehensive benchmark spanning sequential CNNs, residual
+**Eleven** architectures establish a comprehensive benchmark spanning sequential CNNs, residual
 networks, dense connectivity, attention-based transformers, and D₄-equivariant networks.
 A novel **C8-equivariant DenseNet (EqDenseNet-C8)**, combining 8-fold discrete rotational
 equivariance with DenseNet-style dense connectivity and trained entirely from scratch,
@@ -231,7 +231,7 @@ All experiments were conducted on **Google Colab with a single NVIDIA A100 GPU**
 ```bash
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 pip install lenstronomy --quiet          # Section 9: analytical lens fitting
-pip install escnn --quiet                # Sections 5.8–5.9: equivariant CNNs
+pip install escnn --quiet                # Sections 5.8–5.10: equivariant CNNs
 pip install grad-cam --quiet             # Section 7.1: Grad-CAM visualisation
 pip install "numpy<2"                    # escnn + lenstronomy require numpy 1.x
 # ⚠️  Restart runtime after numpy downgrade before proceeding
@@ -1068,6 +1068,9 @@ All eleven architectures evaluated on the predefined val partition (7,500 images
   <br><em>Figure 6.1 — Macro-averaged ROC curves for all eleven architectures. Three performance tiers are clearly visible. The Tier 1 cluster (EqDenseNet-C8, DenseNet-121, E-ResNet, ResNet-50, ResNet-18, EfficientNet-B3) sits near the top-left corner with curves nearly indistinguishable at this scale.</em>
 </p>
 
+---
+
+### 6.2 Performance Tiers
 The macro AUC distribution reveals three distinct tiers separated by architectural discontinuities:
 
 ```
@@ -1103,7 +1106,7 @@ from from-scratch equivariant models without sufficient depth. Notably, EqDenseN
 gap is not inherent to from-scratch training, but specific to architectures that lack
 both depth and skip connections.
 
-### 6.2 Performance Tiers
+
 
 <!-- Figure: Sphere-class precision-recall curves -->
 <p align="center">
@@ -1499,7 +1502,7 @@ provides empirical invariance that the architecture does not have by constructio
 <!-- Figure: equivariance verification — L2 divergence bar chart, Stage 1 and Stage 2 -->
 <p align="center">
   <img src="assets/fig7_5_equivariance_verification.png" alt="Rotation invariance verification: L2 probability divergence" width="95%"/>
-  <br><em>Figure 7.5 — Rotation invariance verification. Left: Stage 1 (untrained models) — mean L₂ probability divergence under 90°/180°/270° rotations for E-ResNet, EPlainCNN, and ResNet-50. The untrained E-ResNet is 37.3× more stable than ResNet-50. Right: Stage 2 (trained models) — empirical invariance after full training. E-ResNet achieves 2.5× better invariance than augmented ResNet-50.</em>
+  <br><em>Figure 7.5 — Rotation invariance verification. Left: Stage 1 (untrained models) — mean L₂ probability divergence under 90°/180°/270° rotations for E-ResNet, EPlainCNN, and ResNet-50. The untrained E-ResNet is 641× more stable than ResNet-50. Right: Stage 2 (trained models) — empirical invariance after full training. E-ResNet achieves 2.5× better invariance than augmented ResNet-50.</em>
 </p>
 
 ---
@@ -1675,7 +1678,7 @@ mean flux across all three classes. The effect is strongest for Sphere.
   <br><em>Figure 8.8 — Classification accuracy (solid) and mean confidence (dashed)
   vs ring mean flux, binned by brightness percentile (E-ResNet, val set). Sphere
   accuracy falls from ~1.0 at high flux to around 0.5 at the lowest flux bin. No
-  Substructure and Vortex show the same trend with a higher floor. The 64
+  Substructure and Vortex show the same trend with a higher floor. The 55
   universally-missed Sphere images originate from the low-flux tail.</em>
 </p>
 
@@ -1701,19 +1704,43 @@ using CAE residual centroids.
 
 ### 8.5 Physical Interpretation
 
-- **Sphere** (CDM subhalo): compact, approximately symmetric perturbation →
-  morphologically similar to smooth arc edge effects
-- **Vortex** (axion DM): elongated, asymmetric density field perturbation →
-  geometrically distinct from both smooth arcs and Sphere subhalos
+- **Sphere** (CDM subhalo): compact, approximately symmetric perturbation →  
+  morphologically similar to smooth arc edge effects, making it the most
+  challenging class due to low-contrast, locally ambiguous signatures  
 
-The data shows that E-ResNet has lower Sphere recall than DenseNet-121 (0.9224 
-vs 0.9364) despite higher theoretical rotational stability. Whether this gap is 
-attributable to the D₄ symmetry constraint, the absence of ImageNet pretraining, 
-the parameter count difference, or some combination of these factors cannot be 
-isolated from the current experiments. Disentangling these contributions — for 
-example by training a DenseNet-121-scale equivariant network with pretraining, 
-or by evaluating under controlled distribution shift — is a natural direction 
-for the main GSoC project.
+- **Vortex** (axion DM): elongated, asymmetric density field perturbation →  
+  geometrically distinct from both smooth arcs and Sphere subhalos, resulting
+  in consistently higher separability across all models  
+
+The updated benchmark shows that **EqDenseNet-C8 achieves the highest Sphere
+recall (0.9448)**, surpassing both DenseNet-121 (0.9364) and E-ResNet (0.9224).
+This result is particularly significant because EqDenseNet-C8 combines strong
+representational capacity with explicit rotational structure, suggesting that
+equivariance does not inherently limit performance when paired with sufficient
+model expressivity.
+
+In contrast, **E-ResNet continues to underperform DenseNet-121 on Sphere recall**
+despite its stronger theoretical rotational stability. This indicates that
+equivariance alone is not sufficient: model capacity, feature reuse (as in dense
+connectivity), and optimization advantages from pretraining all play critical
+roles in detecting subtle, locally symmetric perturbations.
+
+The key insight is therefore not simply that "equivariance helps," but that
+**equivariance must be integrated into a high-capacity architecture to be fully
+effective**. EqDenseNet-C8 demonstrates this by achieving both superior Sphere
+recall and strong parameter efficiency, occupying a regime previously unattained
+by either pretrained CNNs or smaller equivariant models.
+
+However, causal attribution remains unresolved. The performance gap between
+E-ResNet and EqDenseNet-C8 could arise from:
+- architectural differences (residual vs dense connectivity)  
+- parameter scaling  
+- absence of pretraining in equivariant models  
+- or interactions between symmetry constraints and feature propagation  
+
+Disentangling these factors — for example by training DenseNet-scale equivariant
+models with and without pretraining, or evaluating under controlled distribution
+shift — remains a central research direction for the GSoC project.
 
 ---
 ## 9. Residual Image Approach
@@ -2021,7 +2048,7 @@ Five research directions are prioritised based on where current architectures fa
 D₄ covers only 90° multiples; real lenses appear at arbitrary angles. Upgrading to SO(2) or C₈ steerable CNNs would provide continuous rotation equivariance at a smaller parameter budget than achieving equivalent invariance through augmentation. The ablation result — augmentation is the dominant driver, not residual connections — directly motivates replacing D₄-plus-augmentation with a tighter architectural prior.
 
 **2. Silent failure detection via anomaly scoring.**
-The 64 silent Sphere failures (confident consensus errors across 6 models) are the most dangerous operational failure mode. The CAE smooth-lens manifold provides a natural one-class anomaly score: the residual norm within the ring annulus, calibrated against the reconstruction noise floor. Testing whether this score identifies silent failures while remaining below false alarm thresholds on true No Substructure images would directly address the operational safety gap.
+The 55 silent Sphere failures (confident consensus errors across 7 models) are the most dangerous operational failure mode. The CAE smooth-lens manifold provides a natural one-class anomaly score: the residual norm within the ring annulus, calibrated against the reconstruction noise floor. Testing whether this score identifies silent failures while remaining below false alarm thresholds on true No Substructure images would directly address the operational safety gap.
 
 **3. Ring-local perturbation detection head.**
 The interpretability analysis establishes that the discriminative challenge is not identifying the ring but *localising a compact perturbation within* the ring. A ring-local detection architecture — a lightweight ring-finder fitting the Einstein ring, followed by a perturbation classifier operating on a polar-reparameterised ring-local patch — would decouple the two tasks. The polar reparameterisation converts perturbation position to a translation problem, making smaller, more data-efficient detectors viable.
@@ -2123,7 +2150,7 @@ All weights are saved as raw PyTorch state dicts via torch.save(model.state_dict
 | ResNet-18 | 0.9927 | [Download](https://drive.google.com/file/d/1cRMRDweT49wT09Fu9wDVLrGTqvn5Nh-q/view?usp=sharing) |
 | EfficientNet-B3 | 0.9898 | [Download](https://drive.google.com/file/d/1IOim4Px37em7PMdYW3rKLfpTAy2Usq5A/view?usp=sharing) |
 | ViT-Base/16 | 0.9761 | [Download](https://drive.google.com/file/d/1DgXgMUY5hit5lI7_rtetaJ3eIAzsujCO/view?usp=sharing) |
-| VGG-16 | 0.8944 | [Download](https://drive.google.com/file/d/1DgXgMUY5hit5lI7_rtetaJ3eIAzsujCO/view?usp=sharing) |
+| VGG-16 | 0.8944 | [Download](https://drive.google.com/file/d/1GkuBBv8cUmCTDhd5DfZA4WXxA-BEGPob/view?usp=sharing) |
 | Equivariant-D4 (ENN) | 0.7362 | [Download](https://drive.google.com/file/d/1UYCFOdl_TEqnV8iYnuzLuNalViNkK-qg/view?usp=sharing) |
 | AlexNet | 0.6589 | [Download](https://drive.google.com/file/d/13d5yiDvb9LcVxVXu5DmxkVQC0r5s8O9_/view?usp=sharing) |
 | CAE (smooth lens) | — | [Download](https://drive.google.com/file/d/1hQsnWvwOzBHeOozeuBiqHacK4SI5nWQa/view?usp=sharing) |
