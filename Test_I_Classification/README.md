@@ -440,7 +440,7 @@ No Substructure     0.7748    0.8636    0.8168      2500
 > worse AUC — the clearest demonstration that scale without skip connections
 > provides no benefit for this task.
 
-**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/1DgXgMUY5hit5lI7_rtetaJ3eIAzsujCO/view?usp=sharing)
+**Model weights:** [Download from Google Drive](https://drive.google.com/file/d/1GkuBBv8cUmCTDhd5DfZA4WXxA-BEGPob/view?usp=drive_link)
 
 ---
 
