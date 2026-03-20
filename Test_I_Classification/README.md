@@ -1065,7 +1065,7 @@ All eleven architectures evaluated on the predefined val partition (7,500 images
 <!-- Figure: 9-model macro-averaged ROC comparison -->
 <p align="center">
   <img src="assets/fig6_1_roc_comparison.png" alt="Macro-averaged ROC curves for all 9 architectures" width="95%"/>
-  <br><em>Figure 6.1 — Macro-averaged ROC curves for all nine architectures. Three performance tiers are clearly visible. The Tier 1 cluster (DenseNet-121, E-ResNet, ResNet-50, ResNet-18, EfficientNet-B3) sits near the top-left corner with curves nearly indistinguishable at this scale.</em>
+  <br><em>Figure 6.1 — Macro-averaged ROC curves for all eleven architectures. Three performance tiers are clearly visible. The Tier 1 cluster (EqDenseNet-C8, DenseNet-121, E-ResNet, ResNet-50, ResNet-18, EfficientNet-B3) sits near the top-left corner with curves nearly indistinguishable at this scale.</em>
 </p>
 
 The macro AUC distribution reveals three distinct tiers separated by architectural discontinuities:
