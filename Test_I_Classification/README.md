@@ -2137,7 +2137,7 @@ DeepLense-GSoC-2026/
             ├── fig11g_dn_res_roc.png
             ├── fig11i_r18_res_confusion_matrix.png
             └── fig11j_r18_res_roc.png
-```
+
 
 *Model weights are linked individually in each architecture section above.
 All weights are raw PyTorch state dicts — load with
