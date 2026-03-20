@@ -1103,10 +1103,16 @@ from from-scratch equivariant models without sufficient depth. Notably, EqDenseN
 gap is not inherent to from-scratch training, but specific to architectures that lack
 both depth and skip connections.
 
+### 6.2 Performance Tiers
+
 <!-- Figure: Sphere-class precision-recall curves -->
 <p align="center">
   <img src="assets/fig6_2_sphere_pr_curves.png" alt="Sphere-class precision-recall curves for all 9 architectures" width="95%"/>
-  <br><em>Figure 6.2 — Sphere-class precision-recall curves. The PR view reveals differentiation invisible in macro AUC: DenseNet-121 leads at PR-AUC 0.9903, while EfficientNet-B3 trails at 0.9749. AlexNet at 0.4380 is barely above the random baseline of 0.33.</em>
+  <br><em>Figure 6.2 — Sphere-class precision-recall curves for all eleven architectures.
+  The PR view reveals differentiation invisible in macro AUC: EqDenseNet-C8 leads at
+  PR-AUC 0.9932, DenseNet-121 follows at 0.9903, while EfficientNet-B3 trails at
+  0.9749 — a spread of 0.018 compressed into a 0.008 macro AUC gap. AlexNet at
+  0.4380 is barely above the random baseline of 0.33.</em>
 </p>
 
 ### 6.3 Parameter Efficiency
