@@ -165,7 +165,7 @@ PR-AUC random baseline throughout.
 **Sample visualisation — lenses and non-lenses across three bands:**
 
 <p align="center">
-  <img src="figures/eda_samples.png" alt="HSC sample images: lenses and non-lenses across g, r, i bands" width="95%"/>
+  <img src="assets/eda_samples.png" alt="HSC sample images: lenses and non-lenses across g, r, i bands" width="95%"/>
   <br><em>Figure 2.1 — Representative 64×64 HSC images for lens (top rows) and non-lens
   (bottom rows) classes, shown across g, r, and i bands. At this resolution, PSF
   convolution suppresses resolved arc geometry in most cases. What remains is a radial
@@ -177,7 +177,7 @@ PR-AUC random baseline throughout.
 **Pixel intensity distributions per class and band:**
 
 <p align="center">
-  <img src="figures/eda_intensity_distributions.png"
+  <img src="assets/eda_intensity_distributions.png"
        alt="Per-channel pixel intensity distributions for lenses and non-lenses" width="95%"/>
   <br><em>Figure 2.2 — Pixel intensity distributions per band (g, r, i) for lenses and
   non-lenses (n=300 per class, raw arrays). Both distributions are heavily concentrated
@@ -190,7 +190,7 @@ PR-AUC random baseline throughout.
 **Spatial structure analysis — mean images and difference maps:**
 
 <p align="center">
-  <img src="figures/eda_spatial_structure.png"
+  <img src="assets/eda_spatial_structure.png"
        alt="Mean lens and non-lens images, and lens-minus-non-lens difference maps" width="95%"/>
   <br><em>Figure 2.3 — Spatial structure analysis. Row 1: mean lens image per band (g, r, i).
   Row 2: mean non-lens image per band. Row 3: difference map (lens − non-lens) on a
@@ -337,7 +337,7 @@ All equivariant models: `in_type = 3 × trivial_repr` — each band as a scalar 
 **Training:** Early stopping epoch 23, best val AUC = 0.9886.
 
 <p align="center">
-  <img src="figures/EfficientNet-B2_curves.png"
+  <img src="assets/EfficientNet-B2_curves.png"
        alt="EfficientNet-B2 training curves" width="95%"/>
   <br><em>Figure 5.1a — EfficientNet-B2 training dynamics. Left: train/val loss over 23 epochs —
   train loss decreases throughout; val loss fluctuates without a clean minimum. Right: val AUC
@@ -346,7 +346,7 @@ All equivariant models: `in_type = 3 × trivial_repr` — each band as a scalar 
 </p>
 
 <p align="center">
-  <img src="figures/EfficientNet-B2_results.png"
+  <img src="assets/EfficientNet-B2_results.png"
        alt="EfficientNet-B2 evaluation: ROC, confusion matrix, PR, calibration" width="95%"/>
   <br><em>Figure 5.1b — EfficientNet-B2 evaluation on the held-out test set. Top-left: ROC curve
   (AUC-ROC = 0.9790). Top-right: confusion matrix at val-set Youden τ* = 0.275 — 179 true lenses
@@ -381,7 +381,7 @@ All equivariant models: `in_type = 3 × trivial_repr` — each band as a scalar 
 **Training:** Early stopping epoch 26, best val AUC = 0.9954.
 
 <p align="center">
-  <img src="figures/ResNet-34_curves.png"
+  <img src="assets/ResNet-34_curves.png"
        alt="ResNet-34 training curves" width="95%"/>
   <br><em>Figure 5.2a — ResNet-34 training dynamics. Left: train/val loss — val loss fluctuates
   without dramatic spikes; best val AUC reached at epoch 16 and not exceeded in subsequent epochs.
@@ -390,7 +390,7 @@ All equivariant models: `in_type = 3 × trivial_repr` — each band as a scalar 
 </p>
 
 <p align="center">
-  <img src="figures/ResNet-34_results.png"
+  <img src="assets/ResNet-34_results.png"
        alt="ResNet-34 evaluation: ROC, confusion matrix, PR, calibration" width="95%"/>
   <br><em>Figure 5.2b — ResNet-34 evaluation. Top-left: ROC curve (AUC-ROC = 0.9881 — best
   individual model). Top-right: confusion matrix at τ* = 0.279 — 176 true lenses recovered, 19
@@ -428,7 +428,7 @@ where this holds. This is noted but does not imply good calibration under this i
 **Training:** Early stopping epoch 36, best val AUC = 0.9943.
 
 <p align="center">
-  <img src="figures/DenseNet-121_curves.png"
+  <img src="assets/DenseNet-121_curves.png"
        alt="DenseNet-121 training curves" width="95%"/>
   <br><em>Figure 5.3a — DenseNet-121 training dynamics. Left: train/val loss — train loss reaches
   near-zero by epoch 28; val loss fluctuates without dramatic spikes, gradually trending up from
@@ -437,7 +437,7 @@ where this holds. This is noted but does not imply good calibration under this i
 </p>
 
 <p align="center">
-  <img src="figures/DenseNet-121_results.png"
+  <img src="assets/DenseNet-121_results.png"
        alt="DenseNet-121 evaluation: ROC, confusion matrix, PR, calibration" width="95%"/>
   <br><em>Figure 5.3b — DenseNet-121 evaluation. Top-left: ROC curve (AUC-ROC = 0.9844).
   Top-right: confusion matrix at τ* = 0.136 — 181 lenses recovered, 14 missed, 642 false positives.
@@ -490,7 +490,7 @@ score compression toward low values; calibration curve should be consulted direc
 **Training:** Early stopping epoch 17, best val AUC = 0.9932 (reached at epoch 2).
 
 <p align="center">
-  <img src="figures/EResNet-D4_curves.png"
+  <img src="assets/EResNet-D4_curves.png"
        alt="E-ResNet D4 training curves" width="95%"/>
   <br><em>Figure 5.4a — E-ResNet D₄ training dynamics. Left: train/val loss — val loss spikes at
   epoch 1 (0.0725) then stabilises; train loss reaches near-zero by epoch 8. Right: val AUC —
@@ -500,7 +500,7 @@ score compression toward low values; calibration curve should be consulted direc
 </p>
 
 <p align="center">
-  <img src="figures/EResNet-D4_results.png"
+  <img src="assets/EResNet-D4_results.png"
        alt="E-ResNet D4 evaluation: ROC, confusion matrix, PR, calibration" width="95%"/>
   <br><em>Figure 5.4b — E-ResNet D₄ evaluation. Top-left: ROC curve (AUC-ROC = 0.9840 — close to
   DenseNet-121 at 13.5× fewer parameters). Top-right: confusion matrix at τ* = 0.306 — 182 lenses
@@ -555,7 +555,7 @@ continuous domain via escnn weight-sharing.
 **Training:** Early stopping epoch 41, best val AUC = 0.9958.
 
 <p align="center">
-  <img src="figures/EqDenseNet-C8_curves.png"
+  <img src="assets/EqDenseNet-C8_curves.png"
        alt="EqDenseNet-C8 training curves" width="95%"/>
   <br><em>Figure 5.5a — EqDenseNet-C8 training dynamics. Left: train/val loss — more stable than
   E-ResNet D₄, no catastrophic val loss spikes. Train loss reaches near-zero around epoch 20; val
@@ -564,7 +564,7 @@ continuous domain via escnn weight-sharing.
 </p>
 
 <p align="center">
-  <img src="figures/EqDenseNet-C8_results.png"
+  <img src="assets/EqDenseNet-C8_results.png"
        alt="EqDenseNet-C8 evaluation: ROC, confusion matrix, PR, calibration" width="95%"/>
   <br><em>Figure 5.5b — EqDenseNet-C8 evaluation. Top-left: ROC curve (AUC-ROC = 0.9872 — best
   from-scratch model, exceeding DenseNet-121 at 37.9× fewer parameters). Top-right: confusion
@@ -620,7 +620,7 @@ Range: 0.708–0.819. Lowest pair: DenseNet-121 / E-ResNet D₄ (0.708). Highest
 ResNet-34 / EqDenseNet-C8 (0.819). No clean pretrained vs equivariant separation.
 
 <p align="center">
-  <img src="figures/Soft-Ensemble_results.png"
+  <img src="assets/Soft-Ensemble_results.png"
        alt="Soft Ensemble evaluation: ROC, confusion matrix, PR, calibration" width="95%"/>
   <br><em>Figure 5.6 — Soft Ensemble evaluation on the held-out test set. Top-left: ROC curve
   (AUC-ROC = 0.9905 — best of all systems). Top-right: confusion matrix at val-set Youden
@@ -675,7 +675,7 @@ model — thresholds differ across models; direct CM comparisons are indicative,
 ### 6.2 ROC and Precision-Recall Curves
 
 <p align="center">
-  <img src="figures/results_overlay.png"
+  <img src="assets/results_overlay.png"
        alt="ROC and PR curve comparison — all six systems" width="95%"/>
   <br><em>Figure 6.1 — Comparative ROC and PR curves for all six systems on the test set.
   Left: ROC curves — all models achieve AUC-ROC > 0.979; individual model span is only 0.009
@@ -695,7 +695,7 @@ significant divergence that PR-AUC correctly exposes.
 ### 6.3 Parameter Efficiency
 
 <p align="center">
-  <img src="figures/auc_vs_params.png"
+  <img src="assets/auc_vs_params.png"
        alt="AUC-ROC and AUC-PR vs parameter count scatter" width="95%"/>
   <br><em>Figure 6.2 — Parameter efficiency scatter (log-scale x-axis: parameter count in millions;
   y-axis: AUC). Triangles = trained from scratch; circles = ImageNet pretrained.
@@ -745,7 +745,7 @@ is directly visible; no claims are made about model reasoning from these maps.
 **Correct Lenses (TP, p=1.000)**
 
 <p align="center">
-  <img src="figures/gradcam_EfficientNet_B2_co.png"
+  <img src="assets/gradcam_EfficientNet_B2_co.png"
        alt="EfficientNet-B2 Grad-CAM — Correct Lenses" width="95%"/>
   <br><em>Figure 7.1 — EfficientNet-B2 Grad-CAM on 6 correctly classified lenses (all p=1.000).
   Top row: i-band images. Bottom row: Grad-CAM overlays. High activation (red) consistently
@@ -758,7 +758,7 @@ is directly visible; no claims are made about model reasoning from these maps.
 **Missed Lenses (FN, p=0.001–0.035)**
 
 <p align="center">
-  <img src="figures/gradcam_EfficientNet_B2_mi.png"
+  <img src="assets/gradcam_EfficientNet_B2_mi.png"
        alt="EfficientNet-B2 Grad-CAM — Missed Lenses" width="95%"/>
   <br><em>Figure 7.2 — EfficientNet-B2 Grad-CAM on 6 missed lenses (p=0.001–0.035). Morphologies:
   elongated off-centre source (col 1), compact source in noisy field (col 2), two-source
@@ -771,7 +771,7 @@ is directly visible; no claims are made about model reasoning from these maps.
 **False Positives (FP, p=0.948–0.995)**
 
 <p align="center">
-  <img src="figures/gradcam_EfficientNet_B2_fa.png"
+  <img src="assets/gradcam_EfficientNet_B2_fa.png"
        alt="EfficientNet-B2 Grad-CAM — False Positives" width="95%"/>
   <br><em>Figure 7.3 — EfficientNet-B2 Grad-CAM on 6 high-confidence false positives (p=0.948–0.995).
   Sources include compact isolated sources (cols 1, 2, 4, 5, 6) and a triple-source configuration
@@ -787,7 +787,7 @@ is directly visible; no claims are made about model reasoning from these maps.
 **Correct Lenses (TP, p=0.999–1.000)**
 
 <p align="center">
-  <img src="figures/gradcam_DenseNet_121_co.png"
+  <img src="assets/gradcam_DenseNet_121_co.png"
        alt="DenseNet-121 Grad-CAM — Correct Lenses" width="95%"/>
   <br><em>Figure 7.4 — DenseNet-121 Grad-CAM on 6 correctly classified lenses (p=0.999–1.000).
   High activation concentrated in the lower image portion in columns 1–4; column 5 shows lower-right
@@ -798,7 +798,7 @@ is directly visible; no claims are made about model reasoning from these maps.
 **Missed Lenses (FN, p=0.000–0.014)**
 
 <p align="center">
-  <img src="figures/gradcam_DenseNet_121_mi.png"
+  <img src="assets/gradcam_DenseNet_121_mi.png"
        alt="DenseNet-121 Grad-CAM — Missed Lenses" width="95%"/>
   <br><em>Figure 7.5 — DenseNet-121 Grad-CAM on 6 missed lenses (p=0.000–0.014). All 6 panels
   show near-uniform blue — the model produces essentially no gradient signal on any of these
@@ -809,7 +809,7 @@ is directly visible; no claims are made about model reasoning from these maps.
 **False Positives (FP, p=0.964–0.985)**
 
 <p align="center">
-  <img src="figures/gradcam_DenseNet_121_fa.png"
+  <img src="assets/gradcam_DenseNet_121_fa.png"
        alt="DenseNet-121 Grad-CAM — False Positives" width="95%"/>
   <br><em>Figure 7.6 — DenseNet-121 Grad-CAM on 6 high-confidence false positives (p=0.964–0.985).
   Sources include compact isolated sources (cols 1, 2, 4, 6), a source with bright linear edge feature
@@ -840,7 +840,7 @@ distribution. IG satisfies the completeness axiom: attributions sum to the outpu
 between input and baseline.
 
 <p align="center">
-  <img src="figures/ig_channel_attribution.png"
+  <img src="assets/ig_channel_attribution.png"
        alt="Integrated Gradients per-channel attribution — EfficientNet-B2" width="95%"/>
   <br><em>Figure 7.7 — Integrated Gradients per-channel attribution for EfficientNet-B2 on
   correctly classified lenses (TP, n=8). Left: stacked bar chart showing relative per-channel
@@ -876,7 +876,7 @@ The legacy per-channel saliency figure (channel-masking Grad-CAM) is retained be
 for reference, but the IG results above supersede it for all interpretation purposes.
 
 <p align="center">
-  <img src="figures/gradcam_channel_saliency.png"
+  <img src="assets/gradcam_channel_saliency.png"
        alt="Per-channel saliency via channel-masking Grad-CAM (legacy)" width="75%"/>
   <br><em>Figure 7.8 — Legacy per-channel saliency via channel-masking Grad-CAM on 4 correctly
   classified lenses. Rows: g band (row 1), r band (row 2), i band (row 3), all bands (row 4).
@@ -895,7 +895,7 @@ Analysis at Soft-Ensemble operating point τ* = 0.3143. **FN = 10, FP = 379.**
 ### 8.1 Missed Lenses Gallery
 
 <p align="center">
-  <img src="figures/failure_false_negatives.png"
+  <img src="assets/failure_false_negatives.png"
        alt="Soft-Ensemble — All 10 missed lenses" width="95%"/>
   <br><em>Figure 8.1 — All 10 missed lenses (FN=10), sorted by ascending ensemble confidence
   (p=0.023 to p=0.313). Rows per column: RGB composite (g→R, r→G, i→B), g band, r band, i band.
@@ -911,7 +911,7 @@ Analysis at Soft-Ensemble operating point τ* = 0.3143. **FN = 10, FP = 379.**
 ### 8.2 False Positive Gallery
 
 <p align="center">
-  <img src="figures/failure_false_positives_top18.png"
+  <img src="assets/failure_false_positives_top18.png"
        alt="Soft-Ensemble — Top-18 false positives by ensemble confidence" width="95%"/>
   <br><em>Figure 8.2 — Top-18 false positives by ensemble confidence (p=0.898–0.964).
   Rows per column: RGB composite, g band, r band, i band. The highest-confidence FP (col 1, p=0.964)
