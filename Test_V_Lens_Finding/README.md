@@ -469,25 +469,26 @@ score compression toward low values; calibration curve should be consulted direc
 
 ---
 
-### 5.4 E-ResNet D₄ (3-channel)
+### 5.4 E-ResNet $D_4$ (3-channel)
 
-**Architecture:** D₄-equivariant ResNet (`flipRot2dOnR2(N=4)`, order 8).
-`in_type = 3 × trivial_repr`. 0.513M params, from scratch.
+**Architecture:** $D_4$-equivariant ResNet (`flipRot2dOnR2(N=4)`, order 8).  
+`in_type = 3 × trivial_repr`.  
+$0.513$M parameters, trained from scratch.
 
 **Key constraint:** Strided `R2Conv` under `flipRot2dOnR2` breaks equivariance
-(|Δlogit| ~ 3.4 at layer2 — verified by `in_type.transform`). All downsampling uses
-`enn.PointwiseAvgPool + stride-1 conv` in both main path and shortcut.
+($\lvert \Delta \text{logit} \rvert \approx 3.4$ at layer2, verified via `in_type.transform`).
+All downsampling therefore uses `enn.PointwiseAvgPool + stride-1 conv` in both the main path and the shortcut.
 
-**D₄ Invariance (all 8 elements, max |Δlogit| = 7.84e-06 ✓):**
+**$D_4$ invariance check** (all 8 group elements, max $\lvert \Delta \text{logit} \rvert = 7.84\times10^{-6}$ ✓):
 
-| Element | |Δlogit| | Element | |Δlogit| |
-|:--------|--------:|:--------|--------:|
-| identity | 0.00e+00 | flip | 1.40e-06 |
-| rot 90° | 2.38e-06 | flip∘rot90 | 1.64e-06 |
-| rot 180° | **7.84e-06** | flip∘rot180 | 1.43e-06 |
-| rot 270° | 4.11e-06 | flip∘rot270 | 2.38e-06 |
+| Element | $\lvert \Delta \text{logit} \rvert$ | Element | $\lvert \Delta \text{logit} \rvert$ |
+|:--|--:|:--|--:|
+| identity | $0.00\times10^{0}$ | flip | $1.40\times10^{-6}$ |
+| rot $90^\circ$ | $2.38\times10^{-6}$ | flip $\circ$ rot $90^\circ$ | $1.64\times10^{-6}$ |
+| rot $180^\circ$ | **$7.84\times10^{-6}$** | flip $\circ$ rot $180^\circ$ | $1.43\times10^{-6}$ |
+| rot $270^\circ$ | $4.11\times10^{-6}$ | flip $\circ$ rot $270^\circ$ | $2.38\times10^{-6}$ |
 
-**Training:** Early stopping epoch 17, best val AUC = 0.9932 (reached at epoch 2).
+**Training:** Early stopping at epoch 17. Best validation AUC = $0.9932$, first reached at epoch 2.
 
 <p align="center">
   <img src="assets/EResNet-D4_curves.png"
