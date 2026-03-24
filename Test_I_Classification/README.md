@@ -1273,31 +1273,6 @@ changes in spatial evidence usage matter most.
   <br><em>Figure 7.3d — Case 4: both models wrong. Shared failures are concentrated on Sphere images (125/161), suggesting that these examples are genuinely difficult rather than architecture-specific edge cases. In many such cases, both models still attend somewhere on or near the ring, but the signal is too weak, ambiguous, or misleading for either model to reach the correct decision.</em>
 </p>
 
-### 7.4 ViT vs DenseNet-121: Attention and Localisation
-
-The ResNet-50 vs E-ResNet comparison above asked whether equivariant inductive bias
-changes *where* a model looks. This section asks a different question: **if a model
-attends strongly to the Einstein ring, does that necessarily translate into better
-classification?** The comparison between **ViT-Base** and **DenseNet-121** shows that
-the answer is **no**.
-
-These two models are useful to contrast because they perform differently and are
-interpreted through different mechanisms. **DenseNet-121** is analysed with
-**Grad-CAM**, which reflects class-discriminative spatial gradients at the final
-convolutional stage. **ViT-Base** is analysed with **attention rollout**, which
-propagates CLS-token attention back through the transformer layers and gives a
-class-agnostic view of where the model routes information.
-
-The central paradox of this comparison is that **ViT can attend strongly to the ring
-region and still underperform DenseNet-121 on classification**. The likely reason is
-that coarse attention to the correct global structure is not the same as reliable
-localisation of the discriminative perturbation *within* that structure. In other
-words, **finding the ring is easier than reading the perturbation on the ring**.
-
-The analysis is organised in four parts: first a direct visual comparison of the
-attention maps, then a resolution diagnostic explaining DenseNet’s diffuse Grad-CAM
-appearance, then quantitative ring-concentration and attention-stability analyses,
-and finally a synthesis of what these results imply.
 
 ### 7.4 ViT vs DenseNet-121: Attention and Localisation
 
