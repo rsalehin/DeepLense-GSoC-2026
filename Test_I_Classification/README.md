@@ -1232,6 +1232,47 @@ predicting the correct class.
   <br><em>Figure 7.3 — Spatial attention comparison between ResNet-50 and E-ResNet for representative No-Substructure, Sphere, and Vortex examples. Each row shows the original image, ResNet-50 Grad-CAM, E-ResNet CAM, and a difference map (red = higher E-ResNet response, blue = higher ResNet-50 response). In the No-Substructure and Vortex examples, E-ResNet places more of its response along ring-localised structure, whereas ResNet-50 shows broader interior-heavy activation. In the Sphere example, both models attend to the physically relevant perturbation region, but E-ResNet is substantially less confident on this instance despite remaining correct.</em>
 </p>
 
+#### 7.3.2 Disagreement Analysis
+
+To move beyond selected examples, we partition the full validation set into four
+mutually exclusive cases: both models correct, ResNet-50 correct / E-ResNet wrong,
+E-ResNet correct / ResNet-50 wrong, and both wrong. This makes it possible to ask
+whether the two architectures fail on the same images or on different ones.
+
+| Case | Description | Count | Share of val set | Class pattern |
+|:-----|:------------|------:|-----------------:|:--------------|
+| Case 1 | Both correct | 7,064 | 94.19% | Most of the dataset is jointly solved |
+| Case 2 | ResNet-50 ✓, E-ResNet ✗ | 142 | 1.89% | Dominated by Sphere (69), then Vortex (50), then No Substructure (23) |
+| Case 3 | E-ResNet ✓, ResNet-50 ✗ | 133 | 1.77% | Dominated by Sphere (80), then Vortex (35), then No Substructure (18) |
+| Case 4 | Both wrong | 161 | 2.15% | Overwhelmingly Sphere (125), with fewer Vortex (29) and very few No Substructure (7) |
+
+Two points stand out immediately. First, the disagreement region is **small**:
+the models agree on the correct label for **94.19%** of the validation set, so the
+comparison is about a relatively narrow subset of hard examples. Second, the
+hardest class is clearly **Sphere**. It is the largest component of both
+single-model disagreement cases and dominates the shared-failure set
+(**125 / 161**, or **77.6%** of Case 4).
+
+This means the practical difference between ResNet-50 and E-ResNet is not driven
+by easy No-Substructure images. It is driven primarily by **whether the model can
+correctly interpret subtle localised perturbations on Sphere images**, where small
+changes in spatial evidence usage matter most.
+
+<p align="center">
+  <img src="assets/fig7_3b_case2_resnet50_correct_eresnet_wrong.png" alt="Case 2: ResNet-50 correct and E-ResNet wrong" width="95%"/>
+  <br><em>Figure 7.3b — Case 2: ResNet-50 correct, E-ResNet wrong. One representative example is shown for each true class. In these cases, E-ResNet often still places activation on ring-localised structure, but the resulting class decision is unstable or shifted to the wrong label. The largest number of such failures occurs on Sphere images (69/142).</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig7_3c_case3_eresnet_correct_resnet50_wrong.png" alt="Case 3: E-ResNet correct and ResNet-50 wrong" width="95%"/>
+  <br><em>Figure 7.3c — Case 3: E-ResNet correct, ResNet-50 wrong. These examples are especially informative because they show cases where E-ResNet’s more ring-structured spatial strategy is sufficient for the correct decision while ResNet-50 fails. Again, Sphere is the dominant class (80/133), indicating that the main advantage appears on the most discriminating class.</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig7_3d_case4_both_wrong.png" alt="Case 4: both ResNet-50 and E-ResNet wrong" width="95%"/>
+  <br><em>Figure 7.3d — Case 4: both models wrong. Shared failures are concentrated on Sphere images (125/161), suggesting that these examples are genuinely difficult rather than architecture-specific edge cases. In many such cases, both models still attend somewhere on or near the ring, but the signal is too weak, ambiguous, or misleading for either model to reach the correct decision.</em>
+</p>
+
 ## 7. Interpretability Analysis
 
 ### 7.1 Grad-CAM: ResNet-50 vs E-ResNet
