@@ -1534,6 +1534,121 @@ substructure is missed confidently by every strong model in the ensemble. Any
 operational pipeline that uses entropy-based triage should explicitly account for
 this limitation.
 
+### 7.6 E-ResNet Ablation Study
+
+This ablation isolates two design choices inside the equivariant family:
+
+1. **Residual connections**
+2. **Explicit D₄ augmentation during training**
+
+The goal is not to make a strong causal claim from a single four-run study, but to
+ask a narrower question: within a controlled equivariant setting, which of these
+changes is more strongly associated with better optimisation and better validation
+performance?
+
+All four runs use the same corrected architecture setup and the same training
+recipe, so the comparison is internally consistent.
+
+| Run | Architecture | Augmentation |
+|:---:|:-------------|:------------:|
+| A | Plain equivariant CNN | None |
+| B | Plain equivariant CNN | D₄ augmentation |
+| C | E-ResNet | None |
+| D | E-ResNet | D₄ augmentation |
+
+#### 7.6.1 Results
+
+The full validation-set results are:
+
+| Run | Architecture | Augmentation | Macro AUC | Accuracy | No Sub Recall | Sphere Recall | Vortex Recall |
+|:---:|:-------------|:------------:|:---------:|:--------:|:-------------:|:-------------:|:-------------:|
+| A | Plain CNN | None | 0.9866 | 0.9277 | 0.9524 | 0.8932 | 0.9376 |
+| B | Plain CNN | D₄ augmentation | 0.9956 | 0.9621 | 0.9908 | 0.9268 | 0.9688 |
+| C | E-ResNet | None | 0.9879 | 0.9296 | 0.9556 | 0.9028 | 0.9304 |
+| D | E-ResNet | D₄ augmentation | 0.9952 | 0.9596 | 0.9880 | 0.9224 | 0.9684 |
+
+The most obvious pattern is that **augmentation improves performance strongly in both
+architectures**. The gain is visible in overall discrimination (**Macro AUC**),
+overall correctness (**Accuracy**), and the most sensitive class-specific metric
+(**Sphere Recall**).
+
+The corresponding effect sizes are:
+
+**Effect sizes on Macro AUC**
+
+| Effect | Δ Macro AUC |
+|:-------|------------:|
+| Residual connections (no aug): C − A | +0.0014 |
+| Residual connections (with aug): D − B | −0.0004 |
+| Augmentation (plain CNN): B − A | +0.0090 |
+| Augmentation (E-ResNet): D − C | +0.0073 |
+
+**Effect sizes on Sphere Recall**
+
+| Effect | Δ Sphere Recall |
+|:-------|----------------:|
+| Residual connections (no aug): C − A | +0.0096 |
+| Residual connections (with aug): D − B | −0.0044 |
+| Augmentation (plain CNN): B − A | +0.0336 |
+| Augmentation (E-ResNet): D − C | +0.0196 |
+
+These numbers make the hierarchy of effects clear: **augmentation is the dominant
+performance driver**, while the marginal contribution of residual connections is
+small and inconsistent.
+
+<p align="center">
+  <img src="assets/fig7_6_ablation_convergence_curves.png"
+       alt="Ablation study convergence curves for plain equivariant CNN and E-ResNet, with and without D4 augmentation" width="95%"/>
+  <br><em>Figure 7.6 — Ablation study convergence curves for the four equivariant runs. Left: training loss. Centre: validation accuracy. Right: Sphere Recall, the most sensitive metric for local subhalo detection. In both architectures, D₄ augmentation produces the clearest improvement in final validation behaviour. Residual connections have a comparatively small effect relative to augmentation.</em>
+</p>
+
+#### 7.6.2 Hypothesis Assessment
+
+The ablation supports one strong conclusion and two weaker ones.
+
+**1. Augmentation has the largest and most consistent effect.**  
+Across both architectures, D₄ augmentation improves Macro AUC, Accuracy, and Sphere
+Recall. The effect is especially strong on Sphere Recall, where the gains are
+**+0.0336** for the plain CNN and **+0.0196** for E-ResNet. This is the clearest
+result in the table.
+
+**2. Residual connections provide a small benefit without augmentation.**  
+Without augmentation, E-ResNet is slightly better than the plain equivariant CNN:
+
+- **Macro AUC:** 0.9879 vs 0.9866
+- **Sphere Recall:** 0.9028 vs 0.8932
+
+The direction is consistent with a modest residual advantage, but the magnitude is
+small.
+
+**3. Under augmentation, the residual benefit does not persist.**  
+With D₄ augmentation enabled, the plain equivariant CNN slightly exceeds E-ResNet on
+both Macro AUC and Sphere Recall:
+
+- **Macro AUC:** 0.9956 vs 0.9952
+- **Sphere Recall:** 0.9268 vs 0.9224
+
+This is not evidence that residual connections are generally harmful. It shows only
+that, in this specific shallow equivariant setting, residual connections are **not**
+the dominant reason for good performance once augmentation is already present.
+
+#### 7.6.3 Interpretation
+
+The practical takeaway is narrow but important: **equivariance alone is not enough**.
+Even inside a symmetry-aware architecture family, **explicit augmentation still
+provides a substantial benefit**.
+
+The broader interpretation is that the strongest gains in this ablation come from
+improving the model’s effective exposure to rotational variability during training,
+not from adding residual pathways alone. Residual connections may still help
+optimisation in some regimes, but in this experiment their effect is secondary
+relative to augmentation.
+
+So within the E-ResNet ablation, the most defensible conclusion is:
+
+**augmentation is the strongest and most reliable performance lever, while residual
+connections provide at most a modest conditional benefit.**
+
 ## 7. Interpretability Analysis
 
 ### 7.1 Grad-CAM: ResNet-50 vs E-ResNet
