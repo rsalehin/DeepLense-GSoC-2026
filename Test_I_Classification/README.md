@@ -1406,6 +1406,134 @@ This is the central interpretability result of the ViT vs DenseNet comparison:
 **attending to the right global structure is necessary but not sufficient; the harder
 problem is stable, fine-grained reading of local perturbations on that structure.**
 
+### 7.5 Predictive Uncertainty: Deep Ensemble
+
+High classification accuracy does not imply uniformly reliable predictions. Some
+images lie close to the decision boundary and remain sensitive to model choice even
+when the overall benchmark performance is strong. To identify such cases, we estimate
+predictive uncertainty with a **deep ensemble**.
+
+Monte Carlo dropout is not applicable here because the trained models do not contain
+active dropout layers at inference. Instead, uncertainty is estimated by averaging
+the predicted probability vectors from **eight independently trained architectures**:
+
+**ResNet-18, ResNet-50, DenseNet-121, EfficientNet-B3, ViT-Base, E-ResNet,
+EqDenseNet-C8, and Equivariant-D4.**
+
+**AlexNet** and **VGG-16** are excluded because their performance is substantially
+below the rest of the benchmark, so their inclusion would add weak votes rather than
+useful uncertainty information. The goal here is not to maximise ensemble accuracy,
+but to use **cross-model disagreement** as a practical proxy for predictive
+uncertainty.
+
+The uncertainty score is the **predictive entropy** of the ensemble mean:
+
+\[
+H = -\sum_c \bar{p}_c \log \bar{p}_c,
+\qquad
+\bar{p}_c = \frac{1}{M} \sum_{m=1}^{M} p^{(m)}_c
+\]
+
+For a three-class problem, the maximum possible entropy is:
+
+\[
+\log 3 \approx 1.099
+\]
+
+The resulting ensemble reaches **0.9688 accuracy** on the validation set. The entropy
+range is **[0.0002, 1.0968]**, covering almost the full theoretical range up to the
+three-class maximum.
+
+#### 7.5.1 Entropy Distribution Results
+
+Per-class entropy statistics are:
+
+| Class | Mean H | Std H | Median H | p95 H |
+|:------|:------:|:-----:|:--------:|:-----:|
+| No Substructure | 0.2401 | 0.1882 | 0.1740 | 0.6308 |
+| Sphere | 0.2491 | 0.2911 | 0.1117 | 0.8447 |
+| Vortex | 0.1798 | 0.2537 | 0.0448 | 0.7557 |
+
+Two aspects matter more than the means alone. First, **Sphere has the heaviest high-entropy
+tail**: its 95th percentile (**0.8447**) is substantially above No Substructure
+(**0.6308**) and Vortex (**0.7557**). Second, its **median entropy is relatively low
+(0.1117)**, which indicates that many Sphere images are easy, but a subset is
+extremely difficult. This is exactly the pattern expected of a class with a mixed
+population of easy positives and hard borderline cases.
+
+The statistical comparisons support that reading. Sphere entropy is **not**
+significantly higher than No Substructure (**p = 1.000000**), but it is
+significantly higher than Vortex (**p ≈ 8.91 × 10⁻¹⁵**). So the defining feature of
+Sphere is not a uniformly elevated uncertainty level, but a much broader and heavier
+tail of difficult cases.
+
+<p align="center">
+  <img src="assets/fig7_5_ensemble_entropy.png"
+       alt="Deep ensemble predictive entropy distributions and confidence versus uncertainty" width="95%"/>
+  <br><em>Figure 7.5 — Predictive uncertainty from an 8-model deep ensemble. Left: entropy distributions by true class. Sphere shows the broadest spread and the heaviest high-entropy tail. Centre: entropy histogram confirming that all classes contain many low-entropy images, but Sphere extends furthest toward the maximum entropy limit. Right: confidence–uncertainty scatter showing the expected inverse relation between ensemble max probability and predictive entropy.</em>
+</p>
+
+A complementary view is the fraction of ensemble members that disagree with the final
+ensemble prediction:
+
+| Class | Mean disagreement | Max disagreement |
+|:------|:-----------------:|:----------------:|
+| No Substructure | 0.0104 | 0.6250 |
+| Sphere | 0.0688 | 0.7500 |
+| Vortex | 0.0410 | 0.7500 |
+
+Again, **Sphere** is the least consensus-stable class on average.
+
+#### 7.5.2 High-Entropy Sphere Images
+
+The top **12 highest-entropy Sphere images** lie near the theoretical maximum
+(**H = 1.080–1.093**, with maximum possible **1.099**). These are the images about
+which the ensemble is most uncertain. Their ensemble predictions scatter across
+multiple classes, confirming that these are not merely low-confidence correct cases,
+but genuinely ambiguous examples with unstable cross-model interpretation.
+
+<p align="center">
+  <img src="assets/fig7_5b_high_entropy_sphere.png"
+       alt="Top 12 highest-entropy Sphere images from the deep ensemble" width="95%"/>
+  <br><em>Figure 7.5b — Top 12 highest-entropy Sphere images. Each image is annotated with predictive entropy and ensemble majority prediction. These examples lie extremely close to the maximum three-class entropy, indicating near-maximal model disagreement. They represent genuinely ambiguous cases rather than simple low-margin variants of easy Sphere images.</em>
+</p>
+
+#### 7.5.3 Two Distinct Sphere Failure Populations
+
+A particularly important result is that uncertainty is **not** a complete safeguard
+against failure. There are **54 Sphere images** that are predicted as
+**No Substructure by all 8 ensemble members**. These are consensus failures:
+the ensemble is wrong, but not uncertain.
+
+This creates two distinct Sphere failure populations:
+
+1. **High-entropy ambiguous cases** — the ensemble visibly disagrees, so these can be
+   flagged for review.
+2. **Low-entropy silent failures** — all models agree on the wrong answer, so entropy
+   does not detect them.
+
+The separation between these two populations is strict in the current experiment:
+the overlap between the **top-12 highest-entropy Sphere images** and the
+**54 universally misclassified Sphere images** is **0/12**.
+
+That is a strong operational result. It means that predictive entropy can identify
+some difficult images, but it cannot catch the most dangerous class of errors:
+**confident consensus failures**.
+
+#### 7.5.4 Practical Implication for Survey Pipelines
+
+For a realistic lens-search pipeline, predictive entropy is useful as a **triage
+signal**, not as a full reliability solution. High-entropy examples are natural
+candidates for human review or downstream verification because they correspond to
+genuine disagreement across strong models. But low entropy should **not** be treated
+as proof of correctness.
+
+In this benchmark, the hardest practical problem is therefore not only uncertainty
+itself, but the existence of **silent Sphere failures**: images where subtle
+substructure is missed confidently by every strong model in the ensemble. Any
+operational pipeline that uses entropy-based triage should explicitly account for
+this limitation.
+
 ## 7. Interpretability Analysis
 
 ### 7.1 Grad-CAM: ResNet-50 vs E-ResNet
