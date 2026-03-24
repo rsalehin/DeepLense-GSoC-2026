@@ -35,6 +35,15 @@ scratch, achieves the strongest overall single-model result in the benchmark.
 </div>
 
 ---
+> ### ⚠️ Notebook note
+> This notebook is stored in the repository as a **cleaned version with outputs removed**, because the fully rendered notebook is too large for a practical GitHub upload.
+>
+> The **full rendered HTML notebook**, including all plots, outputs, and intermediate results, is available here:
+>
+> **[Open full notebook (HTML)](https://rsalehin.github.io/documentation/)**
+---
+
+---
 > **Note on benchmark scope**
 >
 > This README now treats the **final Section 6.1 benchmark table** as the canonical
