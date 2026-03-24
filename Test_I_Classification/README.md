@@ -1948,6 +1948,172 @@ morphologically close to No Substructure?**
 Answering that would move the analysis beyond aggregate benchmark metrics toward a
 more mechanistic account of why the hardest Sphere cases fail.
 
+#### E-ResNet Sphere False Negatives
+
+**E-ResNet:** Sphere true positives: **2306** · Sphere false negatives (**→ No Substructure**): **129**
+
+To characterise the Sphere images that E-ResNet misses entirely, we compare
+**true positives** against **false negatives misclassified as No Substructure** using
+ring-level statistics computed on the normalised validation images.
+
+| Feature | FN mean | TP mean | p-value | Significant |
+|:--------|:-------:|:-------:|:-------:|:-----------:|
+| Ring mean flux | 0.1423 | 0.1586 | 6.07×10⁻¹⁰ | ✅ |
+| Ring flux std | 0.1630 | 0.1699 | 2.91×10⁻³ | ✅ |
+| Ring compactness | 0.6585 | 0.6375 | 3.78×10⁻⁸ | ✅ |
+| Ring asymmetry | 0.0805 | 0.0782 | 8.99×10⁻¹ | ❌ |
+
+The clearest differences are **lower ring mean flux**, **slightly lower ring flux
+standard deviation**, and **higher compactness** in the false-negative group. By
+contrast, **ring asymmetry does not separate** true positives from false negatives in
+a meaningful way.
+
+The safest interpretation is descriptive: Sphere images missed as No Substructure
+tend to have **weaker ring-level signal** and a **more compact intensity
+distribution**, making them easier to confuse with smooth lenses. This supports a
+signal-strength interpretation, but does not by itself establish a single causal
+mechanism.
+
+<p align="center">
+  <img src="assets/fig8_2_sphere_failure_statistics.png"
+       alt="Sphere TP vs FN morphological statistics" width="95%"/>
+  <br><em>Figure 8.4 — E-ResNet Sphere true positives (n=2306) versus false negatives to No Substructure (n=129). False negatives show significantly lower ring mean flux and ring flux standard deviation, while ring asymmetry is not significantly different. Compactness is also higher in the false-negative group, indicating a more concentrated ring-level intensity pattern.</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig12a_sphere_false_negatives.png"
+       alt="E-ResNet Sphere false negatives sorted by confidence" width="95%"/>
+  <br><em>Figure 8.5 — E-ResNet Sphere false negatives predicted as No Substructure, sorted by descending confidence in the wrong class. Most examples have relatively low ring mean flux, although there are exceptions. This indicates that low flux is an important correlate of failure, but not a complete explanation on its own.</em>
+</p>
+
+#### E-ResNet Sphere↔Vortex Confusion
+
+A second, distinct failure mode is **Sphere↔Vortex confusion**, which should not be
+mixed with the dominant **Sphere→No Substructure** failure above.
+
+- **Sphere predicted as Vortex:** 65  
+- **Vortex predicted as Sphere:** 54  
+
+These error sets are different from the universally missed Sphere cohort in the
+previous subsection, which is dominated by **Sphere→No Substructure**, not
+Sphere↔Vortex swaps.
+
+To test whether this confusion is explained by simple residual shape, we compare the
+**CAE residual elongation** (major/minor axis ratio) across correct and confused
+groups:
+
+| Feature | Sphere→Vortex (n=65) | Sphere TP (n=2306) | Vortex→Sphere (n=54) | Vortex TP (n=2421) |
+|:--------|:--------------------:|:------------------:|:--------------------:|:-----------------:|
+| Mean elongation | 1.199 | 1.205 | 1.213 | 1.205 |
+
+These values are very similar, and the distributions overlap strongly. So
+**residual elongation alone does not explain the Sphere–Vortex confusion in a useful
+way**.
+
+The gallery should therefore be read qualitatively: some confused cases do show mixed
+local and arc-level structure, but no single visual pattern appears sufficient on
+its own.
+
+<p align="center">
+  <img src="assets/fig12c_sv_confusion_gallery.png"
+       alt="Sphere-Vortex confusion gallery" width="95%"/>
+  <br><em>Figure 8.6 — Sphere↔Vortex confusion gallery. Row 1: correctly classified Sphere. Row 2: Sphere misclassified as Vortex. Row 3: Vortex misclassified as Sphere. These examples illustrate that the confused cases can look morphologically intermediate, but not in a way captured cleanly by a single scalar shape statistic.</em>
+</p>
+
+<p align="center">
+  <img src="assets/fig12d_elongation_distribution.png"
+       alt="Elongation distributions by confusion type" width="95%"/>
+  <br><em>Figure 8.7 — Residual elongation distributions by confusion type. Sphere true positives, Sphere→Vortex, Vortex true positives, and Vortex→Sphere show substantial overlap. Residual elongation therefore does not provide a strong standalone explanation for Sphere–Vortex confusion.</em>
+</p>
+
+---
+
+### 8.3 Confidence and Accuracy vs Ring Brightness
+
+Classification accuracy and model confidence both increase with **ring mean flux**
+across all three classes, with the strongest effect visible for **Sphere**.
+
+This result is consistent with the earlier false-negative analysis: **low-brightness
+Sphere images are systematically harder to classify**, and they also tend to receive
+lower confidence. No Substructure and Vortex show the same broad trend, but with a
+higher performance floor.
+
+This should still be interpreted descriptively rather than causally. The result shows
+that **ring brightness is associated with classification difficulty**, not that
+brightness alone determines success or failure.
+
+<p align="center">
+  <img src="assets/fig12e_confidence_vs_brightness.png"
+       alt="Classification accuracy and confidence vs ring mean flux" width="95%"/>
+  <br><em>Figure 8.8 — Classification accuracy (solid) and mean confidence (dashed) versus ring mean flux, binned by brightness. The trend is strongest for Sphere, where low-brightness cases are much harder than high-brightness ones. Across all classes, lower ring brightness is associated with both lower accuracy and lower confidence.</em>
+</p>
+
+---
+
+### 8.4 Perturbation Position Analysis
+
+Perturbation position along the Einstein ring is tested as a possible predictor of
+failure using **CAE residual centroids**.
+
+Across all panels, the centroid positions remain tightly clustered near the image
+centre, with substantial overlap between correct and incorrect classifications. No
+clear angular or radial separation is visible between true positives and the
+different confusion types.
+
+Under this centroid-based summary, **perturbation position does not provide a strong
+explanation for the observed errors**.
+
+That conclusion should remain limited to this representation: the absence of
+separation in centroid position does not rule out more subtle position-dependent
+effects that are not captured by a single centroid statistic.
+
+<p align="center">
+  <img src="assets/fig12f_perturbation_position.png"
+       alt="CAE residual centroid positions by classification outcome" width="95%"/>
+  <br><em>Figure 8.9 — CAE residual centroid positions by classification outcome. Each point marks the spatial position of the peak residual signal for one image. Correct and incorrect cases overlap strongly, with no obvious spatial separation. In this representation, perturbation position does not appear to be a major driver of classification failure.</em>
+</p>
+
+---
+
+### 8.5 Physical Interpretation
+
+The failure analysis supports a fairly specific picture of the class structure.
+
+- **Sphere** corresponds to a compact, approximately symmetric perturbation. That
+  makes it the most difficult class because its signature can be weak and locally
+  similar to smooth arc structure.
+- **Vortex** corresponds to a more extended and asymmetric perturbation, which is
+  generally easier to separate from both smooth lenses and Sphere-like substructure.
+
+The updated benchmark shows that **EqDenseNet-C8 achieves the highest Sphere recall
+(0.9448)**, ahead of **DenseNet-121 (0.9364)** and **E-ResNet (0.9224)**. This is an
+important result because EqDenseNet-C8 combines **strong representational capacity**
+with **explicit rotational structure**, showing that equivariance does not inherently
+limit performance when paired with sufficient model expressivity.
+
+By contrast, **E-ResNet underperforms DenseNet-121 on Sphere recall** despite its
+stronger measured rotational stability. That indicates that **equivariance alone is
+not sufficient**. Model capacity, feature reuse, and overall architectural
+expressivity remain critical for detecting subtle, locally symmetric perturbations.
+
+So the key lesson is not simply that *equivariance helps*. It is that
+**equivariance appears most effective when embedded in a sufficiently expressive
+architecture**. EqDenseNet-C8 is the strongest evidence for that claim in this
+benchmark.
+
+At the same time, causal attribution remains unresolved. The performance gap between
+E-ResNet and EqDenseNet-C8 could reflect one or more of the following:
+
+- residual vs dense connectivity,
+- parameter scale,
+- differences in feature propagation,
+- optimisation dynamics,
+- or interactions between symmetry constraints and model capacity.
+
+Disentangling those factors — for example by training larger equivariant dense
+architectures under controlled conditions — remains a natural next research
+direction.
+
 
 ## 8. Failure Mode Analysis
 
