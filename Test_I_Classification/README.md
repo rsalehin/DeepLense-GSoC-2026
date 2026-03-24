@@ -1649,6 +1649,164 @@ So within the E-ResNet ablation, the most defensible conclusion is:
 **augmentation is the strongest and most reliable performance lever, while residual
 connections provide at most a modest conditional benefit.**
 
+### 7.7 Equivariance Verification
+
+This section tests **output invariance**, not internal feature equivariance. The
+question is simple: if an input image is rotated or otherwise transformed, how much
+does the model’s **output probability vector** change?
+
+Two stages are separated:
+
+- **Stage 1: untrained models** — tests the symmetry built into the architecture
+  before learning.
+- **Stage 2: trained models** — tests how much of that output stability remains
+  after optimisation.
+
+For the equivariant models, transformed inputs are generated using **escnn**’s own
+group action via `in_type.transform`, which is the correct architecture-aware test.
+For **ResNet-50**, standard tensor rotations are used. The metric is the **L2**
+distance between the original and transformed output probability vectors; **smaller
+values mean greater invariance**.
+
+#### 7.7.1 Invariance Test Setup
+
+The invariance test is purely an inference-time diagnostic. For each selected
+validation image, the model is evaluated on the original input and on transformed
+versions of the same image.
+
+- **Equivariant models:** all **8 D₄ group elements** are tested using
+  `in_type.transform`
+- **ResNet-50:** **90°, 180°, and 270°** rotations are tested using `torch.rot90`
+
+A perfectly invariant classifier would give **L2 distance = 0** for every transformed
+copy of the same image.
+
+#### 7.7.2 Stage 1 — Theoretical Invariance (Untrained Models)
+
+Before training, both equivariant architectures show near-zero output variation under
+the tested D₄ transformations:
+
+| Model | Mean L2 |
+|:------|--------:|
+| EPlainCNN (untrained) | 0.00005 |
+| E-ResNet (untrained) | 0.00009 |
+| ResNet-50 (untrained) | 0.06480 |
+
+This is the expected architectural pattern. Before any learning takes place, the
+equivariant models are already almost perfectly output-stable under the tested group
+actions, whereas the standard CNN is not. The small numerical difference between
+EPlainCNN and E-ResNet at this stage is negligible in practical terms and should not
+be over-interpreted.
+
+So Stage 1 provides strong evidence that the symmetry-aware architectures are
+behaving as intended at initialisation.
+
+#### 7.7.3 Stage 2 — Empirical Invariance After Training
+
+After training, the equivariant models remain more output-stable than ResNet-50, but
+their invariance is no longer numerically near-perfect.
+
+| Model | Training | Mean L2 | Max L2 |
+|:------|:---------|--------:|-------:|
+| E-ResNet D₄ | with augmentation | 0.01817 | 0.75205 |
+| EPlainCNN D₄ | no augmentation | 0.03768 | 1.02230 |
+| ResNet-50 | with augmentation | 0.05814 | 1.26498 |
+
+Under this test, **E-ResNet** has the lowest mean output variation, followed by
+**EPlainCNN**, then **ResNet-50**. So the trained equivariant models remain more
+rotation-stable than the standard CNN, even though exact numerical invariance is
+weakened by training.
+
+A particularly useful comparison is that **EPlainCNN without augmentation** is still
+more stable than **ResNet-50 with augmentation**. That suggests the architectural
+symmetry prior contributes meaningfully to output stability beyond what augmentation
+alone provides.
+
+Within the equivariant family, the residual variant is also clearly more stable than
+the plain variant after training. This is one of the clearest places in the notebook
+where residual connections appear beneficial, even though their effect on validation
+AUC was small in the earlier ablation.
+
+The full trained EPlainCNN D₄ transformation table is:
+
+| Group element | Mean L2 | Max L2 |
+|:--------------|--------:|-------:|
+| (+, 0[2π/4]) | 0.00000 | 0.00000 |
+| (+, 1[2π/4]) | 0.03814 | 0.61942 |
+| (+, 2[2π/4]) | 0.05050 | 0.65071 |
+| (+, 3[2π/4]) | 0.06204 | 1.02225 |
+| (-, 0[2π/4]) | 0.03815 | 0.61945 |
+| (-, 1[2π/4]) | 0.00003 | 0.00064 |
+| (-, 2[2π/4]) | 0.06205 | 1.02230 |
+| (-, 3[2π/4]) | 0.05050 | 0.65070 |
+
+This shows that the identity case and one reflection-aligned case remain near zero,
+while most non-trivial transforms account for the observed empirical drift.
+
+#### 7.7.4 Theoretical vs Empirical Invariance
+
+The overall shift from untrained to trained behaviour is:
+
+| Model | Theoretical | Empirical | Change |
+|:------|------------:|----------:|-------:|
+| E-ResNet D₄ | 0.00009 | 0.01817 | +0.01808 |
+| EPlainCNN D₄ | 0.00005 | 0.03768 | +0.03763 |
+| ResNet-50 | 0.06480 | 0.05814 | −0.00666 |
+
+Three conclusions are supported by this comparison.
+
+**1. Training increases output variation in the equivariant models.**  
+Both equivariant architectures move away from their near-zero untrained baseline.
+So the practically relevant result is not exact numerical invariance after training,
+but whether the trained models remain more stable than a non-equivariant baseline.
+
+**2. The equivariant models still retain a clear stability advantage.**  
+After training, both **E-ResNet** and **EPlainCNN** remain more transformation-stable
+than **ResNet-50** under this test. E-ResNet is the strongest of the three.
+
+**3. E-ResNet preserves output stability better than EPlainCNN.**  
+This is one of the clearest differences between the two equivariant variants: the
+residual model shows substantially less empirical drift away from the untrained
+baseline.
+
+The small decrease for ResNet-50 after training should not be over-interpreted. Its
+output variation remains much larger than that of the equivariant models, so the
+main conclusion is unchanged: **architectural equivariance provides a substantial
+stability advantage at the classifier output, even after training**.
+
+#### 7.7.5 Connection to the Ablation and Practical Recommendation
+
+The ablation in Section 7.6 and the invariance test here measure different
+properties, so their conclusions are not contradictory.
+
+In the ablation, the best validation performance within the equivariant family comes
+from **Plain CNN + D₄ augmentation**:
+
+- **Macro AUC:** 0.9956
+- **Sphere Recall:** 0.9268
+
+In the invariance test, the strongest output stability is obtained by **E-ResNet**:
+
+- **Mean L2:** 0.01817, compared with
+- **0.03768** for EPlainCNN (no augmentation), and
+- **0.05814** for ResNet-50
+
+That suggests the model choice depends on the deployment objective:
+
+| Objective | More suitable model | Reason |
+|:----------|:--------------------|:-------|
+| Highest validation performance on this benchmark | Plain equivariant CNN + D₄ augmentation | Slightly better Macro AUC and Sphere Recall |
+| Stronger output stability under transformation | E-ResNet | Lowest mean output variation under transformation |
+
+A cautious practical takeaway is therefore this: if **orientation robustness** is a
+priority, **E-ResNet** is the safer choice despite its slightly lower validation
+metrics. If the priority is only benchmark performance on the current split, the
+**plain equivariant CNN + augmentation** is marginally stronger.
+
+That should still be treated as a practical recommendation, not a definitive one.
+The invariance and accuracy comparisons are informative, but they do not by
+themselves quantify downstream bias or robustness on real survey data.
+
 ## 7. Interpretability Analysis
 
 ### 7.1 Grad-CAM: ResNet-50 vs E-ResNet
