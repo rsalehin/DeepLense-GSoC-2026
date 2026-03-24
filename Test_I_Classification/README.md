@@ -1042,154 +1042,120 @@ Full implementation is planned for the GSoC 2026 project period.*
 
 ### 6.1 Full Benchmark Table
 
-All eleven architectures evaluated on the predefined val partition (7,500 images, 2,500 per class). Sorted by macro-averaged AUC.
+All eleven architectures were evaluated on the predefined `val` partition (7,500 images; 2,500 per class) and sorted by macro-averaged AUC.
 
 | Rank | Architecture | Pretrained | Params (M) | Macro AUC | No Sub AUC | Sphere AUC | Vortex AUC | Sphere PR-AUC | Test Acc. | Sphere Recall |
 |:----:|:-------------|:----------:|:----------:|:---------:|:----------:|:----------:|:----------:|:-------------:|:---------:|:-------------:|
-| 1 | **EqDenseNet-C8** | ❌ | **0.093** | **0.9974** | 0.9974 | **0.9955** | 0.9990 | **0.9932** | **97.35%** | **0.9448** |
-| 2 | Ensemble-Top6 | Mixed | N/A | 0.9970 | 0.9970 | 0.9949 | 0.9990 | 0.9923 | 97.25% | 0.9360 |
+| 1 | **EqDenseNet-C8** | ❌ | **0.1** | **0.9973** | **0.9974** | **0.9955** | **0.9990** | **0.9932** | **97.35%** | **0.9448** |
+| 2 | Ensemble-Top6 | Mixed | N/A | 0.9970 | 0.9970 | 0.9948 | 0.9990 | 0.9923 | 97.25% | 0.9360 |
 | 3 | DenseNet-121 | ✅ | 7.0 | 0.9962 | 0.9963 | 0.9937 | 0.9985 | 0.9903 | 96.88% | 0.9364 |
-| 4 | E-ResNet | ❌ | 0.39 | 0.9952 | 0.9960 | 0.9918 | 0.9977 | 0.9871 | 95.96% | 0.9224 |
+| 4 | E-ResNet | ❌ | 0.4 | 0.9952 | 0.9960 | 0.9918 | 0.9977 | 0.9871 | 95.96% | 0.9224 |
 | 5 | ResNet-50 | ✅ | 23.5 | 0.9946 | 0.9951 | 0.9909 | 0.9974 | 0.9862 | 96.08% | 0.9180 |
 | 6 | ResNet-18 | ✅ | 11.2 | 0.9927 | 0.9939 | 0.9872 | 0.9966 | 0.9813 | 95.24% | 0.9064 |
 | 7 | EfficientNet-B3 | ✅ | 10.7 | 0.9898 | 0.9915 | 0.9830 | 0.9947 | 0.9749 | 93.87% | 0.8848 |
-| 8 | ViT-Base/16 | ✅ | 85.4 | 0.9761 | 0.9861 | 0.9612 | 0.9805 | 0.9413 | 88.81% | 0.7800 |
-| 9 | VGG-16 | ✅ | 134.3 | 0.8944 | 0.9385 | 0.8659 | 0.8783 | 0.8065 | 72.43% | 0.5044 |
-| 10 | Equivariant-D4 (ENN) | ❌ | ~0.0 | 0.7362 | 0.8391 | 0.7071 | 0.6620 | 0.5363 | 53.76% | 0.3864 |
+| 8 | Equivariant-D4 | ❌ | 0.2 | 0.9784 | 0.9829 | 0.9700 | 0.9818 | 0.9574 | 89.48% | 0.8016 |
+| 9 | ViT-Base | ✅ | 85.4 | 0.9761 | 0.9861 | 0.9612 | 0.9805 | 0.9413 | 88.81% | 0.7800 |
+| 10 | VGG-16 | ✅ | 134.3 | 0.8944 | 0.9385 | 0.8659 | 0.8783 | 0.8065 | 72.43% | 0.5044 |
 | 11 | AlexNet | ✅ | 57.0 | 0.6589 | 0.7358 | 0.6053 | 0.6351 | 0.4380 | 43.65% | 0.1240 |
 
-*All metrics evaluated on the held-out val partition (7,500 images). Sphere Recall and Sphere PR-AUC are the most discriminating metrics for this dataset.*
-*Ensemble-Top6: soft vote across EqDenseNet-C8, DenseNet-121, E-ResNet, ResNet-50, ResNet-18, EfficientNet-B3.*
-*EqDenseNet-C8 surpasses all ten individual architectures — including all seven ImageNet-pretrained models — on every reported metric at 0.093M parameters trained from scratch.*
+*All metrics were evaluated on the predefined `val` partition (7,500 images). Sphere Recall and Sphere PR-AUC are the most discriminating metrics for this dataset (see Section 6.1).*
+
+*Ensemble-Top6 denotes a soft-voting ensemble over EqDenseNet-C8, DenseNet-121, E-ResNet, ResNet-50, ResNet-18, and EfficientNet-B3.*
+
+*EqDenseNet-C8 is the best single model by Macro AUC, Sphere AUC, Sphere PR-AUC, Test Accuracy, and Sphere Recall, while using only ~0.1M parameters and training from scratch.*
 
 <!-- Figure: 9-model macro-averaged ROC comparison -->
 <p align="center">
-  <img src="assets/fig6_1_roc_comparison.png" alt="Macro-averaged ROC curves for all 9 architectures" width="95%"/>
-  <br><em>Figure 6.1 — Macro-averaged ROC curves for all eleven architectures. Three performance tiers are clearly visible. The Tier 1 cluster (EqDenseNet-C8, DenseNet-121, E-ResNet, ResNet-50, ResNet-18, EfficientNet-B3) sits near the top-left corner with curves nearly indistinguishable at this scale.</em>
+  <img src="assets/fig6_1_roc_comparison.png" alt="Macro-averaged ROC curves for all eleven architectures" width="95%"/>
+  <br><em>Figure 6.1 — Macro-averaged ROC curves for all eleven architectures on the predefined validation set. A clear top-performing cluster is visible near the top-left corner, led by EqDenseNet-C8 (AUC = 0.9973), followed closely by the Ensemble-Top6, DenseNet-121, E-ResNet, ResNet-50, ResNet-18, and EfficientNet-B3. Equivariant-D4 and ViT-Base form a lower but still strong intermediate tier, while VGG-16 and especially AlexNet show substantially weaker discrimination. At this scale, the leading curves are tightly packed and only weakly separable visually, which is why class-specific metrics such as Sphere PR-AUC and Sphere Recall remain more informative for fine-grained comparison.</em>
 </p>
 
 ---
 
 ### 6.2 Performance Tiers
-The macro AUC distribution reveals three distinct tiers separated by architectural discontinuities:
+The macro-AUC distribution reveals three broad performance tiers, but the previous interpretation needs revision because **Equivariant-D4 is no longer a low-performing bottom-tier model**. In the updated results, it sits much closer to ViT-Base than to VGG-16, so the architectural separation is different:
 
 ```
 Macro AUC
 1.000 ┤
-0.997 ┤  ████ EqDenseNet-C8  (0.9974)  ← best overall (from scratch, 0.093M)
-      │  ████ Ensemble-Top6  (0.9970)  ← Tier 1: AUC > 0.989
-0.996 ┤  ████ DenseNet-121   (0.9962)    (skip/dense connections)
-      │  ████ E-ResNet        (0.9952)
-0.994 ┤  ████ ResNet-50       (0.9946)
-      │  ████ ResNet-18       (0.9927)
-      │  ████ EffNet-B3       (0.9898)
-0.980 ┤─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Gap 1
-0.976 ┤  ████ ViT-Base        (0.9761)  ← Tier 2: Attention-based
+0.997 ┤  ████ EqDenseNet-C8    (0.9973)  ← best single model (from scratch, ~0.1M)
+      │  ████ Ensemble-Top6    (0.9970)
+0.996 ┤  ████ DenseNet-121     (0.9962)  ← Tier 1: high-performing models
+      │  ████ E-ResNet         (0.9952)     tightly clustered near ceiling
+0.994 ┤  ████ ResNet-50        (0.9946)
+      │  ████ ResNet-18        (0.9927)
+0.990 ┤  ████ EfficientNet-B3  (0.9898)
+0.980 ┤─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Gap 1
+0.978 ┤  ████ Equivariant-D4   (0.9784)
+      │  ████ ViT-Base         (0.9761)  ← Tier 2: second-tier but still strong
 0.950 ┤
-0.920 ┤─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Gap 2
-0.900 ┤  ████ VGG-16          (0.8944)
-0.800 ┤─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Gap 3
-      │  ████ Equiv-D4        (0.7362)  ← Tier 3: No skip connections
-0.700 ┤  ████ AlexNet         (0.6589)    or insufficient depth
+0.920 ┤─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Gap 2
+0.900 ┤  ████ VGG-16           (0.8944)  ← Tier 3: clearly degraded
+0.800 ┤
+0.700 ┤─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Gap 3
+      │  ████ AlexNet          (0.6589)  ← Tier 4: decisively weakest
 0.600 ┤
+
 ```
+Gap 1 (EfficientNet-B3 → Equivariant-D4) separates the near-ceiling top cluster from a lower but still competent intermediate pair.
 
-**Gap 1** (EfficientNet-B3 → ViT): Separates convolutional models with skip connections
-from the attention-based architecture.
+Gap 2 (ViT-Base → VGG-16) is the largest practically meaningful architectural break, separating modern high-capacity models from an older sequential CNN that lacks residual or dense skip connectivity.
 
-**Gap 2** (ViT → VGG-16): Separates attention-based architectures from sequential
-networks without skip connections.
-
-**Gap 3** (VGG-16 → Equivariant-D4): Separates architectures with ImageNet pretraining
-from from-scratch equivariant models without sufficient depth. Notably, EqDenseNet-C8
-(also from scratch, 0.093M) sits at the top of Tier 1 — demonstrating that the depth
-gap is not inherent to from-scratch training, but specific to architectures that lack
-both depth and skip connections.
+Gap 3 (VGG-16 → AlexNet) separates a weak but still usable legacy CNN from a decisively underpowered baseline.
 
 
 
 <!-- Figure: Sphere-class precision-recall curves -->
 <p align="center">
-  <img src="assets/fig6_2_sphere_pr_curves.png" alt="Sphere-class precision-recall curves for all 9 architectures" width="95%"/>
-  <br><em>Figure 6.2 — Sphere-class precision-recall curves for all eleven architectures.
-  The PR view reveals differentiation invisible in macro AUC: EqDenseNet-C8 leads at
-  PR-AUC 0.9932, DenseNet-121 follows at 0.9903, while EfficientNet-B3 trails at
-  0.9749 — a spread of 0.018 compressed into a 0.008 macro AUC gap. AlexNet at
-  0.4380 is barely above the random baseline of 0.33.</em>
+  <img src="assets/fig6_2_sphere_pr_curves.png" alt="Sphere-class precision-recall curves for all eleven architectures" width="95%"/>
+  <br><em>Figure 6.2 — Sphere-class precision-recall curves for all eleven architectures on the validation set. This view separates models more clearly than macro-AUC by focusing on the hardest class, Sphere. EqDenseNet-C8 achieves the strongest overall balance of precision and recall (PR-AUC = 0.9932), followed closely by Ensemble-Top6 (0.9923) and DenseNet-121 (0.9903). E-ResNet, ResNet-50, and ResNet-18 form a strong second cluster, while EfficientNet-B3 remains competitive but measurably lower. Equivariant-D4 (0.9574) and ViT-Base (0.9413) fall into an intermediate tier, and VGG-16 degrades substantially as recall increases. AlexNet performs only marginally above the random baseline (0.33), confirming that Sphere-class detection is where architectural differences become most visible.</em>
 </p>
 
 ### 6.3 Parameter Efficiency
 
+**EqDenseNet-C8 occupies the extreme top-left of the efficiency plot**: it achieves the
+highest macro-AUC in the benchmark (**0.9973**) with only **~0.1M parameters**, trained
+entirely from scratch. E-ResNet sits slightly to the right at **~0.4M parameters** with
+macro-AUC **0.9952**, confirming that compact equivariant models can remain highly
+competitive when paired with sufficient architectural capacity. Equivariant-D4, also
+trained from scratch and still very small (**~0.2M parameters**), reaches **0.9784** —
+well below the top cluster, but far above the earlier low-performing regime. This makes
+the architectural lesson more precise: **equivariance alone is not enough to match the
+best models, but when combined with deeper feature extraction and strong connectivity,
+it becomes extremely parameter-efficient**.
 
-
-**EqDenseNet-C8 occupies the top-left corner** of the efficiency plot — the highest
-AUC in the entire benchmark at 0.093M parameters trained entirely from scratch.
-E-ResNet sits just to its right at 0.39M parameters with AUC 0.9952, establishing
-that the equivariant family as a whole dominates the efficiency frontier. The contrast
-between EqDenseNet-C8 and Equivariant-D4 (also from scratch, also tiny, but AUC only
-0.73) isolates the contribution of depth and dense connectivity: equivariance alone
-is not sufficient without sufficient architectural capacity. The gap between
-EqDenseNet-C8 (0.093M) and DenseNet-121 (7.0M, AUC 0.9962) — 75× more parameters,
-ImageNet pretrained, yet lower AUC — is the single most striking result in the
-efficiency plot. Among pretrained models, the DenseNet-121 / ResNet-18 /
-EfficientNet-B3 cluster achieves the best AUC-per-parameter trade-off but sits
-below the equivariant frontier. ViT-Base (85M parameters) falls noticeably below
-this pretrained cluster despite being the largest model in the group. AlexNet is the
-outlier in the opposite direction — 57M parameters, worst AUC at 0.66 — the clearest
-demonstration that parameter count without skip connections provides no benefit for
-this task.
+The gap between **EqDenseNet-C8 (~0.1M, 0.9973)** and **DenseNet-121 (7.0M, 0.9962)** is
+one of the strongest results in the plot: the pretrained DenseNet-121 uses roughly
+**70× more parameters** yet still scores slightly lower on macro-AUC. Among pretrained
+models, **DenseNet-121, ResNet-18, ResNet-50, and EfficientNet-B3** form the strongest
+accuracy–efficiency cluster, all performing near ceiling but at one to two orders of
+magnitude larger parameter budgets than EqDenseNet-C8 and E-ResNet. **ViT-Base**
+(**85.4M**, **0.9761**) is substantially larger than this pretrained CNN cluster while
+also underperforming it. **VGG-16** is even larger (**134.3M**) yet drops sharply to
+**0.8944**, showing that parameter count alone does not guarantee performance.
+**AlexNet** is the clearest negative outlier: despite **57.0M parameters**, it achieves
+just **0.6589**, making it the least efficient architecture in the benchmark.
 
 <!-- Figure: AUC vs parameter count scatter (log scale) -->
 <p align="center">
   <img src="assets/fig6_3_param_efficiency.png"
-       alt="Parameter efficiency scatter: AUC vs parameter count" width="95%"/>
-  <br><em>Figure 6.3 — Parameter efficiency scatter (x-axis: parameter count in
-  millions, log scale; y-axis: macro AUC on the val set). Triangles = trained from
-  scratch; circles = ImageNet pretrained. EqDenseNet-C8 (cyan triangle, far top-left)
-  achieves AUC 0.9974 at 0.093M parameters — the most parameter-efficient model in
-  the benchmark. E-ResNet (blue triangle) achieves AUC 0.9952 at 0.39M — the second
-  most efficient. Both sit above the entire pretrained cluster, establishing the
-  equivariant family as the dominant efficiency frontier. Equivariant-D4 (orange
-  triangle, far left) shows that equivariance without depth yields AUC only 0.73.
-  The DenseNet-121, ResNet-18, and EfficientNet-B3 cluster (7–85M, AUC 0.99–1.00)
-  represents the best pretrained trade-off. ViT-Base (85M) falls below this cluster
-  despite its large capacity. AlexNet (57M, AUC 0.66) is the worst pretrained model
-  — parameter count without skip connections provides no benefit for this task.</em>
+       alt="Parameter efficiency scatter: macro-AUC versus parameter count for all architectures" width="95%"/>
+  <br><em>Figure 6.3 — Parameter efficiency scatter (x-axis: parameter count in millions, log scale; y-axis: macro-AUC on the validation set). Triangles denote models trained from scratch; circles denote pretrained models. EqDenseNet-C8 sits at the top-left frontier, achieving the best macro-AUC (0.9973) with only ~0.1M parameters. E-ResNet follows closely at ~0.4M parameters and 0.9952 macro-AUC. Equivariant-D4 (~0.2M, 0.9784) remains highly compact but falls below the top frontier, indicating that equivariance benefits from stronger architectural capacity. The best pretrained trade-off is formed by DenseNet-121, ResNet-18, ResNet-50, and EfficientNet-B3, which cluster near ceiling performance at substantially larger model sizes. ViT-Base (85.4M, 0.9761) underperforms this CNN cluster despite its much larger capacity. VGG-16 (134.3M, 0.8944) and AlexNet (57.0M, 0.6589) demonstrate most clearly that large parameter count without modern connectivity patterns is highly inefficient for this task. Ensemble-Top6 is excluded because it does not have a single parameter count.</em>
 </p>
 
 ### 6.4 Key Takeaways
 
-**1. Skip connections are necessary, not optional.**
-The AUC gap between {AlexNet, VGG-16} and the ResNet family is the largest
-discontinuity in the benchmark — larger than any gap among architectures with skip
-connections. Gradient accessibility to shallow feature detectors is a prerequisite
-for low-SNR substructure detection.
+**1. Skip connectivity appears highly important, but it is not the only factor.**  
+The gap between legacy sequential CNNs (**AlexNet**, **VGG-16**) and the stronger modern architectures (**ResNet**, **DenseNet**, **EfficientNet**, **EqDenseNet-C8**, **E-ResNet**) is one of the clearest structural patterns in the benchmark. Models with residual or dense feature reuse consistently dominate the upper tier, while AlexNet and VGG-16 fall far behind despite large parameter counts. This strongly suggests that effective feature propagation and multi-scale reuse are critical for low-SNR substructure detection. Still, skip connectivity alone is not a complete explanation, since **ViT-Base** underperforms the best CNNs and **Equivariant-D4** remains below the top cluster despite being compact and symmetry-aware.
 
-**2. Physical symmetry beats scale.**
-EqDenseNet-C8 (0.093M, scratch) surpasses every ImageNet-pretrained model including
-DenseNet-121 (7.0M), ResNet-50 (23.5M), and ViT-Base (85.4M) on every reported
-metric. Encoding the rotational symmetry of gravitational lensing directly into the
-architecture — and combining it with dense connectivity — eliminates the need to
-learn that symmetry from data, freeing parameter capacity entirely for the
-classification task. The 75× parameter gap between EqDenseNet-C8 and DenseNet-121,
-in favour of the from-scratch equivariant model, is the central result of this
-benchmark.
+**2. Physical symmetry plus strong connectivity beats scale.**  
+**EqDenseNet-C8** (~**0.1M** parameters, trained from scratch) outperforms every individual pretrained model in the benchmark on the most important reported metrics, including **Macro-AUC (0.9973)**, **Sphere AUC (0.9955)**, **Sphere PR-AUC (0.9932)**, **Test Accuracy (0.9735)**, and **Sphere Recall (0.9448)**. That result is especially striking against much larger pretrained baselines such as **DenseNet-121 (7.0M)**, **ResNet-50 (23.5M)**, and **ViT-Base (85.4M)**. The most defensible interpretation is not simply that equivariance alone solves the task, but that **rotational inductive bias becomes exceptionally powerful when combined with sufficient architectural capacity and dense connectivity**. The roughly **70×** parameter gap between **EqDenseNet-C8** and **DenseNet-121**, with the smaller from-scratch equivariant model still ranking first, is one of the central findings of the benchmark.
 
-**3. The Sphere class is the true benchmark.**
-On macro AUC, DenseNet-121 and E-ResNet are nearly indistinguishable (0.9962 vs
-0.9952). On **Sphere Recall** — the physically meaningful metric — EqDenseNet-C8
-leads decisively (0.9448) over DenseNet-121 (0.9364) and E-ResNet (0.9224). Sphere
-Recall is where the equivariant advantage is most visible: the C8 inductive bias
-provides finer angular coverage than D₄, and dense connectivity ensures that
-substructure-scale gradients reach all layers. The hardest class exposes the
-architecture most cleanly.
+**3. The Sphere class is the most discriminating benchmark.**  
+Macro-AUC compresses differences among the strongest models. For example, **DenseNet-121 (0.9962)** and **E-ResNet (0.9952)** are close on Macro-AUC, but the separation becomes clearer on harder class-sensitive metrics. On **Sphere Recall**, **EqDenseNet-C8** leads at **0.9448**, ahead of **DenseNet-121 (0.9364)**, **Ensemble-Top6 (0.9360)**, and **E-ResNet (0.9224)**. The same pattern holds on **Sphere PR-AUC**, where EqDenseNet-C8 again ranks first. This supports the conclusion that the Sphere class is where architectural quality is most meaningfully exposed. What the results support is that **the hardest class reveals differences that Macro-AUC partially hides**; the stronger claim about why C8 beats D4 should be framed as an interpretation rather than a proven causal mechanism.
 
-**4. Ensembles do not always win.**
-The Top-6 soft ensemble (Macro AUC 0.9970) underperforms EqDenseNet-C8 alone
-(0.9974) on every metric. When one model is consistently dominant on the hardest
-class, uniform probability averaging dilutes rather than improves performance.
-Ensemble gains require diverse error profiles — a condition not met when a single
-architecture has a structurally superior inductive bias for the task.
+**4. Ensembles do not automatically outperform the best single model.**  
+The **Top-6 soft-voting ensemble** reaches **Macro-AUC 0.9970**, which is excellent, but it does **not** surpass **EqDenseNet-C8 (0.9973)**. The same pattern holds on **Sphere PR-AUC (0.9923 vs 0.9932)**, **Test Accuracy (0.9725 vs 0.9735)**, and **Sphere Recall (0.9360 vs 0.9448)**. So in this benchmark, uniform soft voting does not improve on the strongest individual model. The likely explanation is that ensemble gains depend on sufficiently complementary error profiles, and here the top models appear too correlated for naive averaging to add much. More targeted ensemble designs might still help, but the present Top-6 ensemble does not.
 
 ---
 
