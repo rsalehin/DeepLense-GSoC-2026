@@ -1273,6 +1273,164 @@ changes in spatial evidence usage matter most.
   <br><em>Figure 7.3d — Case 4: both models wrong. Shared failures are concentrated on Sphere images (125/161), suggesting that these examples are genuinely difficult rather than architecture-specific edge cases. In many such cases, both models still attend somewhere on or near the ring, but the signal is too weak, ambiguous, or misleading for either model to reach the correct decision.</em>
 </p>
 
+### 7.4 ViT vs DenseNet-121: Attention and Localisation
+
+The ResNet-50 vs E-ResNet comparison above asked whether equivariant inductive bias
+changes *where* a model looks. This section asks a different question: **if a model
+attends strongly to the Einstein ring, does that necessarily translate into better
+classification?** The comparison between **ViT-Base** and **DenseNet-121** shows that
+the answer is **no**.
+
+These two models are useful to contrast because they perform differently and are
+interpreted through different mechanisms. **DenseNet-121** is analysed with
+**Grad-CAM**, which reflects class-discriminative spatial gradients at the final
+convolutional stage. **ViT-Base** is analysed with **attention rollout**, which
+propagates CLS-token attention back through the transformer layers and gives a
+class-agnostic view of where the model routes information.
+
+The central paradox of this comparison is that **ViT can attend strongly to the ring
+region and still underperform DenseNet-121 on classification**. The likely reason is
+that coarse attention to the correct global structure is not the same as reliable
+localisation of the discriminative perturbation *within* that structure. In other
+words, **finding the ring is easier than reading the perturbation on the ring**.
+
+The analysis is organised in four parts: first a direct visual comparison of the
+attention maps, then a resolution diagnostic explaining DenseNet’s diffuse Grad-CAM
+appearance, then quantitative ring-concentration and attention-stability analyses,
+and finally a synthesis of what these results imply.
+
+### 7.4 ViT vs DenseNet-121: Attention and Localisation
+
+The ResNet-50 vs E-ResNet comparison asked whether equivariant inductive bias changes
+*where* a model looks. This section asks a different question: **if a model attends
+more strongly to the Einstein ring, does that necessarily lead to better
+classification?** The comparison between **ViT-Base** and **DenseNet-121** shows that
+the answer is **no**.
+
+These two architectures are interpreted through different mechanisms. **DenseNet-121**
+is analysed with **Grad-CAM**, which reflects class-discriminative gradient-weighted
+activation at the final convolutional stage. **ViT-Base** is analysed with
+**attention rollout**, which propagates CLS-token attention back through the
+transformer layers and gives a class-agnostic view of how information flows across
+patches. Because the two visualisations measure different quantities, they should
+not be compared as if they were numerically equivalent saliency maps. The useful
+comparison is instead at the level of **spatial pattern, class sensitivity, and
+consistency**.
+
+#### 7.4.1 Visual Comparison
+
+A direct visual comparison already reveals a qualitative difference. DenseNet-121
+produces broad, low-resolution Grad-CAM maps that often appear as diffuse blobs,
+while ViT-Base produces more spatially structured patch-level attention maps.
+Visually, ViT appears to place stronger emphasis on the Einstein ring region,
+especially for the substructure classes.
+
+<p align="center">
+  <img src="assets/fig7_4a_spatial_attention_vit_densenet.png"
+       alt="Spatial attention comparison between DenseNet-121 Grad-CAM and ViT-Base attention rollout" width="95%"/>
+  <br><em>Figure 7.4a — Spatial attention comparison between DenseNet-121 and ViT-Base across representative No-Substructure, Sphere, and Vortex examples. DenseNet-121 Grad-CAM produces broad, smooth, class-discriminative activation maps, while ViT-Base attention rollout yields patch-structured class-agnostic saliency. ViT appears more tightly concentrated on the Einstein ring region, but the two methods measure different quantities and should not be compared pixel-for-pixel.</em>
+</p>
+
+#### 7.4.2 DenseNet Resolution Diagnostic
+
+The diffuse blob-like appearance of DenseNet Grad-CAM is not, by itself, evidence
+that DenseNet fails to track ring structure. The final DenseNet activation map is
+generated after heavy spatial compression in the last dense block. In these examples,
+the relevant feature map is only about **4×5 pixels** before upsampling back to the
+original **150×150** image size. At that resolution, fine ring geometry cannot be
+faithfully preserved.
+
+This means that DenseNet’s broad Grad-CAM shape is largely a **resolution artefact**:
+the network may still rely on ring-localised evidence, but that evidence is
+represented on an extremely coarse spatial grid before visualisation.
+
+<p align="center">
+  <img src="assets/fig7_4b_densenet_resolution_diagnostic.png"
+       alt="DenseNet-121 resolution diagnostic showing coarse denseblock4 activations before upsampling" width="95%"/>
+  <br><em>Figure 7.4b — DenseNet-121 resolution diagnostic. From left to right: original image, raw denseblock4 output at native coarse resolution, bicubic upsampling to 150×150, and the final Grad-CAM overlay. The apparent blob structure in DenseNet Grad-CAM follows directly from severe spatial compression before upsampling and should not be interpreted as evidence that the model ignores the Einstein ring.</em>
+</p>
+
+#### 7.4.3 Ring Concentration and Attention Stability
+
+To move beyond visual inspection, we measure **ring concentration score**: the
+fraction of total attention mass that lies inside a predefined Einstein ring annulus.
+The annulus covers **19.0% of image pixels**, so a random attention baseline is
+**0.190**.
+
+**Ring concentration scores (mean ± std, n=50 per class):**
+
+| Model | No Substructure | Sphere | Vortex |
+|:------|:---------------:|:------:|:------:|
+| DenseNet-121 | 0.282 ± 0.019 | 0.288 ± 0.020 | 0.285 ± 0.014 |
+| ViT-Base | 0.371 ± 0.032 | 0.462 ± 0.050 | 0.468 ± 0.053 |
+| Random baseline | 0.190 | 0.190 | 0.190 |
+
+Two patterns are immediate. First, **both models concentrate attention on the ring
+above random baseline**. Second, **ViT is much more class-sensitive**: its ring
+concentration rises from **0.371** on No Substructure to **0.462–0.468** on Sphere
+and Vortex. DenseNet, in contrast, stays almost flat across classes
+(**0.282–0.288**).
+
+<p align="center">
+  <img src="assets/fig7_4c_vit_ring_concentration_by_class.png"
+       alt="ViT-Base ring concentration score distributions by class" width="95%"/>
+  <br><em>Figure 7.4c — ViT-Base ring concentration score distributions by class (n=50 per class). ViT attends to the Einstein ring well above the random baseline of 0.190 in all classes, with noticeably higher concentration for Sphere and Vortex than for No Substructure.</em>
+</p>
+
+We next ask whether ViT’s attention is **stable** across images of the same class.
+The mean attention maps remain ring-centred, but the standard deviation maps show
+clear class dependence. The reported mean per-pixel attention standard deviations are:
+
+| Class | Mean attention std | Interpretation |
+|:------|:------------------:|:---------------|
+| No Substructure | 0.0409 | Most stable |
+| Sphere | 0.0597 | Less stable |
+| Vortex | 0.0516 | Less stable |
+
+ViT is therefore **least stable on the substructure classes**, exactly where
+precise localisation should matter most. This suggests that although ViT strongly
+attends to the ring, the spatial deployment of that attention shifts more from
+example to example when subtle perturbations are present.
+
+<p align="center">
+  <img src="assets/fig7_4d_vit_attention_consistency.png"
+       alt="ViT-Base attention consistency showing mean and standard deviation maps across classes" width="95%"/>
+  <br><em>Figure 7.4d — ViT-Base attention consistency analysis (n=20 per class). The top row shows mean attention maps; the bottom row shows standard deviation maps. No Substructure has the lowest mean standard deviation (0.0409), while Sphere (0.0597) and Vortex (0.0516) are less stable. ViT’s global attention remains ring-centred, but its precise spatial allocation varies more on the harder substructure classes.</em>
+</p>
+
+Finally, a direct ring-concentration comparison makes the central paradox explicit:
+**ViT concentrates more attention on the Einstein ring than DenseNet-121 in every
+class, yet DenseNet-121 still achieves higher classification performance.**
+
+<p align="center">
+  <img src="assets/fig7_4e_ring_concentration_densenet_vs_vit.png"
+       alt="Ring concentration comparison between DenseNet-121 and ViT-Base" width="95%"/>
+  <br><em>Figure 7.4e — Ring concentration comparison between DenseNet-121 and ViT-Base (n=50 per class). DenseNet remains nearly flat across classes at about 0.28, while ViT shifts upward to about 0.46–0.47 on the substructure classes. Higher ring concentration alone is therefore not sufficient to explain better classification performance.</em>
+</p>
+
+#### 7.4.4 Interpretation
+
+The main lesson of this comparison is that **coarse localisation of the Einstein ring
+is not the same as reliable recognition of substructure within the ring**. ViT-Base
+attends more strongly to the physically relevant annulus and shows clear class
+sensitivity, yet it still underperforms DenseNet-121 on classification. DenseNet’s
+Grad-CAM, although visually blurrier, is resolution-limited rather than obviously
+misdirected.
+
+The most defensible interpretation is therefore:
+
+- **DenseNet-121** may be using comparatively coarse but effective class-discriminative
+  local detectors.
+- **ViT-Base** clearly finds the ring, but its patch-level attention is less stable
+  on the harder substructure classes.
+- **Higher ring concentration does not guarantee higher macro-AUC**, because the task
+  is not just to find the ring but to identify the discriminative perturbation
+  embedded within it.
+
+This is the central interpretability result of the ViT vs DenseNet comparison:
+**attending to the right global structure is necessary but not sufficient; the harder
+problem is stable, fine-grained reading of local perturbations on that structure.**
+
 ## 7. Interpretability Analysis
 
 ### 7.1 Grad-CAM: ResNet-50 vs E-ResNet
