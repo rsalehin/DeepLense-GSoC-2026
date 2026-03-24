@@ -1455,17 +1455,17 @@ uncertainty.
 
 The uncertainty score is the **predictive entropy** of the ensemble mean:
 
-\[
-H = -\sum_c \bar{p}_c \log \bar{p}_c,
+
+$$H = -\sum_c \bar{p}_c \log \bar{p}_c,
 \qquad
-\bar{p}_c = \frac{1}{M} \sum_{m=1}^{M} p^{(m)}_c
-\]
+\bar{p}_c = \frac{1}{M} \sum_{m=1}^{M} p^{(m)}_c$$
+
 
 For a three-class problem, the maximum possible entropy is:
 
-\[
-\log 3 \approx 1.099
-\]
+
+$$\log 3 \approx 1.099$$
+
 
 The resulting ensemble reaches **0.9688 accuracy** on the validation set. The entropy
 range is **[0.0002, 1.0968]**, covering almost the full theoretical range up to the
