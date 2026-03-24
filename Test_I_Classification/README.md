@@ -1976,7 +1976,9 @@ Answering that would move the analysis beyond aggregate benchmark metrics toward
 more mechanistic account of why the hardest Sphere cases fail.
 
 ### 8.2 E-ResNet Failure Mode Analysis
-#### E-ResNet Sphere False Negatives
+#### 8.2.1 E-ResNet Sphere False Negatives
+
+Here, I zoom in to one single model, and analyze its failure mode. 
 
 **E-ResNet:** Sphere true positives: **2306** · Sphere false negatives (**→ No Substructure**): **129**
 
@@ -1996,7 +1998,7 @@ standard deviation**, and **higher compactness** in the false-negative group. By
 contrast, **ring asymmetry does not separate** true positives from false negatives in
 a meaningful way.
 
-The safest interpretation is descriptive: Sphere images missed as No Substructure
+Sphere images missed as No Substructure
 tend to have **weaker ring-level signal** and a **more compact intensity
 distribution**, making them easier to confuse with smooth lenses. This supports a
 signal-strength interpretation, but does not by itself establish a single causal
@@ -2014,7 +2016,7 @@ mechanism.
   <br><em>Figure 8.5 — E-ResNet Sphere false negatives predicted as No Substructure, sorted by descending confidence in the wrong class. Most examples have relatively low ring mean flux, although there are exceptions. This indicates that low flux is an important correlate of failure, but not a complete explanation on its own.</em>
 </p>
 
-#### E-ResNet Sphere↔Vortex Confusion
+#### 8.2.2 E-ResNet Sphere↔Vortex Confusion
 
 A second, distinct failure mode is **Sphere↔Vortex confusion**, which should not be
 mixed with the dominant **Sphere→No Substructure** failure above.
@@ -2056,7 +2058,7 @@ its own.
 
 ---
 
-### 8.3 Confidence and Accuracy vs Ring Brightness
+### 8.2.3 Confidence and Accuracy vs Ring Brightness
 
 Classification accuracy and model confidence both increase with **ring mean flux**
 across all three classes, with the strongest effect visible for **Sphere**.
@@ -2078,10 +2080,15 @@ brightness alone determines success or failure.
 
 ---
 
-### 8.4 Perturbation Position Analysis
+### 8.2.4 Perturbation Position Analysis
 
-Perturbation position along the Einstein ring is tested as a possible predictor of
-failure using **CAE residual centroids**.
+To test whether failures depend on *where* the perturbation appears, we estimate the
+spatial position of the residual signal using the centroid of the CAE residual inside
+the Einstein ring. Each image is reduced to one point showing the centre of mass of
+its residual perturbation signal. We then compare these centroid locations for
+correct and incorrect predictions. Because the different groups overlap strongly and
+show no clear angular or radial separation, perturbation position does not appear to
+be a major driver of failure under this centroid-based summary.
 
 Across all panels, the centroid positions remain tightly clustered near the image
 centre, with substantial overlap between correct and incorrect classifications. No
@@ -2091,8 +2098,7 @@ different confusion types.
 Under this centroid-based summary, **perturbation position does not provide a strong
 explanation for the observed errors**.
 
-That conclusion should remain limited to this representation: the absence of
-separation in centroid position does not rule out more subtle position-dependent
+The absence of separation in centroid position does not rule out more subtle position-dependent
 effects that are not captured by a single centroid statistic.
 
 <p align="center">
@@ -2103,7 +2109,7 @@ effects that are not captured by a single centroid statistic.
 
 ---
 
-### 8.5 Physical Interpretation
+### 8.2.5 Physical Interpretation
 
 The failure analysis supports a fairly specific picture of the class structure.
 
@@ -2142,14 +2148,15 @@ Disentangling those factors — for example by training larger equivariant dense
 architectures under controlled conditions — remains a natural next research
 direction.
 
-#### 8.6 EqDenseNet-C8 Failure Mode Analysis
+#### 8.3 EqDenseNet-C8 Failure Mode Analysis
 
+As, the idea and implementation of EqDenseNet-C8 came much later, as a last-minute addition, I also show the EqDenseNet-C8 failure mode analysis here. 
 EqDenseNet-C8 (**Macro AUC 0.9973**, **validation accuracy 97.35%**) misclassifies
 **107 / 2500 Sphere** images as **No Substructure** and correctly classifies
 **2362 / 2500**. Both figures are better than E-ResNet, consistent with the higher
 Sphere recall reported earlier.
 
-**Sphere → No Substructure false negatives (Fig. 12a–12b).**  
+#### 8.3.1 **Sphere → No Substructure false negatives**  
 Like E-ResNet, EqDenseNet-C8 can still be strongly confident on the Sphere images it
 misses. The highest-confidence false negatives receive very high predicted
 No-Substructure probabilities, indicating that these are not merely low-margin
@@ -2158,13 +2165,13 @@ mistakes.
 Morphological statistics comparing **Sphere true positives** against **Sphere false
 negatives misclassified as No Substructure** are:
 
-| Statistic | TP mean | FN mean | Mann–Whitney p |
-|:----------|--------:|--------:|:--------------:|
-| Ring mean flux | 0.15830 | 0.14046 | 2.73×10⁻¹⁰ |
-| Ring flux std | 0.16969 | 0.16253 | 2.23×10⁻³ |
-| Ring max intensity | 0.99990 | 1.00000 | 6.34×10⁻¹ |
-| Ring asymmetry | 0.07859 | 0.08226 | 6.54×10⁻¹ |
-| Compactness | 0.63773 | 0.66217 | 1.05×10⁻⁸ |
+| Statistic | TP mean | FN mean | Mann–Whitney p | Significant |
+|:----------|--------:|--------:|:--------------:|:-----------:|
+| Ring mean flux | 0.15830 | 0.14046 | 2.73×10⁻¹⁰ | ✅ |
+| Ring flux std | 0.16969 | 0.16253 | 2.23×10⁻³ | ✅ |
+| Ring max intensity | 0.99990 | 1.00000 | 6.34×10⁻¹ | ❌ |
+| Ring asymmetry | 0.07859 | 0.08226 | 6.54×10⁻¹ | ❌ |
+| Compactness | 0.63773 | 0.66217 | 1.05×10⁻⁸ | ✅ |
 
 The main pattern closely matches E-ResNet: false negatives have **lower ring mean
 flux**, **slightly lower ring flux standard deviation**, and **higher compactness**,
@@ -2187,7 +2194,7 @@ more compact ring-level signals that are easier to mistake for smooth lenses.
   <br><em>Figure 12b — EqDenseNet-C8 Sphere true positives versus false negatives to No Substructure. False negatives show significantly lower ring mean flux and lower ring flux standard deviation, along with higher compactness. Ring asymmetry and maximum intensity do not separate the groups meaningfully in this analysis.</em>
 </p>
 
-**Sphere ↔ Vortex confusion (Fig. 12c–12d).**  
+#### 8.3.2 **Sphere ↔ Vortex confusion.**  
 EqDenseNet-C8 confuses **31 Sphere** images as **Vortex** and **34 Vortex** images as
 **Sphere**, which is substantially fewer than E-ResNet.
 
@@ -2217,7 +2224,7 @@ itself.
   <br><em>Figure 12d — Residual elongation distributions by confusion type for EqDenseNet-C8. The confused and correctly classified populations overlap strongly, indicating that residual elongation alone is not a useful separator for Sphere–Vortex confusion.</em>
 </p>
 
-**Classification accuracy vs ring brightness (Fig. 12e).**  
+#### 8.3.3 **Classification accuracy vs ring brightness**  
 The brightness–accuracy pattern is qualitatively similar to E-ResNet, but shifted
 upward overall. EqDenseNet-C8 performs better across most brightness bins, while the
 lowest-brightness Sphere regime remains difficult for both architectures.
@@ -2228,7 +2235,7 @@ lowest-brightness Sphere regime remains difficult for both architectures.
   <br><em>Figure 12e — EqDenseNet-C8 classification accuracy and mean confidence versus ring mean flux. Accuracy rises with brightness across all classes, and the pattern is strongest for Sphere. Even for the best model, the lowest-brightness Sphere regime remains the hardest.</em>
 </p>
 
-**Perturbation position vs failure (Fig. 12f).**  
+#### 8.3.4 **Perturbation position vs failure**  
 The CAE residual centroids remain tightly clustered near the image centre for both
 correct and incorrect predictions. No clear spatial separation is visible between
 true positives and the different confusion types under this centroid-based summary.
@@ -2239,7 +2246,7 @@ true positives and the different confusion types under this centroid-based summa
   <br><em>Figure 12f — CAE residual centroid positions by classification outcome for EqDenseNet-C8. Correct and incorrect cases overlap strongly, with no obvious centroid-level separation. Under this representation, perturbation position does not appear to be a major driver of failure.</em>
 </p>
 
-**Cross-model summary.**
+### 8.4 **Cross-model summary.**
 
 | Metric | E-ResNet | EqDenseNet-C8 |
 |:-------|---------:|--------------:|
@@ -2276,9 +2283,9 @@ A direct analytical subtraction approach using `lenstronomy` to fit smooth SIE +
 
 Instead, a **convolutional autoencoder (CAE)** was trained **only on No Substructure images**. This forces the CAE to learn the smooth lens morphology without access to perturbation-bearing examples. The trained CAE is then applied to Sphere and Vortex images, and the residual is defined as:
 
-\[
-\text{residual} = \text{observed image} - \text{CAE reconstruction}
-\]
+
+$$\text{residual} = \text{observed image} - \text{CAE reconstruction}$$
+
 
 Under this setup, any unreconstructed structure should correspond mainly to substructure-related signal.
 
