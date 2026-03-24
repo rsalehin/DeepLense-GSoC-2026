@@ -2148,13 +2148,13 @@ So although EqDenseNet-C8 reduces the number of Sphere false negatives, the
 more compact ring-level signals that are easier to mistake for smooth lenses.
 
 <p align="center">
-  <img src="assets/fig12a_sphere_false_negatives.png"
+  <img src="assets/fig12aa_sphere_false_negatives.png"
        alt="EqDenseNet-C8 Sphere false negatives sorted by confidence" width="95%"/>
   <br><em>Figure 12a — EqDenseNet-C8 Sphere false negatives predicted as No Substructure, sorted by descending confidence in the wrong class. As with E-ResNet, the model can be strongly confident on the Sphere cases it misses. Most examples appear to have relatively weak ring-level signal, though brightness alone is not sufficient to explain every error.</em>
 </p>
 
 <p align="center">
-  <img src="assets/fig12b_sphere_fn_statistics.png"
+  <img src="assets/fig12bb_sphere_fn_statistics.png"
        alt="EqDenseNet-C8 Sphere true positives versus false negatives morphological statistics" width="95%"/>
   <br><em>Figure 12b — EqDenseNet-C8 Sphere true positives versus false negatives to No Substructure. False negatives show significantly lower ring mean flux and lower ring flux standard deviation, along with higher compactness. Ring asymmetry and maximum intensity do not separate the groups meaningfully in this analysis.</em>
 </p>
@@ -2178,13 +2178,13 @@ this scalar morphology measure does not explain the Sphere–Vortex confusions b
 itself.
 
 <p align="center">
-  <img src="assets/fig12c_sv_confusion_gallery.png"
+  <img src="assets/fig12cc_sv_confusion_gallery.png"
        alt="EqDenseNet-C8 Sphere-Vortex confusion gallery" width="95%"/>
   <br><em>Figure 12c — EqDenseNet-C8 Sphere↔Vortex confusion gallery. Correctly classified and confused examples show visually overlapping morphologies, reinforcing that this confusion is not cleanly explained by a single obvious visual cue.</em>
 </p>
 
 <p align="center">
-  <img src="assets/fig12d_elongation_distribution.png"
+  <img src="assets/fig12dd_elongation_distribution.png"
        alt="EqDenseNet-C8 elongation distributions by confusion type" width="95%"/>
   <br><em>Figure 12d — Residual elongation distributions by confusion type for EqDenseNet-C8. The confused and correctly classified populations overlap strongly, indicating that residual elongation alone is not a useful separator for Sphere–Vortex confusion.</em>
 </p>
@@ -2195,7 +2195,7 @@ upward overall. EqDenseNet-C8 performs better across most brightness bins, while
 lowest-brightness Sphere regime remains difficult for both architectures.
 
 <p align="center">
-  <img src="assets/fig12e_confidence_vs_brightness.png"
+  <img src="assets/fig12ee_confidence_vs_brightness.png"
        alt="EqDenseNet-C8 classification accuracy and confidence versus ring brightness" width="95%"/>
   <br><em>Figure 12e — EqDenseNet-C8 classification accuracy and mean confidence versus ring mean flux. Accuracy rises with brightness across all classes, and the pattern is strongest for Sphere. Even for the best model, the lowest-brightness Sphere regime remains the hardest.</em>
 </p>
@@ -2206,7 +2206,7 @@ correct and incorrect predictions. No clear spatial separation is visible betwee
 true positives and the different confusion types under this centroid-based summary.
 
 <p align="center">
-  <img src="assets/fig12f_perturbation_position.png"
+  <img src="assets/fig12ff_perturbation_position.png"
        alt="EqDenseNet-C8 perturbation position versus classification outcome" width="95%"/>
   <br><em>Figure 12f — CAE residual centroid positions by classification outcome for EqDenseNet-C8. Correct and incorrect cases overlap strongly, with no obvious centroid-level separation. Under this representation, perturbation position does not appear to be a major driver of failure.</em>
 </p>
