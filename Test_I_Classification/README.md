@@ -13,57 +13,42 @@
 <br>
 
 **Classifying dark matter substructure in simulated strong gravitational lensing images**
-using eleven architectures — from convolutional baselines to physics-motivated equivariant
-networks encoding the rotational symmetry of gravitational lensing directly into their weights.
+using **eleven evaluated architectures** — from convolutional baselines to
+physics-motivated equivariant networks that encode rotational structure directly
+into the model.
 
-**Eleven** architectures establish a comprehensive benchmark spanning sequential CNNs, residual
-networks, dense connectivity, attention-based transformers, and D₄-equivariant networks.
-A novel **C8-equivariant DenseNet (EqDenseNet-C8)**, combining 8-fold discrete rotational
-equivariance with DenseNet-style dense connectivity and trained entirely from scratch,
-surpasses all nine benchmarked architectures — including seven ImageNet-pretrained models —
-on every reported metric.
-
-<br>
+This benchmark compares sequential CNNs, residual networks, dense connectivity,
+transformer-based attention, and equivariant architectures under a common evaluation
+pipeline. A novel **C8-equivariant DenseNet (EqDenseNet-C8)**, trained entirely from
+scratch, achieves the strongest overall single-model result in the benchmark.
 
 | | |
 |:-:|:-:|
-| **Best Macro AUC** | **0.9974** — EqDenseNet-C8 (0.093M params, from scratch) |
+| **Best Macro AUC** | **0.9973** — EqDenseNet-C8 (~0.1M params, from scratch) |
 | **Best Sphere Recall** | **0.9448** — EqDenseNet-C8 |
 | **Best Sphere PR-AUC** | **0.9932** — EqDenseNet-C8 |
 | **Best Pretrained AUC** | 0.9962 — DenseNet-121 (7.0M params, ImageNet) |
-| **Best Efficiency** | **0.093M params** — EqDenseNet-C8 (AUC 0.9974) |
+| **Best Efficiency** | **~0.1M params** — EqDenseNet-C8 (Macro AUC 0.9973) |
 | **Task** | 3-class classification (No Sub / Sphere / Vortex) |
 | **Input** | 150 × 150 × 1 (single-channel simulated lensing images) |
 
 </div>
 
 ---
-> **Important Note on Scope and Development Timeline**
+> **Note on benchmark scope**
 >
-> This notebook was originally prepared with nine architectures — spanning sequential
-> CNNs, residual networks, dense connectivity, attention-based transformers, and
-> D₄-equivariant networks. The full analysis suite (interpretability, ablation,
-> failure mode analysis, residual image approach, deep ensemble uncertainty) was
-> designed around and applied to these nine models.
+> This README now treats the **final Section 6.1 benchmark table** as the canonical
+> result summary for the project. The document includes:
 >
-> During the course of preparing this submission, a novel architecture —
-> **EqDenseNet-C8** — emerged from combining C8 cyclic equivariance with DenseNet-style
-> dense connectivity. It was trained, evaluated, and included in Section 5.10, where
-> it achieves the best results across every reported metric, surpassing all nine
-> original architectures including all seven ImageNet-pretrained models.
+> - **11 evaluated architectures** in the main benchmark
+> - additional **planned / exploratory SO(2)-equivariant directions** documented
+>   separately as future work or implementation attempts, not as evaluated benchmark
+>   entries
 >
-> However, given the submission deadline and the non-linear nature of exploration and experimentations, EqDenseNet-C8 has not yet received the same
-> depth of analysis as the original nine models. Specifically, failure mode
-> characterisation largely reflect the original
-> nine-model study. EqDenseNet-C8 appears in the benchmark table, ROC/PR comparisons,
-> parameter efficiency plot, and cross-architecture confusion matrix, CAM-analysis, ensemble uncertainty analysis but its deeper
-> analysis — including full ablation over {C8, SO(2)} × {residual, dense} and
-> cross-dataset evaluation — is planned for the GSoC 2026 project timeline.
->
-> The comprehensive analyses shown throughout Sections 6–9 therefore serve a dual
-> purpose: rigorous evaluation of the nine-model benchmark, and a foundation for
-> targeted follow-up work on EqDenseNet-C8 and its SO(2) extensions during the main
-> GSoC project.
+> Earlier stages of the project were organised around a smaller architecture set, but
+> the present README has been updated to reflect the expanded final benchmark.
+> Wherever summary metrics or rankings are reported, Section 6.1 is the source of
+> truth.
 
 ---
 
@@ -302,11 +287,9 @@ Four complementary metrics are computed for every architecture:
 
 ## 5. Architecture Evaluations
 
-Thirteen architectures are evaluated across three categories: standard deep learning
-baselines (Sections 5.1–5.7), physics-motivated equivariant networks (Sections 5.8–5.10),
-a soft ensemble combining the top-6 models (Section 5.11), and two planned SO(2)
-continuous equivariant architectures targeting the GSoC project timeline
-(Sections 5.12–5.13).
+Eleven architectures are evaluated in the benchmark below. Two additional
+SO(2)-equivariant variants are documented as planned or exploratory directions and
+are not included in the evaluated leaderboard.
 
 The ordering follows the historical development sequence — from sequential baselines
 establishing the lower bound, through increasingly capable general architectures, to
@@ -717,35 +700,75 @@ No Substructure     0.9177    0.9600    0.9384      2500
 
 ---
 
-### 5.8 Equivariant Neural Network (D₄-ENN)
+### 5.8 Equivariant-D4
 
-**Role:** Shallow equivariant baseline — demonstrates that encoding rotational
-symmetry helps, but depth and skip connections remain necessary.
+**Role:** Shallow D₄-equivariant baseline — tests whether encoding rotational
+symmetry as an architectural prior is sufficient without sufficient depth and
+dense skip connections.
 
 **Architecture:** 2-block shallow network built with `escnn` D₄-equivariant
-convolutions (D₄ = dihedral group of the square, 90° rotations + reflections).
-GroupPooling collapses the equivariant feature space to a standard tensor before
-classification.
+convolutions (`flipRot2dOnR2`, dihedral group of the square: 90° rotations +
+reflections). `GroupPooling` collapses the equivariant feature space to a
+standard tensor before the classification head. 0.250M parameters, trained
+from scratch.
 
-**Training:** From scratch — 50 epochs, lr = 1e-3.
+**D₄ Invariance Verification (all 8 elements, max |Δlogit| = 3.81e-06 ✓):**
+
+| Element | \|Δlogit\| | Element | \|Δlogit\| |
+|:--------|:----------:|:--------|:----------:|
+| (+, 0) identity | 0.00e+00 | (−, 0) flip | 3.17e-06 |
+| (+, 1) rot 90° | 2.08e-06 | (−, 1) flip∘rot90 | 2.35e-06 |
+| (+, 2) rot 180° | **3.81e-06** | (−, 2) flip∘rot180 | 1.11e-06 |
+| (+, 3) rot 270° | 1.65e-06 | (−, 3) flip∘rot270 | 2.46e-06 |
+
+D₄ invariance holds at machine precision across all 8 group elements. The
+architectural constraint is correctly implemented and verified.
+
+**Training:** From scratch, 50 epochs, lr = 1e-3.
 
 <p align="center">
-  <img src="assets/fig5_8_enn_eval.png" alt="Equivariant-D4 ENN confusion matrix and curves" width="95%"/>
-  <br><em>Figure 5.8 — Equivariant-D4 (ENN) evaluation: equivariance alone without sufficient
-  depth and skip connections yields AUC only 0.74.</em>
+  <img src="assets/fig5_8_enn_eval.png"
+       alt="Equivariant-D4 evaluation: ROC, confusion matrix, PR, calibration"
+       width="95%"/>
+  <br><em>Figure 5.8 — Equivariant-D4 evaluation. Top-left: ROC curves — macro
+  AUC 0.9784, with Sphere (0.970) below No Substructure (0.983) and Vortex
+  (0.982). Top-right: confusion matrix — 343 Sphere images misclassified as No
+  Substructure (13.7% FN rate, the highest of any competitive model) and 203
+  Vortex images misclassified as No Substructure. Bottom-left: Sphere PR curve
+  (PR-AUC = 0.9574). Bottom-right: calibration curve — slight underconfidence
+  at intermediate probability levels.</em>
 </p>
 
 | Metric | Value |
 |:-------|------:|
-| Macro AUC | 0.7362 |
-| AUC — No Substructure | 0.8391 |
-| AUC — Sphere | 0.7071 |
-| AUC — Vortex | 0.6620 |
-| Sphere PR-AUC | 0.5363 |
-| Test Accuracy | 53.76% |
-| Sphere Recall | 0.3864 |
-| Parameters | ~0.0 M (shallow) |
+| **Macro AUC** | **0.9784** |
+| AUC — No Substructure | 0.9829 |
+| AUC — Sphere | 0.9700 |
+| AUC — Vortex | 0.9818 |
+| Sphere PR-AUC | 0.9574 |
+| Test Accuracy | 0.8948 |
+| Sphere Recall | 0.8016 |
+| Sphere Precision | 0.9612 |
+| Parameters | **0.250M** |
 | Pretrained | ❌ Scratch |
+
+**Confusion matrix:**
+
+| | Predicted No Sub | Predicted Sphere | Predicted Vortex |
+|:---|:---:|:---:|:---:|
+| True No Sub | 2,485 | 6 | 9 |
+| True Sphere | 343 | 2,004 | 153 |
+| True Vortex | 203 | 75 | 2,222 |
+
+Equivariant-D4 ranks 8th in the benchmark (macro AUC 0.9784), above ViT-Base
+(0.9761) and well below Tier 1 (AUC > 0.989). Its Sphere FN rate (13.7%,
+343/2,500) is the highest among all models except ViT-Base, VGG-16, and
+AlexNet. The architectural D₄ invariance is verified at machine precision —
+the performance gap relative to E-ResNet (0.9952) and EqDenseNet-C8 (0.9973)
+is not due to broken equivariance, but to insufficient architectural depth
+and the absence of dense skip connections. The ablation in §7.4 isolates
+this directly: within the equivariant family, connectivity drives performance
+more than the symmetry prior alone.
 
 **Model weights:** [Download from Google Drive](https://drive.google.com/file/d/1UYCFOdl_TEqnV8iYnuzLuNalViNkK-qg/view?usp=sharing)
 
@@ -1948,6 +1971,7 @@ morphologically close to No Substructure?**
 Answering that would move the analysis beyond aggregate benchmark metrics toward a
 more mechanistic account of why the hardest Sphere cases fail.
 
+### 8.2 E-ResNet Failure Mode Analysis
 #### E-ResNet Sphere False Negatives
 
 **E-ResNet:** Sphere true positives: **2306** · Sphere false negatives (**→ No Substructure**): **129**
@@ -2114,7 +2138,7 @@ Disentangling those factors — for example by training larger equivariant dense
 architectures under controlled conditions — remains a natural next research
 direction.
 
-#### 8.6.1 EqDenseNet-C8 Failure Mode Analysis
+#### 8.6 EqDenseNet-C8 Failure Mode Analysis
 
 EqDenseNet-C8 (**Macro AUC 0.9973**, **validation accuracy 97.35%**) misclassifies
 **107 / 2500 Sphere** images as **No Substructure** and correctly classifies
@@ -2922,11 +2946,6 @@ If you use this work, please cite the ML4SCI DeepLense project and the DeepLense
   url          = {https://github.com/rsalehin/DeepLense-GSoC-2026}
 }
 
-@article{toomey2023deeplensesim,
-  title  = {DeepLenseSim: A Simulation Pipeline for Strong Gravitational Lensing},
-  author = {Toomey, M. W. and others},
-  year   = {2023}
-}
 ```
 
 **Related work:**
