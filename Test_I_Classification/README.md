@@ -2230,78 +2230,67 @@ cases are associated with **lower ring-level signal** and **higher compactness**
 which is more consistent with a **shared hard subset of the data** than with two
 fundamentally different failure regimes.
 
-
-
 ## 9. Residual Image Approach
 
 ### 9.1 Motivation
 
-A physically motivated hypothesis: if the smooth lens morphology can be subtracted 
-from each image, the residual should contain only the substructure perturbation 
-signal — a potentially cleaner input for classification. This approach would be most 
-valuable in a heterogeneous lens population where macro-lens morphology varies 
-strongly, making the raw image a noisier discriminant.
+A physically motivated idea is to remove the smooth macro-lens structure from each image and classify only the remaining **residual**. If the smooth lens morphology can be reconstructed accurately, the residual should concentrate the substructure perturbation signal and suppress irrelevant variation.
+
+This idea is most attractive in a **heterogeneous lens population**, where macro-lens morphology varies strongly across images and may act as nuisance variation. In that setting, a residual-based representation could be more robust than direct classification on raw images.
+
+For the present dataset, the question is narrower: **does subtracting a learned smooth-lens reconstruction improve substructure classification, or does it discard useful information and introduce reconstruction noise?**
+
+---
 
 ### 9.2 Convolutional Autoencoder
 
-An analytical fitting approach (using `lenstronomy` to fit SIE + shear parameters) 
-was attempted but abandoned due to parameter degeneracy and slow convergence per 
-image. A **Convolutional Autoencoder (CAE)** was trained instead, exclusively on 
-No Substructure images — forcing it to learn only the smooth lens morphology. 
-Applied to Sphere and Vortex images, the difference (observed − reconstruction) 
-isolates the perturbation signal.
+A direct analytical subtraction approach using `lenstronomy` to fit smooth SIE + shear lens models was explored first, but was not practical for this benchmark because of parameter degeneracy and slow per-image convergence.
 
-**CAE architecture:**
-```
-Encoder: 4 × (Conv2d + ReLU + MaxPool) → Flatten → Linear(128)
-           ↓ channels: 1 → 16 → 32 → 64 → 128
-Decoder: Linear(128) → Unflatten → 4 × (ConvTranspose2d + ReLU/Sigmoid)
-           ↑ channels: 128 → 64 → 32 → 16 → 1
-```
+Instead, a **convolutional autoencoder (CAE)** was trained **only on No Substructure images**. This forces the CAE to learn the smooth lens morphology without access to perturbation-bearing examples. The trained CAE is then applied to Sphere and Vortex images, and the residual is defined as:
 
-The training curve below confirms the CAE converged stably on the smooth lens 
-reconstruction task before being applied to substructure images.
+\[
+\text{residual} = \text{observed image} - \text{CAE reconstruction}
+\]
+
+Under this setup, any unreconstructed structure should correspond mainly to substructure-related signal.
+
+**CAE architecture**
+
+    Encoder: 4 × (Conv2d + ReLU + MaxPool) → Flatten → Linear(128)
+               channels: 1 → 16 → 32 → 64 → 128
+
+    Decoder: Linear(128) → Unflatten → 4 × (ConvTranspose2d + ReLU / Sigmoid)
+               channels: 128 → 64 → 32 → 16 → 1
+
+The CAE converges stably on the smooth-lens reconstruction task:
 
 <p align="center">
   <img src="assets/fig11_cae_training.png"
        alt="CAE training curve" width="95%"/>
-  <br><em>Figure 9.1 — CAE training curve (No Substructure images only, 60 epochs). 
-  Train and val MSE loss converge by epoch 3 and track closely throughout with no 
-  divergence. Final MSE near zero.</em>
+  <br><em>Figure 9.1 — CAE training curve on No Substructure images only. Train and validation MSE converge rapidly and track closely, indicating stable optimisation of the smooth-lens reconstruction task.</em>
 </p>
 
-The three figures below characterise the residual quality — whether the CAE 
-subtraction leaves interpretable substructure signal or noise.
+The residual quality is then assessed visually and statistically.
 
 <p align="center">
   <img src="assets/fig9_1_cae_residuals.png"
        alt="CAE residual visualisation: original, reconstruction, residual per class" width="95%"/>
-  <br><em>Figure 9.2 — CAE residual visualisation (n=1 example per class). Columns: 
-  original image, CAE reconstruction, residual full range, residual clipped ±0.1. 
-  No Substructure residuals are near-zero; Sphere and Vortex residuals show 
-  localised structure in the ring region.</em>
+  <br><em>Figure 9.2 — CAE residual visualisation for representative No Substructure, Sphere, and Vortex images. No Substructure residuals are near-zero, while Sphere and Vortex leave localised residual structure in the ring region, consistent with unreconstructed perturbation signal.</em>
 </p>
 
 <p align="center">
   <img src="assets/fig11_residual_distributions.png"
        alt="Residual distributions inside ring annulus per class" width="95%"/>
-  <br><em>Figure 9.3 — Residual value distributions inside the Einstein ring annulus 
-  per class. No Substructure std = 0.01492. Sphere std = 0.01722. 
-  Vortex std = 0.01646. Substructure classes show wider distributions, consistent 
-  with unreconstucted perturbation signal remaining in the residual.</em>
+  <br><em>Figure 9.3 — Residual value distributions inside the Einstein ring annulus by class. The substructure classes retain broader residual distributions than No Substructure, indicating that the CAE does not fully reconstruct perturbation-bearing structure.</em>
 </p>
 
 <p align="center">
   <img src="assets/fig11_mean_residual_maps.png"
        alt="Mean and std residual maps per class" width="95%"/>
-  <br><em>Figure 9.4 — Mean residual maps (top row) and pixel-wise std maps (bottom 
-  row), n=50 images per class. Mean pixel std: No Substructure 0.00760, Sphere 
-  0.00843, Vortex 0.00802. No Substructure mean map shows no coherent spatial 
-  structure. Sphere and Vortex std maps show elevated variance concentrated in 
-  the ring annulus.</em>
+  <br><em>Figure 9.4 — Mean residual maps (top) and pixel-wise standard deviation maps (bottom), computed over multiple examples per class. No Substructure shows little coherent residual structure, while Sphere and Vortex exhibit elevated residual variance concentrated around the ring annulus.</em>
 </p>
 
-**Residual statistics (ring annulus, per class):**
+**Residual statistics inside the ring annulus**
 
 | Class | Mean residual | Std residual | Mean \|residual\| |
 |:------|:-------------:|:------------:|:-----------------:|
@@ -2309,12 +2298,13 @@ subtraction leaves interpretable substructure signal or noise.
 | Sphere | 0.03915 | 0.15966 | 0.10564 |
 | Vortex | 0.04661 | 0.17307 | 0.11574 |
 
+These residual maps confirm that the CAE subtraction is not trivial: substructure images retain structured residual signal. The relevant downstream question is whether that residual representation is **better for classification** than the raw image.
+
 ---
 
 ### 9.3 Residual Classifiers
 
-Two classifiers were trained on CAE residuals and compared against the raw-image 
-DenseNet-121 baseline from Section 5.
+To test that, two classifiers were trained directly on the CAE residuals and compared with the raw-image DenseNet-121 baseline.
 
 | Model | Input | Macro AUC | Val Accuracy | Training |
 |:------|:-----:|:---------:|:------------:|:--------:|
@@ -2322,231 +2312,496 @@ DenseNet-121 baseline from Section 5.
 | DenseNet-121 | CAE residuals | 0.9614 | 84.88% | Scratch |
 | ResNet-18 | CAE residuals | 0.9543 | 83.80% | Scratch |
 
-*† Evaluated in a separate run for this comparison. The authoritative benchmark 
-result from Section 6 is 0.9962, obtained from the primary evaluation pipeline.*
+*† This raw-image DenseNet-121 number comes from the dedicated residual-comparison run. The main benchmark result reported earlier remains 0.9962 from the primary evaluation pipeline.*
 
-Both residual classifiers exhibit severe overfitting — the training curves below 
-show a two-order-of-magnitude train/val loss gap by epoch 30.
+Both residual classifiers underperform the raw-image baseline by a substantial margin. The training curves show why: both models overfit rapidly, with training loss continuing to fall while validation loss deteriorates.
 
 <p align="center">
   <img src="assets/fig9_2_residual_classifier_training.png"
        alt="DenseNet-121 residual classifier training curve" width="95%"/>
-  <br><em>Figure 9.5 — DenseNet-121 residual classifier training. Best checkpoint 
-  at epoch 10 (val loss 0.3946), monotonic val deterioration to 0.8211 by epoch 30, 
-  train loss near zero.</em>
+  <br><em>Figure 9.5 — DenseNet-121 trained on CAE residuals. Validation performance peaks early and then degrades, while training loss continues toward zero, indicating strong overfitting.</em>
 </p>
 
 <p align="center">
   <img src="assets/fig9_3_residual_classifier_training.png"
        alt="ResNet-18 residual classifier training curve" width="95%"/>
-  <br><em>Figure 9.6 — ResNet-18 residual classifier training. Best checkpoint at 
-  epoch 5 (val loss 0.4213), no further improvement in the remaining 25 epochs.</em>
+  <br><em>Figure 9.6 — ResNet-18 trained on CAE residuals. The best checkpoint occurs early, with little evidence of sustained validation improvement afterward.</em>
 </p>
 
-The confusion matrices and ROC curves below show the evaluation of both 
-residual classifiers on the val set.
+The evaluation results on the validation set are shown below.
 
 <p align="center">
   <img src="assets/fig11f_dn_res_confusion_matrix.png"
        alt="DenseNet-121 residual classifier confusion matrix" width="95%"/>
-  <br><em>Figure 9.7 — DenseNet-121 residual classifier confusion matrix (raw counts).
-  No Substructure recall: 2378/2500 (0.951). Sphere recall: 1786/2500 (0.714).
-  Vortex recall: 2202/2500 (0.881). Sphere shows the largest off-diagonal leakage,
-  consistent with it having the weakest residual signal.</em>
+  <br><em>Figure 9.7 — DenseNet-121 residual classifier confusion matrix. Sphere shows the largest off-diagonal leakage, indicating that the Sphere residual signal is the hardest to use reliably in isolation.</em>
 </p>
 
 <p align="center">
   <img src="assets/fig11g_dn_res_roc.png"
        alt="DenseNet-121 residual classifier ROC curves" width="95%"/>
-  <br><em>Figure 9.8 — DenseNet-121 residual classifier ROC curves. Macro AUC = 0.9614.
-  Per-class: No Substructure 0.9724, Vortex 0.9630, Sphere 0.9488.
-  Sphere has the lowest AUC — consistent across both residual classifiers and the
-  raw-image benchmark.</em>
+  <br><em>Figure 9.8 — DenseNet-121 residual classifier ROC curves. Macro AUC = 0.9614. Sphere is again the weakest class, with the lowest per-class AUC among the three classes.</em>
 </p>
 
 <p align="center">
   <img src="assets/fig11i_r18_res_confusion_matrix.png"
        alt="ResNet-18 residual classifier confusion matrix" width="95%"/>
-  <br><em>Figure 9.9 — ResNet-18 residual classifier confusion matrix (raw counts).
-  No Substructure recall: 2316/2500 (0.926). Sphere recall: 1992/2500 (0.797).
-  Vortex recall: 1977/2500 (0.791). Higher Sphere recall than DenseNet-121 residual
-  (0.797 vs 0.714) but lower Vortex recall (0.791 vs 0.881).</em>
+  <br><em>Figure 9.9 — ResNet-18 residual classifier confusion matrix. Compared with DenseNet-121 on residuals, Sphere recall is somewhat higher, but Vortex performance is weaker and overall macro-AUC is lower.</em>
 </p>
 
 <p align="center">
   <img src="assets/fig11j_r18_res_roc.png"
        alt="ResNet-18 residual classifier ROC curves" width="95%"/>
-  <br><em>Figure 9.10 — ResNet-18 residual classifier ROC curves. Macro AUC = 0.9543.
-  Per-class: No Substructure 0.9683, Vortex 0.9556, Sphere 0.9390.
-  All three per-class AUCs fall below DenseNet-121 residual, consistent with the
-  macro AUC gap of 0.007.</em>
+  <br><em>Figure 9.10 — ResNet-18 residual classifier ROC curves. Macro AUC = 0.9543, below DenseNet-121 on residuals and well below the raw-image baseline.</em>
 </p>
 
-**Per-class AUC on residuals:**
+**Per-class AUC on residual inputs**
 
 | Class | DenseNet-121 (residual) | ResNet-18 (residual) |
 |:------|:----------------------:|:--------------------:|
 | No Substructure | 0.9724 | 0.9683 |
 | Vortex | 0.9630 | 0.9556 |
-| Sphere ⚠️ | 0.9488 | 0.9390 |
+| Sphere | 0.9488 | 0.9390 |
+
+The main result is straightforward: the residual contains real class-discriminative signal, but that signal is **not sufficient to match raw-image classification** on this dataset.
 
 ---
-
-### 9.4 Summary & Interpretation
+### 9.4 Summary and Interpretation
 
 | Finding | Value |
 |:--------|:------|
 | AUC gap (raw → residual DenseNet-121) | −0.034 |
-| DenseNet-121 best checkpoint epoch | Epoch 10 |
-| DenseNet-121 train/val loss gap at epoch 30 | 0.0013 vs 0.8211 |
-| ResNet-18 best checkpoint epoch | Epoch 5 |
+| DenseNet-121 residual best checkpoint | Epoch 10 |
+| DenseNet-121 residual train/val loss gap at epoch 30 | 0.0013 vs 0.8211 |
+| ResNet-18 residual best checkpoint | Epoch 5 |
 
-**Conclusion:** For this homogeneous simulated dataset, classifying raw images 
-directly is the correct engineering choice. The residual approach demonstrates 
-that isolated perturbation signal contains real discriminative information 
-(AUC well above 0.5), but introduces:
+The residual branch is therefore **scientifically informative but not competitive**
+on this benchmark.
 
-1. A reconstruction noise penalty from CAE artefacts
-2. Loss of macro-lens morphology cues that carry discriminative information on 
-   a homogeneous lens population
-3. Severe overfitting risk when training a 7M-parameter model from scratch on residuals
+The most defensible interpretation is:
 
-The residual approach would become competitive in a **heterogeneous lens population** 
-(variable mass, ellipticity, redshift) where macro-lens morphology varies strongly 
-across images, making isolated perturbation signals relatively more discriminative 
-than full-image features.
+1. **The residual representation does preserve some class-discriminative signal.**  
+   Both residual classifiers perform well above chance, and the residual maps show
+   structured differences between No Substructure and the substructure classes.
+
+2. **That signal is weaker than the signal available in the raw image.**  
+   On this homogeneous simulated dataset, direct raw-image classification remains
+   clearly superior.
+
+3. **The residual pipeline introduces additional costs.**  
+   These include reconstruction artefacts from the CAE, loss of potentially useful
+   macro-lens context, and strong overfitting when residual classifiers are trained
+   from scratch.
+
+So for the present benchmark, **classifying raw images directly is the better
+engineering choice**.
+
+That does not make the residual idea useless. Its value is more likely to appear in
+a **heterogeneous lens population**, where macro-lens morphology varies more strongly
+across images and acts as nuisance variation. In that setting, isolating local
+perturbation signal may become more useful than it is here.
+
+The appropriate conclusion is therefore conditional:
+
+**For this homogeneous benchmark, residual classification is inferior to direct
+raw-image classification. For more heterogeneous lens populations, the residual
+approach remains a plausible research direction rather than a discarded idea.**
+
+---
 
 ## 10. Discussion
 
-### The Sphere Class Is Systematically Harder — Physical Interpretation
+### 10.1 The Sphere Class is Systematically Harder
 
-Every well-converged model (AUC > 0.95) shows the same failure pattern: Sphere subhalos
-are misclassified predominantly as No Substructure, not as Vortex. This one-directional
-confusion is physically interpretable. Spherical CDM subhalos produce compact,
-approximately symmetric perturbations to the lensing potential. Vortex substructure
-produces elongated, asymmetric perturbations that are geometrically distinct. Models
-detect this geometric similarity correctly — they are not failing randomly; they are
-resolving genuine physical ambiguity at the low-mass end of the subhalo distribution.
+Across the stronger models in this benchmark, the **Sphere** class is consistently
+the most difficult. The dominant error is **Sphere → No Substructure**, while the
+No Substructure / Vortex boundary is much easier. This is consistent with the visual
+character of the classes: Sphere perturbations are compact and relatively subtle,
+whereas Vortex perturbations are typically more extended and asymmetric.
 
-**Macro AUC understates difficulty.** Macro AUC is dominated by the easier No
-Substructure/Vortex boundary. Sphere PR-AUC is the more discriminating metric:
-EqDenseNet-C8 leads at 0.9932 while EfficientNet-B3 trails at 0.9749 — a spread
-of 0.018 invisible in the macro AUC comparison. A model that appears competitive
-on macro AUC but underperforms on Sphere PR-AUC has learned to classify No
-Substructure and Vortex well while failing on the class requiring the most subtle
-detection.
+For that reason, **Sphere-specific metrics** are more informative than macro AUC
+alone. In particular, **Sphere Recall** and **Sphere PR-AUC** separate models that
+look very similar under macro-averaged performance.
+
+The detailed failure analysis supports the same interpretation. For both
+**EqDenseNet-C8** and **E-ResNet**, Sphere false negatives are associated with
+**lower ring mean flux** and **higher compactness**, while coarse measures such as
+**asymmetry** and **centroid position** do not separate the groups well. The two
+models differ in error rate, but the morphological signature of the missed Sphere
+cases is very similar, which suggests a **shared hard subset** rather than two
+qualitatively different failure regimes.
+
+The cross-model cohort analysis points in the same direction. The **54 Sphere
+images missed by all 8 models** are, on average, dimmer and slightly less variable
+than the universally correct Sphere images. That does not prove a hard detection
+limit, but it does indicate that the hardest Sphere cases occupy a **weaker-signal
+region** of the simulated data distribution.
+
+Taken together, the benchmark suggests a simple interpretation: the main challenge
+is not distinguishing Vortex from the other classes, but detecting the **weakest
+compact Sphere perturbations** against the smooth lens background. That is why
+improvements on Sphere-specific performance are more scientifically meaningful here
+than very small gains in macro AUC alone.
+
+### 10.2 Skip Connections Strongly Improve Performance in This Benchmark
+
+| Architecture | Macro AUC | Params | Skip connections |
+|:-------------|:---------:|:------:|:----------------:|
+| AlexNet | 0.6589 | 57M | ✗ |
+| VGG-16 | 0.8944 | 134M | ✗ |
+| ResNet-18 | 0.9927 | 11.2M | ✓ |
+| EqDenseNet-C8 | 0.9973 | 0.093M | ✓ (dense) |
+
+The largest performance jump in the benchmark is between the **plain sequential
+CNNs** and the **skip-connected models**. Even with far more parameters, VGG-16
+remains well below ResNet-18, and AlexNet performs substantially worse than the
+stronger modern architectures. Within this benchmark, skip-connected models are
+consistently superior.
+
+That said, this is **not** a clean one-factor causal test. The sequential models
+differ from the residual and dense models not only in connectivity, but also in
+normalization, optimization behavior, and compatibility with pretraining. So the
+safest interpretation is empirical: **architectures with skip connections are much
+better suited to this task under the present training setup**.
+
+The equivariant models point in the same direction. **EqDenseNet-C8** achieves the
+best overall result at very small parameter count, while the shallower
+**Equivariant-D4** model is much weaker despite sharing a symmetry-aware inductive
+bias. This suggests that **symmetry alone is not enough**; feature reuse and
+information flow through the network also matter.
+
+The practical takeaway is therefore simple: for this benchmark, **skip connections
+appear to be a major architectural advantage**, especially when the discriminative
+signal is subtle and localized.
+
+### 10.3 Equivariant Inductive Bias Improves Parameter Efficiency
+
+**EqDenseNet-C8** achieves the strongest overall result in the benchmark while using
+very few parameters and no ImageNet pretraining. **E-ResNet** shows a similar
+pattern: it remains competitive with strong pretrained models at a much lower
+parameter count.
+
+The cleanest interpretation is a **parameter-efficiency result**, not a
+sample-efficiency one. This benchmark does not include a data-scaling experiment, so
+the claim should remain limited: symmetry-aware architectures can perform very well
+on this task **without large model size or external pretraining**.
+
+The parameter-efficiency plot supports that reading visually. EqDenseNet-C8 and
+E-ResNet occupy the **low-parameter, high-AUC** region of the benchmark, whereas the
+strongest non-equivariant baselines require substantially more parameters and, in
+several cases, ImageNet initialization.
+
+The weaker **Equivariant-D4** model is also important here: it shows that
+equivariance without enough architectural capacity or feature reuse does **not**
+automatically reach top-tier performance. So the fairest interpretation is specific
+rather than universal: **for this benchmark, the combination of equivariant
+inductive bias with an effective architecture yields unusually strong performance at
+low parameter count**.
+
+A secondary advantage is robustness. **E-ResNet** is also substantially more
+rotation-stable than **ResNet-50** at the classifier output after training, which
+makes the equivariant result attractive not only in efficiency terms, but also in
+terms of symmetry consistency.
+
+### 10.4 The Role of Augmentation in Equivariant Networks
+
+Within the equivariant-family ablation, **augmentation** has the largest and most
+consistent effect on validation performance. The gains from adding **D₄
+augmentation** are substantially larger than the differences associated with adding
+residual connections in the same small-model setting.
+
+On **Macro AUC**:
+
+- Plain CNN: Aug − NoAug = **+0.0090**
+- E-ResNet: Aug − NoAug = **+0.0073**
+
+On **Sphere Recall**:
+
+- Plain CNN: **+0.0336**
+- E-ResNet: **+0.0196**
+
+By contrast, the residual effect is small in the no-augmentation setting and does
+not persist once augmentation is already present.
+
+A cautious interpretation is that **architectural equivariance and data augmentation
+are complementary rather than redundant**. The equivariant layers encode the desired
+symmetry into the model class, but augmentation still improves how well that
+symmetry is realized under the actual training and image-discretization conditions
+of this benchmark.
+
+The rotation-stability results point in the same direction: the equivariant models
+are much more stable than a standard CNN, but training does not preserve exact
+numerical invariance automatically. Augmentation appears to help close part of that
+gap in practice.
+
+The role of residual connections is narrower here. In this shallow equivariant
+setting, they do not produce a large validation-performance gain, although they do
+appear to help preserve output stability under rotation after training. So the
+cleanest conclusion is not that residual connections are unimportant, but that
+**augmentation is the stronger performance-side factor in this particular ablation**.
+
+### 10.5 Architecture Priors Aligned with the Task Appear Advantageous
+
+Across the benchmark, the strongest models tend to be those whose architectural
+biases are well matched to the structure of the problem. This is a **descriptive
+pattern** in the current dataset, not a universal rule.
+
+Two comparisons illustrate it.
+
+**1. Symmetry-aware models vs standard CNNs.**  
+The best equivariant models achieve top-tier performance at very small parameter
+count and without ImageNet pretraining. They also retain much stronger output
+stability under rotation than a standard CNN. This is consistent with the
+rotational symmetry prior being useful for lensing images, although the comparison
+is not cleanly attributable to symmetry alone because architecture family and
+training regime also differ.
+
+**2. Dense local feature reuse vs patch-based global attention.**  
+**DenseNet-121** clearly outperforms **ViT-Base** on this benchmark, especially on
+the Sphere class. The interpretability analysis suggests a plausible reason: the
+difficult signal in Sphere appears to be a **subtle local perturbation within the
+ring**, and dense convolutional feature reuse may be better matched to that kind of
+localized structure than patch-based transformer attention at this image scale. That
+interpretation remains suggestive rather than causal.
+
+The common thread is modest but consistent: when the architecture encodes a prior
+that fits the task geometry, such as **rotational symmetry** or **strong locality**,
+the model seems to need less help from scale, pretraining, or data volume to
+perform well. In this benchmark, those task-aligned priors appear to be more useful
+than relying on a more flexible architecture to learn the same structure from data
+alone.
+
+### 10.6 Deep Ensemble Uncertainty Reveals Two Distinct Failure Groups
+
+The deep ensemble adds a useful reliability signal beyond single-model accuracy. In
+particular, it shows that difficult Sphere cases do not form one uniform
+uncertainty pattern.
+
+The class-level entropy statistics are slightly counterintuitive: Sphere has the
+highest **mean entropy**, but not the highest **median**. This indicates a
+distribution with a **heavier high-uncertainty tail** rather than a uniformly
+uncertain class. Many Sphere images are classified confidently, but a smaller subset
+is much more ambiguous than the corresponding tail in the other classes.
+
+The more important result is the separation between two empirical failure groups:
+
+| Failure group | Entropy | Approx. size | Operational implication |
+|:--------------|:-------:|:------------:|:------------------------|
+| Silent failures | Low | 54 | Not flagged by entropy-based review |
+| High-entropy ambiguous cases | High | ~12 | Naturally flagged for secondary review |
+
+These two groups do not overlap in the current analysis. That matters because they
+suggest different practical problems. High-entropy cases are difficult, but at least
+the ensemble signals that difficulty. **Silent failures are more serious**: the
+ensemble is confidently wrong, so uncertainty alone does not catch them.
+
+The cohort analysis suggests that the silent-failure Sphere images are also weaker
+on simple image-level statistics such as **mean intensity** and **pixel standard
+deviation**. That does not identify a single mechanism, but it supports the view
+that the most dangerous errors come from a **shared hard subset** of the data rather
+than from isolated architectural mistakes.
+
+The practical lesson is therefore limited but important: **uncertainty is useful,
+but incomplete**. Ensemble entropy can help identify ambiguous cases, but it cannot
+be treated as a general safeguard against error.
+
+### 10.7 The Residual Image Approach — Scientific Value and Practical Ceiling
+
+The residual-image branch reaches **Macro AUC 0.9614** with DenseNet-121 and
+**0.9543** with ResNet-18, remaining well below the corresponding raw-image
+baseline. At the same time, the residual statistics show a modest class-dependent
+effect: residual variation inside the ring is somewhat structured by class. So the
+residual maps do retain some substructure-related information, but not strongly
+enough to match direct classification on the original images.
+
+Two limitations appear to define the practical ceiling of this branch.
+
+First, the **residual representation is weak relative to the reconstruction noise
+floor**. Both residual classifiers generalize poorly compared with their raw-image
+counterparts, and the gap between DenseNet-121 and ResNet-18 on residuals is small
+relative to the much larger drop from raw images to residuals. This suggests that
+the representation itself is the dominant bottleneck, even if classifier choice
+still matters somewhat.
+
+Second, the **analytical fitting route** did not produce a clean alternative residual
+representation. The forward-model fits were unstable and did not yield
+class-separating residuals, so the notebook ultimately relied on a data-driven CAE
+approximation instead. That does not prove that all analytical fitting strategies
+would fail, but it does show that the straightforward version was not usable here.
+
+A likely reason the residual branch underperforms is the **homogeneity of the
+simulated dataset**. In this benchmark, the smooth lens morphology is already highly
+constrained, so the raw image itself remains a very informative input. Subtracting a
+learned smooth reconstruction removes some shared structure, but also introduces
+reconstruction noise, and the net result is worse classification performance.
+
+The residual approach is therefore **scientifically useful but practically limited**
+in this setting. It shows that some discriminative signal survives subtraction, but
+not enough to compete with direct raw-image classification on this dataset. A
+stronger version of this idea may require either better residual extraction or a
+dataset regime in which macro-lens variation is a larger confound than it is here.
 
 ---
 
-### Skip Connections Are Necessary, Not Merely Beneficial
+## 11. Limitations
 
-| Architecture | Macro AUC | Parameters |
-|:-------------|:---------:|:----------:|
-| AlexNet (sequential) | 0.659 | 57.0M |
-| VGG-16 (sequential, deep) | 0.894 | 134M |
-| ResNet-18 (skip connections) | 0.993 | 11.2M |
+- **Single random seed.** All experiments were run with one fixed seed. Run-to-run
+  variance is therefore unknown, and very small metric differences should not be
+  over-interpreted.
 
-The performance gap between sequential and residual architectures is the largest
-discontinuity in the benchmark. VGG-16 uses 12× more parameters than ResNet-18 yet
-achieves substantially lower AUC. For low-contrast, low-SNR classification tasks
-operating near a photon-statistics detection threshold, gradient accessibility to
-shallow feature detectors is a prerequisite.
+- **Convergence and compute budget.** Some models, especially the equivariant ones,
+  were still improving when training stopped. Their reported results may therefore
+  be slightly conservative, but this was not tested systematically with longer
+  schedules or repeated runs.
 
----
+- **Homogeneous simulation regime.** The dataset is highly structured, with limited
+  variation in macro-lens parameters. Strong performance here does not guarantee
+  similar behavior on more heterogeneous simulations or on real observational data.
 
-### The Equivariance Advantage Is Real and Decisive
+- **Asymmetric pretraining conditions.** Some models use ImageNet pretraining while
+  the equivariant models are trained from scratch. This makes cross-family
+  comparisons informative but not perfectly controlled.
 
-E-ResNet achieves 37.3× better theoretical rotational stability than ResNet-50 at
-initialisation, and 2.5× better empirical invariance after training. The ablation
-study confirms that augmentation is the dominant performance driver within the
-equivariant family, but the efficiency argument — competitive AUC at 0.39M
-parameters — holds regardless. The architectural inductive bias genuinely reduces
-the sample and parameter cost of learning the rotational symmetry of gravitational
-lensing.
+- **Discrete symmetry approximation.** The equivariant models use discrete groups
+  such as D₄ and C8, which are useful approximations in this benchmark but not exact
+  physical symmetries of real lens systems. More flexible rotational groups may be
+  more appropriate for realistic observations.
 
-EqDenseNet-C8 extends this advantage further by combining C8 cyclic equivariance
-with dense connectivity. The result — surpassing every ImageNet-pretrained model at
-0.093M parameters trained entirely from scratch — demonstrates that the equivariance
-advantage scales with architectural depth and feature reuse, not just symmetry
-encoding alone.
+- **ViT input adaptation.** ViT-Base was adapted from its native pretrained
+  resolution to this dataset through interpolation and patch-grid adjustment. That
+  mismatch may have contributed to its weaker performance.
 
----
+- **Single-band input only.** All experiments use one simulated intensity channel.
+  Real substructure analysis may benefit from additional information such as
+  multi-band imaging or other observational context.
 
-### EqDenseNet-C8 Is the Overall Winner on This Benchmark
+- **Residual-branch limitations.** The CAE residual approach retained some
+  class-dependent signal, but the residual classifiers generalized much more poorly
+  than the raw-image models. This suggests that, in this benchmark, the residual
+  representation is a major bottleneck.
 
-EqDenseNet-C8 achieves the highest Macro AUC (0.9974), Sphere AUC (0.9955), Sphere
-PR-AUC (0.9932), Sphere Recall (0.9448), and Test Accuracy (97.35%) of all eleven
-architectures — including all seven ImageNet-pretrained models.
+- **Failure-analysis limitations.** Some summary statistics used in the failure
+  analysis are coarse. For example, centroid-based position measures may miss angular
+  effects along the ring, so null results on position should be interpreted
+  cautiously.
 
-| Architecture | Macro AUC | Sphere PR-AUC | Params | Pretrained |
-|:-------------|:---------:|:-------------:|:------:|:----------:|
-| EqDenseNet-C8 | **0.9974** | **0.9932** | **0.093M** | ❌ Scratch |
-| DenseNet-121  | 0.9962 | 0.9903 | 7.0M | ✅ ImageNet |
-| E-ResNet      | 0.9952 | 0.9871 | 0.39M | ❌ Scratch |
-
-The combined inductive bias of C8 equivariance and dense connectivity provides a
-stronger prior for gravitational lensing substructure detection than 75× more
-parameters with ImageNet pretraining. DenseNet-121 remains the strongest pretrained
-baseline — its dense connectivity and 7M ImageNet-initialised parameters place it
-second overall — but EqDenseNet-C8's result reframes the central question of the
-benchmark: the physically correct symmetry group, encoded architecturally, is more
-valuable than learned feature representations from natural images.
-
-The soft ensemble (Top-6 soft vote) ranks second overall at Macro AUC 0.9970 but
-underperforms EqDenseNet-C8 alone on every metric, confirming that uniform averaging
-dilutes a dominant model's signal on hard cases rather than compensating for it.
+- **Interpretability limitations.** CAM and Grad-CAM maps are constrained by the
+  spatial resolution of the underlying feature maps and by the visualization method
+  itself. The resulting heatmaps are useful for coarse spatial interpretation, but
+  not for precise localization or causal claims.
 
 ---
 
-## 11. Limitations & Future Work
+## 12. Future Work
 
-### 11.1 Dataset Limitations
+### 12.1 Architectural Directions
 
-- **Homogeneous simulation:** Fixed lens mass (~10¹² M☉), fixed ellipticity, fixed source morphology. Real lens surveys (HST, Euclid, LSST) will show significant variation in all three. Performance under distribution shift is unknown.
-- **Single-band:** No photometric colour information. Chromatic lensing effects scale differently for Sphere vs Vortex substructures; multi-band models may resolve some failure modes.
-- **Balanced classes:** Real surveys will have highly imbalanced substructure fractions.
-- **Log-uniform exposure time:** Creates a ~3× SNR range that drives the low-flux Sphere failures. Separate models or SNR-conditioning may improve performance in the low-brightness regime.
+**Higher-order and continuous rotation equivariance.**  
+The current equivariant models use discrete rotation groups such as D₄ and C8, which
+are useful approximations but do not cover arbitrary sky orientations exactly. A
+natural next step is to test higher cyclic groups or continuous-group steerable
+CNNs. The goal would be to determine whether finer rotational structure improves
+performance and stability on more realistic lens populations.
 
-### 11.2 Model Limitations
+**Scaling equivariant dense architectures.**  
+EqDenseNet-C8 achieved the strongest result at very low parameter count, which makes
+it a strong base architecture for further scaling. A controlled study of wider or
+deeper equivariant dense networks would test whether the remaining Sphere errors are
+mainly a capacity issue or mainly a data/representation issue.
 
-- **D₄ covers only 90° multiples:** Real lenses appear at arbitrary position angles.
-  Full continuous SO(2) equivariance requires steerable CNNs.
+**Equivariant transformer variants.**  
+ViT underperformed the strongest convolutional models in this benchmark. A useful
+follow-up would be to test transformer-style architectures that incorporate explicit
+rotational structure or ring-local attention, rather than relying on generic global
+patch attention alone.
 
-- **55 silent confident failures:** The 7-model deep ensemble identifies 55 Sphere
-  images misclassified as No Substructure with near-zero entropy — unanimous,
-  confident, wrong. These pass through any entropy-based triage filter undetected,
-  constituting an operational safety concern for deployed pipelines. These are
-  entirely distinct from the 12 high-entropy cases the ensemble flags as uncertain
-  (zero overlap), meaning uncertainty estimation catches the wrong failure mode.
+**Ring-aware spatial gating.**  
+Several analyses suggest that the discriminative signal is concentrated on the
+Einstein ring. A lightweight ring-localization module followed by a ring-focused
+classifier could test whether explicitly restricting computation to the physically
+relevant region reduces false positives and improves Sphere recall.
 
-- **CAE bottleneck:** The 128-dimensional CAE bottleneck has not been studied
-  systematically. Too-large → memorises substructure; too-small → fails to capture
-  arc shape variation.
+### 12.2 Detection and Estimation Extensions
 
-- **Calibration under distribution shift:** Ensemble entropy analysis assumes val
-  distribution = train distribution. Calibration experiments under controlled
-  PSF/noise/background shifts are needed before deployment.
+**Subhalo mass regression.**  
+The current pipeline predicts discrete classes only. A natural extension is to add a
+regression head for subhalo mass and test whether the model representation preserves
+continuous lensing information related to perturbation strength and scale, rather
+than only class identity.
+
+**Anomaly-detection framing.**  
+The silent-failure Sphere cases suggest that three-class classification is not the
+only useful formulation. A one-class or anomaly-detection approach, using
+No Substructure as the reference manifold, could test whether subtle substructure
+cases are better detected as deviations from smooth lenses than as standard
+multiclass labels.
+
+**Uncertainty-aware triage.**  
+The ensemble analysis showed that entropy captures some ambiguous cases but misses
+confident shared failures. A more complete triage pipeline could combine ensemble
+uncertainty with an additional anomaly-style score or image-quality statistic to
+detect both types of failure.
+
+### 12.3 Robustness and Calibration
+
+**Distribution-shift evaluation.**  
+All current results are measured on validation data drawn from the same simulation
+pipeline as training. A necessary next step is to test robustness under controlled
+shifts in noise level, PSF, seeing, and lens morphology.
+
+**Calibration under shifted class priors.**  
+The benchmark uses balanced class proportions, whereas real survey data will not.
+Post-hoc calibration and threshold analysis would therefore be required before using
+model confidence operationally.
+
+**Multi-channel or multi-band inputs.**  
+All experiments here use a single simulated intensity channel. Adding extra channels,
+such as multi-band information in a more realistic setting, would test whether some
+of the current hard cases are limited by the available input representation rather
+than by classifier design alone.
+
+### 12.4 Interpretability and Analysis
+
+**Angular position along the ring.**  
+The centroid-based position analysis was coarse. A more physically meaningful
+follow-up would parameterize perturbation position by angular coordinate along the
+fitted ring and test whether certain arc regions are systematically harder.
+
+**Direct arc-coverage measurements.**  
+Several failure analyses suggest that weaker or sparser ring structure is associated
+with errors. A direct measure of arc coverage or ring completeness would be more
+interpretable than global mean intensity alone.
+
+**CAE bottleneck study.**  
+The residual branch may depend strongly on bottleneck size. A systematic sweep over
+latent dimensionality would test the tradeoff between smooth-lens reconstruction
+quality and preservation of substructure-related residual signal.
 
 ---
 
-## 12. GSoC Research Directions
+## 13. Future DeepLense Research Directions
 
-Five research directions are prioritised based on where current architectures fail and where the physics suggests the most leverage:
+The benchmark suggests five concrete follow-up directions.
 
-**1. Continuous-group equivariant architectures for real telescope data.**
-D₄ covers only 90° multiples; real lenses appear at arbitrary angles. Upgrading to SO(2) or C₈ steerable CNNs would provide continuous rotation equivariance at a smaller parameter budget than achieving equivalent invariance through augmentation. The ablation result — augmentation is the dominant driver, not residual connections — directly motivates replacing D₄-plus-augmentation with a tighter architectural prior.
+1. **Continuous-rotation equivariant lens classifiers.**  
+   Test whether moving beyond discrete D₄/C8 symmetry improves performance and
+   stability on lens images with arbitrary orientations.
 
-**2. Silent failure detection via anomaly scoring.**
-The 55 silent Sphere failures (confident consensus errors across 7 models) are the most dangerous operational failure mode. The CAE smooth-lens manifold provides a natural one-class anomaly score: the residual norm within the ring annulus, calibrated against the reconstruction noise floor. Testing whether this score identifies silent failures while remaining below false alarm thresholds on true No Substructure images would directly address the operational safety gap.
+2. **Silent-failure detection through anomaly scoring.**  
+   Use the CAE residual or a related one-class score to target the Sphere cases that
+   remain confidently misclassified by all ensemble members.
 
-**3. Ring-local perturbation detection head.**
-The interpretability analysis establishes that the discriminative challenge is not identifying the ring but *localising a compact perturbation within* the ring. A ring-local detection architecture — a lightweight ring-finder fitting the Einstein ring, followed by a perturbation classifier operating on a polar-reparameterised ring-local patch — would decouple the two tasks. The polar reparameterisation converts perturbation position to a translation problem, making smaller, more data-efficient detectors viable.
+3. **Ring-local perturbation detection.**  
+   Build a two-stage system that first identifies the ring geometry, then classifies
+   perturbations in a ring-aligned coordinate frame.
 
-**4. Subhalo mass regression with calibrated uncertainty.**
-Extending the pipeline to predict continuous subhalo mass with calibrated confidence intervals would turn a classification result into a physical measurement. The monotonic confidence–brightness relationship in Section 8.3 demonstrates that the models already implicitly estimate something like SNR; formalising this as a heteroscedastic regression head would propagate photon-noise-driven uncertainty into mass estimates in a physically interpretable way.
+4. **Joint classification and subhalo-mass estimation.**  
+   Extend the current classification setting to a more physically informative output
+   space with calibrated uncertainty.
 
-**5. Heterogeneous lens population evaluation.**
-All results use homogeneous simulation with fixed lens mass and ellipticity. The core scientific question — whether equivariant architectures generalise better than pretrained CNNs under distribution shift — cannot be answered on this dataset. Testing trained models on simulations with variable lens mass (10¹¹–10¹³ M☉), variable ellipticity, and variable source morphology would determine whether the equivariant efficiency advantage persists under realistic variation, or whether richer ImageNet feature spaces provide better generalisation.
+5. **Evaluation on heterogeneous lens populations.**  
+   Move beyond the current homogeneous simulation regime and test whether the
+   observed advantage of symmetry-aware architectures persists when macro-lens
+   properties vary more realistically.
 
 ---
 
