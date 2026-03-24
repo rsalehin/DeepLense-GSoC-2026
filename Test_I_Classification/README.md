@@ -1807,337 +1807,146 @@ That should still be treated as a practical recommendation, not a definitive one
 The invariance and accuracy comparisons are informative, but they do not by
 themselves quantify downstream bias or robustness on real survey data.
 
-## 7. Interpretability Analysis
-
-### 7.1 Grad-CAM: ResNet-50 vs E-ResNet
-
-Grad-CAM maps (weighted gradient activations at the final conv layer) are compared for ResNet-50 (Classical CAM) and E-ResNet across all three classes.
-**Summary of spatial attention strategies:**
-
-| Class | ResNet-50 attention | E-ResNet attention | Physical correctness |
-|:------|:--------------------|:-------------------|:---------------------|
-| No Substructure | Diffuse blob on ring **interior** (dark/structureless) | Distributed **along the arc** | E-ResNet more physically correct |
-| Sphere | Both concentrate on the **compact bright knot** | Both concentrate on the **compact bright knot** | Both correct — compact signal easy to localise |
-| Vortex | Broad central blob overlapping interior | Tighter arc-following on asymmetric arc region | E-ResNet more arc-specific |
-
-**Primary difference:** E-ResNet's equivariant weight sharing enforces the same filter responses at all ring orientations, discouraging reliance on ring interior features that carry no physical substructure information. ResNet-50 partially exploits the interior as a classification cue.
-
-<!-- Figure: Grad-CAM comparison grid — ResNet-50 vs E-ResNet, 3 classes -->
-<p align="center">
-  <img src="assets/fig7_1_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="95%"/>
-   <img src="assets/fig7_2_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="95%"/>
-   <img src="assets/fig7_3_gradcam_resnet50_eresnet.png" alt="Grad-CAM: ResNet-50 vs E-ResNet across three classes" width="95%"/>
-  <br><em>Figure 7.1 — Grad-CAM spatial attention comparison. Rows: No Substructure, Sphere, Vortex. Columns: original image, ResNet-50 Grad-CAM, E-ResNet Grad-CAM, difference map (red = E-ResNet higher, blue = ResNet-50 higher). E-ResNet follows the arc perimeter; ResNet-50 partially attends to the dark ring interior.</em>
-</p>
-
-**Case analysis — ResNet-50 vs E-ResNet disagreement (full val set, n=7,500):**
-
-| Case | Description | Count | Key finding |
-|:-----|:------------|:-----:|:------------|
-| Both correct | Agreement on correct class | 7,075 | E-ResNet arc-following, ResNet-50 interior-blending |
-| E-ResNet wrong only | E-ResNet false alarms (over-sensitivity) | 131 | Over-detection of perturbations not present |
-| ResNet-50 wrong only | ResNet-50 misses localised Sphere | 142 | 87 Sphere misses — imprecise spatial attention |
-| Both wrong | Jointly fail — signal-limited, not attention-limited | ~252 | Both look at arc correctly; signal below threshold |
-
-*Grad-CAM maps below are visualised on a stratified 100-image subset (33 per class). Counts are from the full val set (n=7,500).*
-
-<!-- Case 2: E-ResNet wrong, ResNet-50 correct -->
-<p align="center">
-  <img src="assets/fig6_1_case2_gradcam.png" alt="Case 2: E-ResNet false alarm, ResNet-50 correct" width="95%"/>
-  <br><em>Figure 7.1b — Case 2 (E-ResNet wrong, ResNet-50 correct): E-ResNet predicts substructure on images where ResNet-50 is correct. 131 such cases occur across the full val set.</em>
-</p>
-
-<!-- Case 3: ResNet-50 wrong, E-ResNet correct -->
-<p align="center">
-  <img src="assets/fig6_1_case3_gradcam.png" alt="Case 3: E-ResNet correct, ResNet-50 misses Sphere" width="95%"/>
-  <br><em>Figure 7.1c — Case 3 (ResNet-50 wrong, E-ResNet correct): E-ResNet correctly classifies images where ResNet-50 fails. 87 of the 142 ResNet-50-only errors are Sphere images. E-ResNet Grad-CAM shows activation concentrated on the arc region; ResNet-50 activation is more spatially distributed.</em>
-</p>
-
-<!-- Case 4: Both wrong -->
-<p align="center">
-  <img src="assets/fig6_1_case4_gradcam.png" alt="Case 4: Both models wrong" width="95%"/>
-  <br><em>Figure 7.1d — Case 4 (both wrong): both models attend to the correct arc region but fail to cross the decision boundary. These failures are signal-limited rather than attention-limited — the substructure perturbation is below the effective detection threshold of both architectures. This is confirmed in Section 8 via the ring flux analysis (Mann-Whitney p = 6.07×10⁻¹⁰).</em>
-</p>
-
-### 7.2 ViT Attention Rollout vs DenseNet Grad-CAM
-
-Two architectures compared using fundamentally different visualisation tools:
-
-| Method | Architecture | What it measures |
-|:-------|:-------------|:----------------|
-| **Grad-CAM** | DenseNet-121 | Class-discriminative spatial gradients |
-| **Attention Rollout** | ViT-Base | CLS token attention propagated back through all layers (class-agnostic) |
-
-**The interpretability paradox:** ViT concentrates ~28% more attention on the ring 
-than DenseNet for substructure classes (0.472 vs 0.292), yet DenseNet outperforms 
-ViT by 0.020 macro-AUC. The resolution: attending to the correct spatial region at 
-macro scale ≠ detecting the discriminative *perturbation within* that region. 
-I have tried to explain this through some analyses which are shown below:
-
 ---
 
-**What do the attention maps actually look like?**
+## 8. Failure Mode Analysis
 
-DenseNet produces a diffuse blob; ViT produces spatially structured patch-level maps.
-Before interpreting either, we need to establish what causes the blob.
+### 8.1 Cross-Architecture Sphere Confusion Pattern
 
-<p align="center">
-  <img src="assets/fig7_2a_spatial_attention_vit_densene.png"
-       alt="Spatial attention: DenseNet Grad-CAM vs ViT Attention Rollout" width="95%"/>
-  <br><em>Figure 7.2a — Spatial attention maps (rows: No Substructure, Sphere, Vortex;
-  columns: original, DenseNet Grad-CAM, ViT Attention Rollout). DenseNet produces a
-  diffuse central blob; ViT produces sharper patch-level maps with visible
-  class-dependent structure around the ring.</em>
-</p>
+A recurring error across the stronger models is the misclassification of **Sphere**
+images as **No Substructure**. This subsection asks a narrower question: **which
+Sphere images are missed consistently across models, and do those shared hard cases
+differ in simple raw-image statistics from Sphere images that all models classify
+correctly?**
 
----
+The intersection analysis is performed over the eight stronger converged models used
+in the updated benchmark:
 
-**The DenseNet blob is a resolution artefact, not a spatial failure.**
+**ResNet-18, ResNet-50, DenseNet-121, EfficientNet-B3, ViT-Base, E-ResNet,
+EqDenseNet-C8, and Equivariant-D4.**
 
-DenseNet-121 compresses to ~4×5 pixels at denseblock4. Upsampling 30× back to
-150×150 cannot produce ring structure regardless of what the model actually learned.
+Two groups are compared:
 
-<p align="center">
-  <img src="assets/fig7_2b_densenet_resolution.png"
-       alt="DenseNet Grad-CAM resolution diagnostic" width="95%"/>
-  <br><em>Figure 7.2b — DenseNet resolution diagnostic. Left to right: original image,
-  raw denseblock4 feature map at native ~4×5 pixel resolution (grid lines show actual
-  pixel boundaries), bicubic upsampled map, final Grad-CAM overlay. The blob appearance
-  is entirely explained by 30× spatial upsampling — not by DenseNet ignoring the ring.</em>
-</p>
+- **Universally misclassified Sphere images** — Sphere images predicted as
+  **No Substructure by all 8 models**
+- **Universally correct Sphere images** — Sphere images predicted correctly as
+  **Sphere by all 8 models**
 
----
+The raw `.npy` arrays are analysed directly, without any additional normalisation,
+to test whether these two groups differ in simple image-level statistics such as
+mean intensity and pixel variability.
 
-**Does ViT attend to the ring, and does it shift by class?**
+#### 8.1.1 Results
 
-ViT's attention is class-agnostic by construction, so we measure ring concentration
-directly across n=50 images per class.
+Across the **2,500 Sphere** validation images:
 
-**Ring concentration scores (fraction of attention within Einstein ring annulus):**
+- **Sphere → No Substructure by all 8 models:** **54 images** (**2.2%**)
+- **Sphere classified correctly by all 8 models:** **1,703 images** (**68.1%**)
 
-| Model | No Substructure | Sphere | Vortex | Class sensitivity |
-|:------|:--------------:|:------:|:------:|:-----------------:|
-| DenseNet | 0.278 ± 0.032 | 0.292 ± 0.018 | 0.284 ± 0.013 | **None** — flat across classes |
-| ViT | 0.369 ± 0.025 | **0.472 ± 0.052** | **0.475 ± 0.044** | **Present** — substructure classes 28% higher |
-| Random baseline | 0.190 | 0.190 | 0.190 | — |
+The per-model **Sphere → No Substructure** error rates are:
 
-<p align="center">
-  <img src="assets/fig7_2c_vit_ring_concentration.png"
-       alt="ViT ring concentration score by class" width="95%"/>
-  <br><em>Figure 7.2c — ViT ring concentration score distributions (n=50 per class).
-  No Substructure mean: 0.369. Sphere: 0.472. Vortex: 0.475. ViT attends significantly
-  more to the ring when substructure is present — well above the random baseline of 0.190.</em>
-</p>
+| Model | Sphere → No Substructure | Rate |
+|:------|:------------------------:|:----:|
+| DenseNet-121 | 105 / 2500 | 4.2% |
+| EqDenseNet-C8 | 107 / 2500 | 4.3% |
+| E-ResNet | 129 / 2500 | 5.2% |
+| ResNet-50 | 135 / 2500 | 5.4% |
+| ResNet-18 | 153 / 2500 | 6.1% |
+| EfficientNet-B3 | 193 / 2500 | 7.7% |
+| ViT-Base | 309 / 2500 | 12.4% |
+| Equivariant-D4 | 343 / 2500 | 13.7% |
 
----
+So although the per-model rates vary substantially, there remains a nontrivial core
+of **54 Sphere images** that all eight models miss in the **same** way.
 
-**If ViT attends to the right region, why does it underperform DenseNet?**
+The raw image statistics for the two intersection groups are:
 
-The bottleneck is not *finding* the ring — it is *localising the perturbation within* it.
-ViT's attention is unstable across images of the same class, shifting with perturbation
-position because it lacks translation-invariant local detectors.
+| Metric | Universally wrong (n=54) | Universally correct (n=1703) | Mann–Whitney p |
+|:-------|:------------------------:|:-----------------------------:|:--------------:|
+| Contrast (max − min) | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 |
+| Mean pixel intensity | 0.0581 ± 0.0072 | 0.0639 ± 0.0087 | 1.82 × 10⁻⁷ |
+| Pixel std | 0.1114 ± 0.0158 | 0.1190 ± 0.0169 | 4.74 × 10⁻⁴ |
+| Max pixel intensity | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 |
 
-**ViT attention stability analysis:**
-
-| Class | Mean attention std | Interpretation |
-|:------|:-----------------:|:--------------|
-| No Substructure | 0.0374 | **Stable** — consistent ring-centre strategy |
-| Sphere | 0.0614 | **Unstable** — 64% higher variance than No Sub |
-| Vortex | 0.0538 | **Unstable** — 44% higher variance than No Sub |
+The informative differences are in **mean intensity** and **pixel standard
+deviation**: the universally misclassified Sphere images are, on average, **dimmer**
+and **slightly less variable** than the universally correct ones. By contrast,
+contrast and maximum intensity are uninformative here because the arrays are already
+min–max normalised.
 
 <p align="center">
-  <img src="assets/fig7_2d_vit_attention_consistency.png"
-       alt="ViT attention consistency: mean and std maps per class" width="95%"/>
-  <br><em>Figure 7.2d — ViT attention consistency (n=20 per class). Top row: mean
-  attention maps. Bottom row: standard deviation maps. No Substructure std = 0.037
-  (stable). Sphere std = 0.061, Vortex std = 0.054 (both unstable). Bright hotspots
-  in the std maps localise exactly where the subhalo perturbation moves across images —
-  ViT's attention shifts with perturbation position rather than converging on a fixed
-  detection strategy.</em>
+  <img src="assets/fig7_1a_cross_arch_sphere_examples.png"
+       alt="Sphere images universally misclassified versus universally correct across all 8 models" width="95%"/>
+  <br><em>Figure 7.1a — Sphere images universally misclassified versus universally correct across all 8 models. The top row shows representative Sphere images that every model predicts as No Substructure. The bottom row shows representative Sphere images that every model classifies correctly as Sphere. Raw contrast is fixed at 1.0000 for all examples because the stored arrays are already min–max normalised, so the visible failure mode is not explained by dynamic-range collapse.</em>
 </p>
-
----
-
-**Direct comparison: DenseNet vs ViT ring concentration.**
-
-DenseNet's class-invariant attention alongside ViT's class-sensitive attention makes
-the paradox concrete — higher ring concentration does not translate to better classification.
 
 <p align="center">
-  <img src="assets/fig6_2e_ring_concentration_comparison.png"
-       alt="Ring concentration comparison: DenseNet vs ViT" width="95%"/>
-  <br><em>Figure 7.2e — Ring concentration distributions: DenseNet-121 (blue, Grad-CAM)
-  vs ViT-Base (orange, Attention Rollout), n=50 per class. DenseNet clusters tightly
-  at ~0.28 across all classes — class-invariant. ViT shifts from ~0.37 (No Substructure)
-  to ~0.47–0.48 (Sphere/Vortex) — class-sensitive. Note: the two methods measure
-  different quantities; within-model class sensitivity is the meaningful comparison,
-  not the cross-model gap.</em>
+  <img src="assets/fig7_1b_sphere_raw_statistics.png"
+       alt="Raw image statistics for universally wrong versus universally correct Sphere images" width="95%"/>
+  <br><em>Figure 7.1b — Raw image statistics for universally wrong (n=54) versus universally correct (n=1703) Sphere images. Contrast is identical by construction and therefore uninformative. Mean pixel intensity is systematically lower for the universally misclassified group, and pixel standard deviation is also lower, indicating weaker overall image-level signal in the shared hard cohort.</em>
 </p>
 
+#### 8.1.2 Interpretation
 
-### 7.3 Predictive Uncertainty — Deep Ensemble
+Because the arrays are already min–max normalised per image, **contrast** and
+**maximum intensity** are fixed by construction and therefore uninformative in this
+comparison.
 
-A 7-model deep ensemble (EqDenseNet-C8, DenseNet-121, ResNet-50, ResNet-18,
-EfficientNet-B3, ViT-Base, E-ResNet) is used to compute predictive entropy as a
-proxy for epistemic uncertainty.
-```
-Shannon entropy H = −Σᵢ pᵢ log pᵢ
-High H → ensemble disagreement → uncertain prediction → flag for human review
-Low H  → consensus prediction  → reliable output
-```
+The two statistics that remain informative are **mean pixel intensity** and
+**pixel standard deviation**. The universally misclassified Sphere images are, on
+average, dimmer and slightly less variable than the universally correct Sphere
+images. This indicates that the shared Sphere failures are associated with **weaker
+image-level signal** under the representation used here.
 
-**Per-class entropy statistics (M=7):**
+That association should be interpreted cautiously. It does **not** establish a
+single mechanism, and it does **not** prove a hard detection threshold. The two
+distributions still overlap substantially. So this is a **shift in tendency**, not a
+clean separating rule.
 
-| Class | Mean H | Median H | p95 H |
-|:------|:------:|:--------:|:-----:|
-| No Substructure | 0.197 | 0.121 | 0.599 |
-| Sphere | 0.209 | 0.056 | 0.806 |
-| Vortex | 0.143 | 0.023 | 0.683 |
+The important practical point is the **cross-model agreement**. These 54 images are
+not isolated failures of one architecture, but a **common hard subset** across very
+different model families. That makes them more likely to reflect a property of the
+input cases themselves than an idiosyncratic weakness of any single classifier.
 
-**Key findings:**
+#### 8.1.3 Future DeepLense Project Activity — Failure-Cohort Analysis for Hard Sphere Cases
 
-- Sphere has significantly higher entropy than Vortex (p=0.000) but not
-  significantly higher than No Substructure (p=1.000). The Sphere distribution
-  is strongly bimodal — the median H=0.056 confirms most Sphere images are
-  classified easily, but the hard tail extends to maximum entropy (H=1.099) well
-  beyond Vortex's tail.
+A focused next step is to treat the **54 universally misclassified Sphere images** as
+a dedicated failure cohort and analyse them against two control groups:
 
-- **55 Sphere images** are misclassified as No Substructure by all 7 models
-  with near-zero entropy — confident consensus failures. These are the most
-  dangerous operational failure mode: they pass through any entropy-based triage
-  filter undetected. Low ring mean flux drives this failure (Section 8.1).
+1. **Sphere images classified correctly by all strong models**
+2. **Sphere images misclassified by only a subset of models**
 
-- **The high-entropy and silent-failure populations are completely orthogonal.**
-  The top-12 highest-entropy Sphere images share zero overlap with the 55
-  universally-misclassified images (0/12). These are structurally distinct
-  failure modes: the ensemble is maximally uncertain about unusual arc
-  morphologies, and maximally confident about low-flux images it incorrectly
-  classifies as smooth lenses. An entropy-based triage filter catches the former
-  and misses the latter entirely.
+The aim is to determine whether these failures are associated mainly with:
 
-<!-- Figure: deep ensemble entropy distribution — per class and per-image scatter -->
-<p align="center">
-  <img src="assets/fig7_3_ensemble_entropy.png"
-       alt="Deep ensemble predictive entropy distributions" width="95%"/>
-  <br><em>Figure 7.3 — Deep ensemble entropy analysis (M=7 models). Left: entropy
-  distributions per class — Sphere shows a bimodal distribution with a low-entropy
-  peak (easy cases) and a long high-entropy tail (hard cases); Vortex is more
-  concentrated at low entropy. Centre: entropy histogram per class confirming the
-  Sphere tail extends to maximum entropy H=1.099. Right: per-image confidence vs
-  entropy scatter — the 55 silent Sphere failures cluster at high confidence /
-  near-zero entropy (bottom-right), invisible to any entropy-based triage filter.</em>
-</p>
+- weak signal,
+- missing spatial context,
+- morphological similarity to No Substructure,
+- or multiple distinct failure modes.
 
-The grid below shows the 12 Sphere images the ensemble is most uncertain about —
-genuinely ambiguous cases where no model consensus exists.
+A high-value next analysis would be to build a compact feature table for each image,
+including:
 
-<p align="center">
-  <img src="assets/fig7_4_ensemble_entropy.png"
-       alt="Top 12 highest-entropy Sphere images" width="95%"/>
-  <br><em>Figure 7.3b — Top 12 highest-entropy Sphere images (ensemble H = 1.077–1.099,
-  near the maximum H = 1.099). Each image is annotated with its Shannon entropy and
-  ensemble majority prediction. Predictions scatter across all three classes,
-  confirming genuine ensemble disagreement. These images show unusual arc morphologies
-  — partial arcs, off-axis sources, asymmetric geometries — distinct from the typical
-  Sphere signature. Critically, these 12 images share zero overlap with the 55
-  silent failures in Section 8.1: the ensemble is maximally uncertain about these,
-  but maximally confident about the ones it gets wrong.</em>
-</p>
+- raw mean intensity and raw standard deviation,
+- ring-only mean intensity and ring-only standard deviation,
+- fraction of total flux inside a ring mask,
+- arc length / ring completeness,
+- number and prominence of bright knots on the ring,
+- per-model predicted probabilities,
+- and ensemble entropy.
 
----
+From there, the project can compare **universally wrong vs universally correct**
+Sphere cohorts using both statistical tests and effect sizes, and then move to
+ring-specific geometric analysis, embedding-space analysis, and nearest-neighbour
+retrieval.
 
-### 7.4 Ablation Study — E-ResNet Components
+The central scientific question is:
 
-Four controlled runs isolate the contribution of residual connections and D₄ augmentation:
+**Are the universally wrong Sphere images hard because the perturbation signal is
+weak, because the ring geometry removes useful spatial context, or because they lie
+morphologically close to No Substructure?**
 
-| Run | Architecture | Augmentation | Macro AUC | Accuracy | Sphere Recall |
-|:---:|:-------------|:------------:|:---------:|:--------:|:-------------:|
-| A | Plain equivariant CNN | None | 0.9866 | 92.77% | 0.8932 |
-| B | Plain equivariant CNN | D₄ augmentation | **0.9956** | 96.21% | **0.9268** |
-| C | E-ResNet (residual) | None | 0.9879 | 92.96% | 0.9028 |
-| D | E-ResNet (residual) | D₄ augmentation | 0.9952 | 95.96% | 0.9224 |
-
-**Effect sizes:**
-
-| Effect | Δ Macro AUC | Δ Sphere Recall |
-|:-------|:-----------:|:---------------:|
-| Residual connections (no aug): C − A | +0.0013 | +0.0096 |
-| Residual connections (with aug): D − B | −0.0004 | −0.0044 |
-| Augmentation (plain CNN): B − A | **+0.0090** | **+0.0336** |
-| Augmentation (E-ResNet): D − C | **+0.0073** | **+0.0196** |
-
-**Conclusion:** Augmentation is the dominant performance driver within the equivariant family. Residual connections provide negligible benefit over an augmented plain equivariant CNN. However, E-ResNet remains the recommended architecture because it achieves competitive AUC with the full benchmark at 0.39M parameters — the efficiency argument holds even if the residual contribution is small within the equivariant family.
-
-<!-- Figure: ablation training curves — val loss over epochs for all 4 runs -->
-<p align="center">
-  <img src="assets/fig7_4_ablation_training_curves.png" alt="Ablation study training curves for Runs A–D" width="95%"/>
-  <br><em>Figure 7.4 — Ablation training dynamics. Left: validation loss curves for Runs A–D showing augmentation's dominant effect on convergence speed and final loss. Centre: macro AUC bar chart comparing the four runs. Right: Sphere recall bar chart — the metric most sensitive to the augmentation vs residual trade-off. Note the val loss spike in Run C (E-ResNet, no aug) at epoch 33, a gradient explosion event that early stopping caught at epoch 34.</em>
-</p>
-
-### 7.5 Equivariance Verification
-
-**Experiment:** L₂ distance between softmax probability vectors for original vs rotated images (90°, 180°, 270°), tested on 100 stratified validation images.
-
-**Stage 1 — Untrained models (theoretical, architecture-only invariance):**
-
-| Model | 90° L₂ | 180° L₂ | 270° L₂ | Mean L₂ |
-|:------|:------:|:-------:|:-------:|:-------:|
-| E-ResNet (untrained) | 0.00010 | 0.00014 | 0.00011 | **0.00011** |
-| EPlainCNN (untrained) | 0.00004 | 0.00007 | 0.00007 | 0.00006 |
-| ResNet-50 (untrained) | 0.08038 | 0.06392 | 0.06739 | 0.07056 |
-
-> The untrained E-ResNet is **~641× more rotationally stable** than untrained 
-> ResNet-50 (0.00011 vs 0.07056). This definitively proves the equivariance is 
-> architectural — not learned through data memorisation.
-
-**Stage 2 — Trained models (empirical invariance after training):**
-
-| Model | Theoretical L₂ | Empirical L₂ | Change |
-|:------|:--------------:|:------------:|:------:|
-| E-ResNet (aug) | 0.00011 | 0.01821 | +0.01809 ↑ |
-| EPlainCNN (no aug) | 0.00006 | 0.08133 | +0.08127 ↑ |
-| ResNet-50 (aug) | 0.07056 | 0.04597 | −0.02460 ↓ |
-
-**Pairwise comparison (trained models):**
-- E-ResNet is **2.5×** more invariant than augmented ResNet-50 (0.01821 vs 0.04597)
-- E-ResNet is **4.5×** more invariant than unaugmented EPlainCNN (0.01821 vs 0.08133)
-- ResNet-50 is **1.8×** more invariant than EPlainCNN (0.04597 vs 0.08133)
-
-Two observations worth noting. First, all equivariant models become *less* 
-theoretically invariant after training — empirical L₂ increases from near-zero 
-for both E-ResNet and EPlainCNN. This reflects the gap between the discrete 
-D₄ guarantee on exact 90° grid rotations and the interpolation artefacts 
-introduced by learned weights on a 150×150 pixel grid. Second, ResNet-50 
-becomes *more* invariant after training with augmentation — the augmentation 
-provides empirical invariance that the architecture does not have by construction.
-
-**Note on D₄ coverage:** D₄ equivariance covers only 90° multiples. Real gravitational lenses observed by LSST/Euclid appear at arbitrary position angles. Continuous-group equivariance (SO(2) or C₈ steerable CNNs) would provide coverage at all angles without augmentation — a direct motivation for the first GSoC research direction in Section 12.
-
-<!-- Figure: equivariance verification — L2 divergence bar chart, Stage 1 and Stage 2 -->
-<p align="center">
-  <img src="assets/fig7_5_equivariance_verification.png" alt="Rotation invariance verification: L2 probability divergence" width="95%"/>
-  <br><em>Figure 7.5 — Rotation invariance verification. Left: Stage 1 (untrained models) — mean L₂ probability divergence under 90°/180°/270° rotations for E-ResNet, EPlainCNN, and ResNet-50. The untrained E-ResNet is 641× more stable than ResNet-50. Right: Stage 2 (trained models) — empirical invariance after full training. E-ResNet achieves 2.5× better invariance than augmented ResNet-50.</em>
-</p>
-
----
-### 7.6 Class Activation Maps — EqDenseNet-C8
-
-Classic CAM applied to EqDenseNet-C8's `group_pool` output, using
-`classifier[2]` weights. Six cases shown: one correct and one incorrect
-prediction per class.
-
-<p align="center">
-  <img src="assets/eqdensenet_c8_cam.png"
-       alt="EqDenseNet-C8 CAM — correct vs wrong per class" width="75%"/>
-  <br><em>Figure 7.6 — EqDenseNet-C8 Class Activation Maps. Rows: No Substructure
-  (correct / wrong), Sphere (correct / wrong), Vortex (correct / wrong). Green
-  border = correct prediction; red border = incorrect. Correct predictions show
-  activation distributed along the Einstein ring arc. Failures show diffuse or
-  off-arc activation — the model attends to the wrong spatial region when it
-  errs.</em>
-</p>
-
----
+Answering that would move the analysis beyond aggregate benchmark metrics toward a
+more mechanistic account of why the hardest Sphere cases fail.
 
 
 ## 8. Failure Mode Analysis
