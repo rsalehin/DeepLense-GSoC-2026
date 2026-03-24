@@ -1345,7 +1345,7 @@ the network may still rely on ring-localised evidence, but that evidence is
 represented on an extremely coarse spatial grid before visualisation.
 
 <p align="center">
-  <img src="assets/fig7_4b_densenet_resolution_diagnostic.png"
+  <img src="assets/fig7_4b_densenet_resolution_diagnostic.png" 
        alt="DenseNet-121 resolution diagnostic showing coarse denseblock4 activations before upsampling" width="95%"/>
   <br><em>Figure 7.4b — DenseNet-121 resolution diagnostic. From left to right: original image, raw denseblock4 output at native coarse resolution, bicubic upsampling to 150×150, and the final Grad-CAM overlay. The apparent blob structure in DenseNet Grad-CAM follows directly from severe spatial compression before upsampling and should not be interpreted as evidence that the model ignores the Einstein ring.</em>
 </p>
