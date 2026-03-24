@@ -1159,6 +1159,79 @@ The **Top-6 soft-voting ensemble** reaches **Macro-AUC 0.9970**, which is excell
 
 ---
 
+## 7. Interpretability and Diagnostic Analysis
+
+This section examines *why* the strongest models perform well, *where* weaker models fail, and whether the observed gains are consistent with the intended inductive biases. The analysis follows the notebook structure: first the best-performing model (EqDenseNet-C8), then targeted pairwise comparisons, then uncertainty, ablations, and invariance verification.
+
+### 7.1 EqDenseNet-C8: Class Activation Maps
+
+To understand the spatial strategy of the best single model, we first visualise
+Class Activation Maps (CAMs) for EqDenseNet-C8. Correct predictions typically
+show activation concentrated along the Einstein ring or locally perturbed arc
+regions, while failure cases are associated with more diffuse or misplaced
+responses.
+
+<p align="center">
+  <img src="assets/eqdensenet_c8_cam.png"
+       alt="EqDenseNet-C8 class activation maps for correct and incorrect predictions" width="75%"/>
+  <br><em>Figure 7.1 — EqDenseNet-C8 class activation maps. Rows correspond to
+  No Substructure, Sphere, and Vortex, with one correct and one incorrect example
+  per class. Correct predictions tend to align with the ring morphology or local
+  perturbation region, whereas incorrect predictions show weaker or spatially
+  displaced activation.</em>
+</p>
+
+### 7.2 EqDenseNet-C8: Ring Concentration
+
+Because strong-lensing information is concentrated near the Einstein ring, we
+measure how strongly EqDenseNet-C8’s activation mass is concentrated within a
+ring-shaped annulus. This provides a simple quantitative check that the model’s
+attention is aligned with the physically relevant region rather than the image
+interior or background.
+
+<p align="center">
+  <img src="assets/eqdensenet_c8_ring_concentration.png"
+       alt="EqDenseNet-C8 class activation maps for correct and incorrect predictions" width="75%"/>
+  <br><em>Figure 7.2 —Ring concentration analysis for EqDenseNet-C8. Higher values indicate
+that model activation is concentrated within the Einstein ring annulus rather than
+the image centre or background. The result supports the qualitative CAM finding
+that the model primarily relies on ring-localised evidence..</em>
+</p>
+
+
+### 7.3 ResNet-50 vs E-ResNet 
+
+Grad-CAM Comparison We next compare a strong conventional pretrained CNN (ResNet-50) against a compact equivariant model (E-ResNet) to isolate how equivariant inductive bias changes spatial evidence usage.
+
+#### 7.3.1 Main Result
+
+Grad-CAM is used here as a qualitative diagnostic of class-discriminative spatial
+evidence. The comparison asks a narrow question: when ResNet-50 and E-ResNet inspect
+the same lensing image, do they rely on the same spatial region, or does the
+equivariant model use a more physically aligned strategy?
+
+Across these examples, the main difference is **not** that E-ResNet always produces
+sharper or more confident predictions. Instead, the difference is **where** each
+model places its activation. **ResNet-50 tends to produce broader, more interior-filled
+activation**, whereas **E-ResNet more often breaks its response into ring-localised or
+arc-localised components**. This is most visible in the No-Substructure and Vortex
+examples. In the Sphere case, both models attend to the relevant side of the image,
+but E-ResNet is noticeably less confident on this particular example despite still
+predicting the correct class.
+
+| Class | ResNet-50 attention | E-ResNet attention | Interpretation |
+|:------|:--------------------|:-------------------|:---------------|
+| No Substructure | Broad, smooth activation covering much of the ring interior, with the highest response spread across the central arc region | More fragmented, ring-following activation distributed around the annulus, with stronger suppression of the dark interior | E-ResNet is more spatially aligned with the Einstein ring geometry, while ResNet-50 blends ring evidence with interior response |
+| Sphere | Strong activation concentrated on the left bright perturbation, with some spillover into adjacent arc structure; highly confident correct prediction (0.999) | Activation also concentrates on the left perturbation and nearby arc segments, but is more partitioned and less confident overall (0.639 Sphere, 0.331 No Substructure) | Both models identify the relevant perturbation region, but E-ResNet shows weaker class separation on this example despite qualitatively correct localisation |
+| Vortex | Large vertically extended blob spanning the image interior and upper ring region, only partially aligned with the perturbed arc | Tighter, more compact activation near the upper-left perturbed arc, with less diffuse interior coverage; fully confident correct prediction | E-ResNet is more arc-specific, whereas ResNet-50 relies on a broader central response that is less tightly tied to the local perturbation |
+
+<p align="center">
+  <img src="assets/fig7_3_gradcam_resnet50_eresnet_nosub.png" alt="Grad-CAM comparison for No Substructure: ResNet-50 versus E-ResNet" width="95%"/>
+  <img src="assets/fig7_3_gradcam_resnet50_eresnet_sphere.png" alt="Grad-CAM comparison for Sphere: ResNet-50 versus E-ResNet" width="95%"/>
+  <img src="assets/fig7_3_gradcam_resnet50_eresnet_vortex.png" alt="Grad-CAM comparison for Vortex: ResNet-50 versus E-ResNet" width="95%"/>
+  <br><em>Figure 7.3 — Spatial attention comparison between ResNet-50 and E-ResNet for representative No-Substructure, Sphere, and Vortex examples. Each row shows the original image, ResNet-50 Grad-CAM, E-ResNet CAM, and a difference map (red = higher E-ResNet response, blue = higher ResNet-50 response). In the No-Substructure and Vortex examples, E-ResNet places more of its response along ring-localised structure, whereas ResNet-50 shows broader interior-heavy activation. In the Sphere example, both models attend to the physically relevant perturbation region, but E-ResNet is substantially less confident on this instance despite remaining correct.</em>
+</p>
+
 ## 7. Interpretability Analysis
 
 ### 7.1 Grad-CAM: ResNet-50 vs E-ResNet
