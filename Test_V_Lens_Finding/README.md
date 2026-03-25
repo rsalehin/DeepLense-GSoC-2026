@@ -673,7 +673,7 @@ Sorted by AUC-ROC descending.
 
 | Rank | Architecture | Pretrained | Params (M) | AUC-ROC ↑ | AUC-PR ↑ | Sens@τ* | Spec@τ* | Prec@τ* | FP | FN | FP:TP |
 |:----:|:-------------|:----------:|:----------:|:---------:|:--------:|:-------:|:-------:|:-------:|---:|---:|------:|
-| 1 | **Soft-Ensemble** | Mixed | 36.64 | **0.9905** | **0.8233** | 0.9487 | 0.9805 | **0.328** | 379 | 10 | **2.0** |
+| 1 | **Soft-Ensemble** | Mixed | N/A | **0.9905** | **0.8233** | 0.9487 | 0.9805 | **0.328** | 379 | 10 | **2.0** |
 | 2 | ResNet-34 | ✅ | 21.29 | 0.9881 | 0.7851 | 0.9026 | **0.9808** | 0.320 | **374** | 19 | 2.1 |
 | 3 | EqDenseNet-C8 | ❌ | **0.183** | 0.9872 | 0.7728 | **0.9641** | 0.9430 | 0.145 | 1,109 | **7** | 5.9 |
 | 4 | DenseNet-121 | ✅ | 6.95 | 0.9844 | 0.7632 | 0.9282 | 0.9670 | 0.220 | 642 | 14 | 3.5 |
@@ -681,7 +681,7 @@ Sorted by AUC-ROC descending.
 | 6 | EfficientNet-B2 | ✅ | 7.70 | 0.9790 | 0.7087 | 0.9179 | 0.9600 | 0.187 | 778 | 16 | 4.3 |
 
 *Random PR baseline: 0.0099 (195/19,650). All six models exceed Mriganka 2022 HSC baseline
-(AUC 0.816) by >0.16 points. Threshold-dependent metrics at val-set Youden τ* for each
+(AUC 0.816) by >0.16 points (This is the only baseline I have found in the past DeepLense project repositories to compare with). Threshold-dependent metrics at val-set Youden τ* for each
 model — thresholds differ across models; direct CM comparisons are indicative, not controlled.*
 
 ### 6.2 ROC and Precision-Recall Curves
