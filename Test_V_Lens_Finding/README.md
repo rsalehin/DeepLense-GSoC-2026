@@ -284,6 +284,11 @@ interpolation and samples continuous angles — not genuine D₄ and not lossles
 augmentation is identical (10,625 = 10,625 ✓).
 
 ### What Each Split Is Used For
+| Split | Lenses | Non-Lenses | Total | Purpose |
+|:------|-------:|-----------:|------:|:--------|
+| **Train** | 1,557 | 25,807 | 27,364 | Gradient updates only |
+| **Val** | 173 | 2,868 | 3,041 | Checkpoint selection + threshold derivation |
+| **Test** | 195 | 19,455 | 19,650 | Final evaluation only — one pass, no decisions |
 
 **Train** — the only data the model sees gradients from. Served via `WeightedRandomSampler` to produce ~50:50 batches per step.
 
