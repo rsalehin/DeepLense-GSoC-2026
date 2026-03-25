@@ -1134,13 +1134,14 @@ DeepLense-GSoC-2026/
 
 Load with: `model.load_state_dict(torch.load(path, map_location=device))`
 
-| Model | AUC-ROC | AUC-PR | Params | Weight file |
-|:------|:-------:|:------:|:------:|:------------|
-| ResNet-34 | 0.9881 | 0.7851 | 21.29M | `ResNet-34_testV_best.pth` |
-| EqDenseNet-C8 | 0.9872 | 0.7728 | 0.183M | `EqDenseNet-C8_testV_best.pth` |
-| DenseNet-121 | 0.9844 | 0.7632 | 6.95M | `DenseNet-121_testV_best.pth` |
-| E-ResNet D₄ | 0.9840 | 0.6963 | 0.513M | `EResNet-D4_testV_best.pth` |
-| EfficientNet-B2 | 0.9790 | 0.7087 | 7.70M | `EfficientNet-B2_testV_best.pth` |
+
+| Model | AUC-ROC | AUC-PR | Params | Weights |
+|:------|:-------:|:------:|:------:|:--------|
+| ResNet-34 | 0.9881 | 0.7851 | 21.29M | [Download the Weights](https://drive.google.com/file/d/1M54eKgVRNA-VeMJwaTgcjBBsUdpTlkoS/view?usp=sharing) |
+| EqDenseNet-C8 | 0.9872 | 0.7728 | 0.183M | [Download the Weights](https://drive.google.com/file/d/1-cVDhdOgpiCWsTtnXpYe3fgPetibX_1Y/view?usp=sharing) |
+| DenseNet-121 | 0.9844 | 0.7632 | 6.95M | [Download the Weights](https://drive.google.com/file/d/1zgaB7eO4XPsJfnw2uXVLey-zJa9AEP20/view?usp=sharing) |
+| E-ResNet D₄ | 0.9840 | 0.6963 | 0.513M | [Download the Weights](https://drive.google.com/file/d/14wBi5-Sbvvvxh0IWWBPVjdsvSQwzJfG0/view?usp=sharing) |
+| EfficientNet-B2 | 0.9790 | 0.7087 | 7.70M | [Download the Weights](https://drive.google.com/file/d/10TKUpFJ36icQ6cOsqrG0G42QRUUk9CY6/view?usp=sharing) |
 
 ---
 
