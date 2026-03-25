@@ -933,7 +933,7 @@ Analysis at Soft-Ensemble operating point τ* = 0.3143. **FN = 10, FP = 379.**
 <p align="center">
   <img src="assets/failure_false_negatives.png"
        alt="Soft-Ensemble — All 10 missed lenses" width="95%"/>
-  <br><em>Figure 8.1 — All 10 missed lenses (FN=10), sorted by ascending ensemble confidence
+  <br><em>Figure 8.1 —  9 missed lenses, sorted by ascending ensemble confidence
   (p=0.023 to p=0.313). Rows per column: RGB composite (g→R, r→G, i→B), g band, r band, i band.
   FN 1–4 (p=0.023–0.049): missed by all models with very low confidence — morphologically diverse:
   multi-source fields (cols 1, 4), compact sources in noisy backgrounds (cols 2, 3).
@@ -949,7 +949,7 @@ Analysis at Soft-Ensemble operating point τ* = 0.3143. **FN = 10, FP = 379.**
 <p align="center">
   <img src="assets/failure_false_positives_top18.png"
        alt="Soft-Ensemble — Top-18 false positives by ensemble confidence" width="95%"/>
-  <br><em>Figure 8.2 — Top-18 false positives by ensemble confidence (p=0.898–0.964).
+  <br><em>Figure 8.2 — Top-9 false positives by ensemble confidence (p=0.898–0.964).
   Rows per column: RGB composite, g band, r band, i band. The highest-confidence FP (col 1, p=0.964)
   shows visible arc-like peripheral emission — the most lens-like contaminant in the top-18 and a
   genuine ambiguity at 64×64 resolution. Other high-confidence FPs include: an irregular multi-source
