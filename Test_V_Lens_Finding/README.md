@@ -373,6 +373,8 @@ All equivariant models: `in_type = 3 × trivial_repr` — each band as a scalar 
 | True Non-Lens | 18,677 | 778 |
 | True Lens | 16 | 179 |
 
+**[Download the Weights](https://drive.google.com/file/d/10TKUpFJ36icQ6cOsqrG0G42QRUUk9CY6/view?usp=sharing)**
+
 ---
 
 ### 5.2 ResNet-34
@@ -420,6 +422,8 @@ ResNet-34 leads all individual models on AUC-ROC, AUC-PR, and fewest false posit
 Its Brier score (0.0089) falls below the trivial 0.0099 baseline — the only model
 where this holds. This is noted but does not imply good calibration under this imbalance.
 
+**[Download the Weights](https://drive.google.com/file/d/1M54eKgVRNA-VeMJwaTgcjBBsUdpTlkoS/view?usp=sharing)**
+
 ---
 
 ### 5.3 DenseNet-121
@@ -466,6 +470,9 @@ where this holds. This is noted but does not imply good calibration under this i
 DenseNet-121 achieves the second-best AUC-PR among pretrained models at the smallest
 parameter count. Its τ* = 0.136 — the lowest among pretrained models — reflects
 score compression toward low values; calibration curve should be consulted directly.
+
+**[Download the Weights](https://drive.google.com/file/d/1zgaB7eO4XPsJfnw2uXVLey-zJa9AEP20/view?usp=sharing)**
+
 
 ---
 
@@ -530,6 +537,8 @@ All downsampling therefore uses `enn.PointwiseAvgPool + stride-1 conv` in both t
 On AUC-ROC (0.9840) E-ResNet D₄ is close to DenseNet-121 (0.9844) at 13.5× fewer
 parameters. On AUC-PR (0.6963) it has the lowest score of any model — the equivariance
 efficiency advantage does not hold on this metric.
+
+**[Download the Weights](https://drive.google.com/file/d/14wBi5-Sbvvvxh0IWWBPVjdsvSQwzJfG0/view?usp=sharing)**
 
 ---
 
@@ -598,6 +607,8 @@ EqDenseNet-C8's τ* = 0.055 — the lowest in the benchmark — means any sample
 score 0.055 is flagged as a lens. This produces the highest recall (96.4%) and fewest
 missed lenses (FN=7), but also the most false positives (1,109). High recall and high
 FP count are the direct consequence of operating at this threshold.
+
+**[Download the Weights](https://drive.google.com/file/d/1-cVDhdOgpiCWsTtnXpYe3fgPetibX_1Y/view?usp=sharing)**
 
 ---
 
