@@ -1088,7 +1088,7 @@ second-stage classifier on flagged candidates could suppress FP further.
 
 ---
 
-## 11. GSoC 2026 Research Directions
+## 11. ML4SCI DeepLense 2026 Research Directions
 
 **Direction 1 — Equivariant Lens Finding on Multi-Band Real Data**
 
