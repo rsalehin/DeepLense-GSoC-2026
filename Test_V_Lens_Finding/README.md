@@ -166,8 +166,8 @@ PR-AUC random baseline throughout.
 
 <p align="center">
   <img src="assets/eda_samples.png" alt="HSC sample images: lenses and non-lenses across g, r, i bands" width="95%"/>
-  <br><em>Figure 2.1 — Representative 64×64 HSC images for lens (top rows) and non-lens
-  (bottom rows) classes, shown across g, r, and i bands. At this resolution, PSF
+  <br><em>Figure 2.1 — Representative 64×64 HSC images for lens (top 3 rows) and non-lens
+  (bottom 3 rows) classes, shown across g, r, and i bands. At this resolution, PSF
   convolution suppresses resolved arc geometry in most cases. What remains is a radial
   brightness gradient around the central source — the primary discriminative signal.
   Several non-lenses (compact isolated sources, galaxy pairs) are morphologically
@@ -283,11 +283,21 @@ interpolation and samples continuous angles — not genuine D₄ and not lossles
 `torch.rot90` is an exact index permutation; unique value count before and after
 augmentation is identical (10,625 = 10,625 ✓).
 
+### What Each Split Is Used For
+
+**Train** — the only data the model sees gradients from. Served via `WeightedRandomSampler` to produce ~50:50 batches per step.
+
+**Val** — two roles, both completed before the test set is ever accessed:
+- **Checkpoint selection:** val AUC-ROC is computed after every epoch. Weights are saved when val AUC improves by `> min_delta = 1e-4`. Early stopping fires after no improvement for `patience` epochs (10 for pretrained models, 15 for equivariant models).
+- **Threshold derivation:** once training ends, the best checkpoint is run on val to compute Youden's J (argmax TPR − FPR). This produces τ*, which is then fixed.
+
+**Test** — touched exactly once. The best-checkpoint weights and the val-derived τ* are both applied unchanged. No thresholds, hyperparameters, or architectural decisions are revisited here.
+
 ### 4.2 Key Design Decisions
 
 | Decision | Choice | Rationale |
 |:---------|:------:|:----------|
-| Optimiser | AdamW (wd=1e-3) | — |
+| Optimiser | AdamW (wd=1e-3) | Standard Default |
 | Scheduler | CosineAnnealingLR | Smooth LR decay |
 | Loss | **Focal Loss (γ=2, α=0.5)** | γ down-weights easy negatives; α=0.5 avoids double-compensation |
 | Batch balancing | WeightedRandomSampler (~50:50) | Stable gradient signal with 1,557 train lenses |
@@ -309,6 +319,15 @@ augmentation is identical (10,625 = 10,625 ✓).
 | Brier score | Completeness only — dominated by majority class under this imbalance |
 | **Youden τ*** | argmax(TPR − FPR) from **val set**, applied fixed to test |
 | **FP / FN counts** | Absolute operational cost; rates alone mislead at 99.8:1 |
+
+### Metric Categories
+
+This distinction matters for interpreting results:
+
+| Metric | Depends on τ*? | Notes |
+|:-------|:--------------:|:------|
+| AUC-ROC, AUC-PR | No | Threshold-free; clean test-set measurements |
+| Sensitivity, Specificity, FP/FN, Precision@τ* | Yes | τ* derived on val, applied fixed to test — no leakage |
 
 ---
 
