@@ -26,10 +26,8 @@ Each test is self-contained with its own notebook, assets, and requirements.*
 | Test | Topic | Task Summary | Evaluation Metrics | Status |
 |:----:|:------|:-------------|:-------------------|:------:|
 | [**I**](Test_I_Classification/) | Multi-Class Classification | Classify strong lensing images into three dark matter substructure classes | ROC · AUC | ✅ |
-| [**V**](Test_V_Lens_Finding/) | Lens Finding & Data Pipelines | Binary classification of lensed vs non-lensed galaxies from observational data | ROC · AUC | 🔄 |
+| [**V**](Test_V_Lens_Finding/) | Lens Finding & Data Pipelines | Binary classification of lensed vs non-lensed galaxies from observational data | ROC · AUC | ✅ |
 | [**VI**](Test_VI_Super_Resolution/) | Image Super-Resolution | Upscale low-resolution lensing images; adapt to real HSC/HST data | MSE · SSIM · PSNR | 🔄 |
-| [**VII**](Test_VII_Physics_Guided_ML/) | Physics-Guided ML | PINN-based lens classifier incorporating the gravitational lensing equation | ROC · AUC | 🔄 |
-| [**IX**](Test_IX_Foundation_Model/) | Foundation Model | MAE pre-training on lensing images + fine-tuning for classification and super-resolution | ROC · AUC · MSE · SSIM · PSNR | 🔄 |
 
 ---
 
@@ -61,21 +59,7 @@ DeepLense-GSoC-2026/
 │   ├── requirements.txt
 │   └── assets/
 │       └── figures/
-│
-├── Test_VII_Physics_Guided_ML/
-│   ├── README.md
-│   ├── Test_VII_Physics_Guided_ML.ipynb
-│   ├── requirements.txt
-│   └── assets/
-│       └── figures/
-│
-└── Test_IX_Foundation_Model/
-    ├── README.md
-    ├── Test_IX_A_MAE_Classification.ipynb
-    ├── Test_IX_B_MAE_SuperResolution.ipynb
-    ├── requirements.txt
-    └── assets/
-        └── figures/
+
 ```
 
 ---
@@ -109,23 +93,6 @@ Deep learning super-resolution pipeline (e.g. EDSR, SRGAN, or SwinIR backbone). 
 
 → [Full details](Test_VI_Super_Resolution/README.md)
 
----
-
-### Test VII — Physics-Guided ML
-> **Dataset:** Same three-class lensing dataset as Test I.
-
-Physics-Informed Neural Network (PINN) incorporating the gravitational lensing equation as an explicit architectural or loss constraint. The lens equation acts as a differentiable physical prior, penalising predictions inconsistent with smooth macro-lens deflection. Performance benchmarked against the Test I baseline.
-
-→ [Full details](Test_VII_Physics_Guided_ML/README.md)
-
----
-
-### Test IX — Foundation Model
-> **Task IX.A:** MAE pre-training on No Substructure images → fine-tune for 3-class classification. **Task IX.B:** Fine-tune the same MAE backbone for super-resolution.
-
-Masked Autoencoder pre-training builds a general-purpose feature representation of strong lensing images from unlabelled data. Task IX.B investigates whether the same representation transfers to the pixel-reconstruction objective of super-resolution — probing the universality of lensing image features learned via self-supervision.
-
-→ [Full details](Test_IX_Foundation_Model/README.md)
 
 ---
 
