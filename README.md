@@ -66,21 +66,65 @@ DeepLense-GSoC-2026/
 
 ##  Test Summaries
 
-### Test I — Multi-Class Classification
-> **Dataset:** 30,000 simulated strong lensing images (150×150, single-channel) across three balanced classes — No Substructure, CDM Subhalo (Sphere), and Axion Vortex.
+### Test I — Multi-Class Dark Matter Substructure Classification
 
-Nine architectures evaluated: ResNet-18, ResNet-50, DenseNet-121, EfficientNet-B3, AlexNet, VGG-16, ViT-Base/16, Equivariant-D4, and E-ResNet. Includes comprehensive interpretability analysis (Grad-CAM, Attention Rollout, deep ensemble uncertainty), failure mode analysis, ablation study, equivariance verification, and a residual image approach via convolutional autoencoder.
+> **Dataset:** 30,000 simulated strong lensing images (150×150,
+> single-channel) across three balanced classes — No Substructure,
+> CDM Subhalo (Sphere), and Axion Vortex.
 
-**Best result:** DenseNet-121 — Macro AUC **0.9962**, Sphere Recall **0.9364**
+Eleven architectures benchmarked: AlexNet, VGG-16, ResNet-18,
+ResNet-50, DenseNet-121, EfficientNet-B3, ViT-Base/16,
+Equivariant-D4, E-ResNet D₄, EqDenseNet-C8, and a Top-6
+soft-vote ensemble. Includes GradCAM and Attention Rollout
+interpretability, deep ensemble uncertainty decomposition,
+failure mode analysis, ablation study, equivariance verification
+via `in_type.transform`, and a residual-image approach via
+convolutional autoencoder.
+
+| Rank | Model | Params | Macro AUC | Sphere AUC | Sphere PR-AUC |
+|:----:|:------|-------:|:---------:|:----------:|:-------------:|
+| 1 | EqDenseNet-C8 | 0.10M | **0.9973** | 0.9955 | 0.9932 |
+| 2 | Ensemble-Top6 | — | 0.9970 | 0.9948 | 0.9923 |
+| 3 | DenseNet-121 | 7.0M | 0.9962 | 0.9937 | 0.9903 |
+| 4 | E-ResNet D₄ | 0.4M | 0.9952 | 0.9918 | 0.9871 |
+| 5 | ResNet-50 | 23.5M | 0.9946 | 0.9909 | 0.9862 |
+
+**Best individual result:** EqDenseNet-C8 — Macro AUC **0.9973**,
+Sphere PR-AUC **0.9932**, at only 0.10M parameters.
 
 → [Full details](Test_I_Classification/README.md)
 
 ---
 
-### Test V — Lens Finding & Data Pipelines
-> **Dataset:** Observational data of strong lenses and non-lensed galaxies. 3-channel (64×64) images. Highly imbalanced — non-lenses significantly outnumber lenses.
+### Test V — Gravitational Lens Finding on Real HSC Observational Data
 
-Binary classification under class imbalance. Strategy includes imbalance-aware training (focal loss / weighted sampling), multi-channel feature exploitation, and threshold optimisation for deployment-relevant precision-recall trade-offs.
+> **Dataset:** Real Hyper Suprime-Cam (HSC) survey cutouts.
+> 3-channel (g, r, i), 64×64 pixels. Test imbalance: 99.8:1
+> (195 lenses / 19,455 non-lenses).
+
+Binary lens/non-lens classification under severe class imbalance.
+Pipeline includes Focal Loss, WeightedRandomSampler,
+PR-AUC-first evaluation, Youden's J threshold selection,
+post-hoc Platt scaling calibration, GradCAM interpretability,
+and algebraic equivariance verification. Three silent `escnn`
+implementation errors identified and corrected.
+
+| Rank | Model | Params | AUC-ROC | AUC-PR | Sens@τ* |
+|:----:|:------|-------:|:-------:|:------:|:-------:|
+| 1 | Soft-Ensemble | — | **0.9905** | **0.8233** | 0.9487 |
+| 2 | ResNet-34 | 21.3M | 0.9881 | 0.7851 | 0.9026 |
+| 3 | EqDenseNet-C8 | 0.18M | 0.9872 | 0.7728 | **0.9641** |
+| 4 | DenseNet-121 | 6.95M | 0.9844 | 0.7632 | 0.9282 |
+| 5 | E-ResNet D₄ | 0.51M | 0.9840 | 0.6963 | 0.9333 |
+| 6 | EfficientNet-B2 | 7.70M | 0.9790 | 0.7087 | 0.9179 |
+
+**Best ensemble:** AUC-ROC **0.9905**, AUC-PR **0.8233**
+(83× above the random PR baseline of 0.010).
+**Best individual by sensitivity:** EqDenseNet-C8 — FN = 7
+(missed only 7 out of 195 lenses), at 0.18M parameters
+trained entirely from scratch.
+All five individual models exceed the best prior DeepLense
+HSC baseline (AUC-ROC 0.816) by more than 0.16 AUC points.
 
 → [Full details](Test_V_Lens_Finding/README.md)
 
