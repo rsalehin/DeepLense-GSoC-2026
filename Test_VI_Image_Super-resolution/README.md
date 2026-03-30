@@ -518,3 +518,571 @@ All checkpoints available on Google Drive:
 <div align="center">
 <sub>ML4SCI DeepLense · GSoC 2026 · Rafiqus Salehin</sub>
 </div>
+
+<div align="center">
+
+# Test VI.B — Sim-to-Real Super-Resolution Transfer
+
+### ML4SCI DeepLense · GSoC 2026
+
+**Rafiqus Salehin** · [@rsalehin](https://github.com/rsalehin)
+
+[![ML4SCI](https://img.shields.io/badge/ML4SCI-DeepLense-blue?style=flat-square)](https://ml4sci.org)
+[![GSoC](https://img.shields.io/badge/GSoC-2026-4285F4?style=flat-square&logo=google&logoColor=white)](https://summerofcode.withgoogle.com)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)](https://pytorch.org)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](../LICENSE)
+
+<br>
+
+*Domain adaptation from simulated to real telescope data. Four fine-tuning strategies evaluated on 300 real HSC/HST gravitational lensing pairs with only 240 training examples. First quantification of the SR domain gap within DeepLense: simulated ceiling 0.977 → zero-shot collapse 0.471 → fine-tuned recovery 0.899.*
+
+</div>
+
+---
+
+## Table of Contents
+
+- [Task Description](#task-description)
+- [Dataset](#dataset)
+  - [Domain Gap Analysis](#domain-gap-analysis)
+  - [Pixel Distributions and SNR](#pixel-distributions-and-snr)
+  - [LR Registration](#lr-registration)
+  - [Sealed Split](#sealed-split)
+- [Pipeline Overview](#pipeline-overview)
+- [Classical and Zero-Shot Baselines](#classical-and-zero-shot-baselines)
+- [Fine-Tuning Strategies](#fine-tuning-strategies)
+  - [Strategy A — Full Fine-Tune](#strategy-a--full-fine-tune)
+  - [Strategy B — Head-Only Fine-Tune](#strategy-b--head-only-fine-tune)
+  - [Strategy C — Progressive Unfreezing](#strategy-c--progressive-unfreezing)
+  - [Strategy D — From-Scratch](#strategy-d--from-scratch)
+  - [Strategy Comparison](#strategy-comparison)
+- [Ablations](#ablations)
+  - [Augmentation Ablation](#augmentation-ablation)
+  - [Loss Function Ablation](#loss-function-ablation)
+- [Final Test Results](#final-test-results)
+- [Qualitative Analysis](#qualitative-analysis)
+- [Scientific Discussion](#scientific-discussion)
+- [Reproducibility](#reproducibility)
+- [References](#references)
+
+---
+
+## Task Description
+
+Adapt and fine-tune the EDSR model from Test VI.A to enhance real low-resolution lensing images using a limited dataset of HSC/HST telescope pairs. The task is fundamentally **cross-instrument image translation** — not classical degradation SR. LR images come from the ground-based Hyper Suprime-Cam (HSC); HR ground truths are space-based Hubble Space Telescope (HST) observations of the same fields.
+
+**Evaluation metrics:** MSE ↓ · PSNR ↑ · SSIM ↑ · Bootstrap 95% CI (n=1,000)
+
+**Key constraint:** 300 total pairs — 240 training · 30 val · 30 test (sealed)
+
+---
+
+## Dataset
+
+| Property | VI.B (real HSC/HST) | VI.A (simulated, reference) |
+|---|---|---|
+| Pairs | 300 | 10,000 |
+| HR shape | `(1, 128, 128)`, float32 | `(1, 150, 150)`, float64 |
+| LR shape | `(1, 64, 64)`, float32 | `(1, 75, 75)`, float64 |
+| Scale factor | 2× | 2× |
+| HR range (raw) | [−0.048, 1.109] | [0.000, 1.000] |
+| LR range (raw) | [−0.031, 1.080] | [~0.000, ~1.014] |
+| Normalisation | Per-image min-max (both HR and LR) | HR as-is · LR per-image |
+
+Three immediate dataset findings:
+1. **HR is 128×128, not 150×150.** EDSR is fully convolutional — no architecture change needed.
+2. **Neither HR nor LR is pre-normalised.** Raw values represent calibrated surface brightness in telescope units. Per-image min-max normalisation is required for both.
+3. **float32 throughout.** No dtype cast needed in `__getitem__`.
+
+### Domain Gap Analysis
+
+<br>
+
+<div align="center">
+  <img src="assets/1_2_domain_gap.png" width="92%" alt="VI.B real HSC/HST pairs — 3 samples: HR, LR normalised, LR bicubic"/>
+  <br>
+  <sub><b>Figure 1.</b> Three representative HSC/HST pairs: HR (HST, ground truth) | LR (HSC, raw normalised) | LR bicubic upsampled. HR is space-based — clean dark background, compact PSF. LR is ground-based — elevated noisy background, broader PSF. Bicubic merely smooths the noise; any model that outperforms it must simultaneously denoise and sharpen the PSF.</sub>
+</div>
+
+<br>
+
+<div align="center">
+  <img src="assets/1_2_vib_survey.png" width="85%" alt="Visual survey of first 9 VI.B HR images (HST)"/>
+  <br>
+  <sub><b>Figure 2.</b> First 9 HR images (HST, normalised for display) with raw value ranges. Morphological complexity varies: point sources, companion galaxies, and diffuse arc structures are all present.</sub>
+</div>
+
+<br>
+
+<div align="center">
+  <img src="assets/1_2_hr_lr_relationship.png" width="85%" alt="HR/LR relationship check: are HR and LR the same image?"/>
+  <br>
+  <sub><b>Figure 3.</b> HR/LR relationship verification. MSE between downsampled HR and LR is large — confirming these are <b>independent telescope observations</b>, not a classical LR = downsample(HR) pair. This is the defining characteristic of the VI.B cross-instrument translation task.</sub>
+</div>
+
+<br>
+
+### Pixel Distributions and SNR
+
+<br>
+
+<div align="center">
+  <img src="assets/1_3_pixel_distributions.png" width="92%" alt="VI.B pixel distributions: HR (HST) vs LR (HSC) across all 300 pairs"/>
+  <br>
+  <sub><b>Figure 4.</b> Pixel distributions (left: histogram, right: CDF) for VI.B HR and LR across all 300 pairs. The horizontal CDF separation is the systematic brightness offset the SR model must correct.</sub>
+</div>
+
+<br>
+
+| | mean | std | median | >0.5 (%) |
+|---|---|---|---|---|
+| VI.B HR (HST) | 0.0329 | 0.0552 | 0.0177 | 0.25% |
+| VI.B LR (HSC) | 0.0995 | 0.0928 | 0.0749 | 0.80% |
+
+HSC background is **3× higher** than HST. The SR task must simultaneously suppress the elevated noise floor, correct the PSF, and recover spatial resolution — three tasks that VI.A's simulated training never required.
+
+<br>
+
+<div align="center">
+  <img src="assets/1_4_snr.png" width="92%" alt="SNR distributions: VI.B HR vs LR, and HR/LR ratio"/>
+  <br>
+  <sub><b>Figure 5.</b> Left: HR (HST) vs LR (HSC) SNR distributions across 300 pairs. Right: HR/LR SNR ratio — right-skewed with a tail reaching 4.6×, representing the hardest cases where the model must recover signal from near-noise input.</sub>
+</div>
+
+<br>
+
+| | Mean | Std | Range |
+|---|---|---|---|
+| VI.B HR (HST) | 20.32 | 8.00 | [6.6, 69.3] |
+| VI.B LR (HSC) | 12.52 | 6.10 | [6.4, 78.1] |
+| HR/LR ratio | **1.74×** | — | [~1×, 4.60×] |
+
+HST SNR is 1.74× higher than HSC on average. VI.B is therefore also a **SNR enhancement task**, unlike VI.A where HR and LR have nearly identical SNR (~13.4).
+
+### LR Registration
+
+VI.B LR (HSC) and HR (HST) are independent telescope pointings. Small translational offsets from pointing differences are corrected via phase correlation — a per-pair operation with no cross-split statistics (leak-safe).
+
+<br>
+
+<div align="center">
+  <img src="assets/2_3_registered_pairs_survey.png" width="75%" alt="Registered pairs survey: 9 random training samples"/>
+  <br>
+  <sub><b>Figure 6.</b> Nine random training pairs after registration: HR (HST) | LR registered (HSC) | LR bicubic upsampled. Registration corrects rigid translation; PSF and background differences remain. Shift labels show the estimated offset per pair.</sub>
+</div>
+
+<br>
+
+**Shift clipping:** 27/300 pairs produced spurious phase correlation peaks (|shift| > 5 px HR coords). These were reset to zero shift — conservative fallback, no registration is better than a wrong registration.
+
+| | Before clipping | After clipping |
+|---|---|---|
+| Pairs clipped | — | 27 / 300 |
+| Shift magnitude mean | 4.64 px | 1.04 px |
+| Shift magnitude max | 81.47 px | 5.00 px |
+| Non-zero shifts applied | — | 178 / 300 |
+
+Also see registration quality check:
+
+<br>
+
+<div align="center">
+  <img src="assets/2_2_registration_quality.png" width="92%" alt="Registration quality check: 4 training pairs showing HR and absolute difference"/>
+  <br>
+  <sub><b>Figure 7.</b> Registration quality check on 4 training pairs: HR (top) and |HR − LR_reg↑| (bottom). Residual errors are dominated by PSF mismatch rather than translational offset — confirming phase correlation successfully corrects the pointing shift.</sub>
+</div>
+
+<br>
+
+### Sealed Split
+
+| Split | Count | Purpose |
+|---|---|---|
+| Train | 240 | Fine-tuning all strategies |
+| Val | 30 | Model selection and ablations |
+| **Test** | **30** | **Final evaluation only — § 7** |
+
+Split fixed by `np.random.default_rng(42)`. Overlap checks passed ✓.
+
+> **Integrity rule:** `test_hr` and `test_lr` are not passed to any model, loss function, normalisation routine, or metric computation until the final evaluation. All model selection decisions in §§ 5–6 are made on the val set exclusively.
+
+---
+
+## Pipeline Overview
+
+```
+Raw LR (64×64, float32)  +  Raw HR (128×128, float32)
+      │
+      ▼
+Per-image norm01 on both HR and LR independently
+      │
+      ▼
+Phase correlation registration (per-pair, no cross-split leakage)
+      │
+      ▼
+VIBDataset
+  ├── Patch mode  : random 32×32 LR / 64×64 HR crops  (training)
+  └── Full-image  : full 64×64 LR / 128×128 HR         (val / test)
+      │
+      ▼
+D4 augmentation + photometric jitter (LR) + Gaussian noise (LR)
+      │
+      ▼
+EDSR  →  PixelShuffle ×2  →  SR output (128×128)
+      │
+      ▼
+Loss: L1 + 0.1 × (1 − SSIM)
+      │
+      ▼
+Evaluation: MSE · PSNR · SSIM · Bootstrap 95% CI (n=1,000)
+```
+
+**DataLoader configuration:**
+
+| Loader | Batch size | Mode | Augmentation |
+|---|---|---|---|
+| train | 8 | Patch 64×64 HR | D4 + jitter + noise |
+| val | 4 | Full image | Off |
+| test | 1 | Full image | Off |
+
+**Augmentation pipeline:**
+- **D4 symmetries** (8 transforms): justified by azimuthal symmetry of gravitational lensing geometry
+- **Photometric jitter** (±5% brightness, ±3% contrast, LR only): accounts for HSC calibration uncertainty
+- **Gaussian noise** (σ ~ U[0.005, 0.02], LR only): regularises against HSC detector noise mismatch
+
+---
+
+## Classical and Zero-Shot Baselines
+
+All classical baselines evaluated on **val set only** (test set sealed).
+
+| Model | MSE | PSNR (dB) | SSIM |
+|---|---|---|---|
+| VI.A EDSR-FullImg (simulated ref.) | 0.000067 | 41.840 | 0.9768 |
+| — | — | — | — |
+| Bicubic | 0.010041 ± 0.013469 | 22.421 ± 4.615 | 0.3509 ± 0.2124 |
+| Lanczos | 0.010084 ± 0.013563 | 22.415 ± 4.626 | 0.3470 ± 0.2130 |
+| Richardson-Lucy (σ=2.0) | 0.011084 ± 0.014572 | 21.798 ± 4.284 | 0.3321 ± 0.2102 |
+| Zero-shot EDSR | 0.009508 ± 0.012546 | 22.712 ± 4.749 | 0.3655 ± 0.2044 |
+
+**Sim-to-real SSIM drop: 0.9768 → 0.3655 (Δ = −0.611)**
+
+The VI.A EDSR applied zero-shot achieves only +0.015 SSIM over bicubic. Richardson-Lucy underperforms bicubic (−0.019 SSIM) — classical PSF deconvolution cannot address simultaneous sky background suppression, noise removal, and resolution enhancement. All four methods cluster between SSIM 0.33–0.37, confirming the task cannot be solved without real paired data.
+
+---
+
+## Fine-Tuning Strategies
+
+All strategies use: CombinedLoss (L1 + 0.1·SSIM) · CosineAnnealingLR · patience=15 · A100 GPU.
+
+### Strategy A — Full Fine-Tune
+
+| | |
+|---|---|
+| Init | `edsr_fullimage.pth` (VI.A best) |
+| Frozen layers | None |
+| Learning rate | 1e-5 |
+| Epochs run | 42 / 50 (early stopping) |
+| Best epoch | 27 |
+| Best val SSIM | **0.8220** |
+
+<br>
+
+<div align="center">
+  <img src="assets/5_1_stratA_curves.png" width="85%" alt="Strategy A training curves: train loss and val SSIM"/>
+  <br>
+  <sub><b>Figure 8.</b> Strategy A training curves. Val SSIM 0.399 → 0.822 over 27 epochs — the model escapes domain collapse in the first 5 epochs by rapidly learning the VI.B intensity regime, then refines slowly. The curve plateaus from epoch 10 onward.</sub>
+</div>
+
+<br>
+
+### Strategy B — Head-Only Fine-Tune
+
+| | |
+|---|---|
+| Init | `edsr_fullimage.pth` (VI.A best) |
+| Frozen layers | head + body (1,219,264 params frozen) |
+| Unfrozen | tail only (148,289 trainable params) |
+| Learning rate | 1e-4 |
+| Epochs run | 25 / 30 (early stopping) |
+| Best epoch | 10 |
+| Best val SSIM | **0.8042** |
+
+<br>
+
+<div align="center">
+  <img src="assets/5_2_stratB_curves.png" width="85%" alt="Strategy B training curves"/>
+  <br>
+  <sub><b>Figure 9.</b> Strategy B training curves. Peaks at epoch 10 then degrades — the frozen body cannot adapt its feature representations to VI.B real telescope statistics, and the tail alone lacks capacity to compensate.</sub>
+</div>
+
+<br>
+
+### Strategy C — Progressive Unfreezing
+
+| Stage | Trainable params | lr | Epochs | Best epoch | Best val SSIM |
+|---|---|---|---|---|---|
+| 1 — tail only | 148,289 | 1e-4 | 20 | 10 | 0.8024 |
+| 2 — tail + body top-8 | 776,065 | 5e-5 | 15 | 7 | **0.8237** |
+| 3 — full network | 1,367,553 | 1e-5 | 15 | 9 | 0.8225 |
+
+Overall best: Stage 2, epoch 7 — saved as `edsr_vib_stratC_s2.pth`.
+
+<br>
+
+<div align="center">
+  <img src="assets/5_3_stratC_curves.png" width="85%" alt="Strategy C progressive unfreezing: combined 3-stage val SSIM curve"/>
+  <br>
+  <sub><b>Figure 10.</b> Strategy C — combined 3-stage val SSIM curve. Grey dashed lines mark stage boundaries. Stage 2 (unfreezing top-8 body blocks) provides the largest gain (+0.021 SSIM) — these layers encode higher-level features that must adapt to VI.B real telescope statistics. Stage 3 provides no further improvement.</sub>
+</div>
+
+<br>
+
+### Strategy D — From-Scratch
+
+| | |
+|---|---|
+| Init | Random (no VI.A pretraining) |
+| Learning rate | 1e-4 |
+| Epochs run | 32 / 100 (early stopping) |
+| Best epoch | 17 |
+| Best val SSIM | **0.8263** |
+
+<br>
+
+<div align="center">
+  <img src="assets/5_4_stratD_curves.png" width="85%" alt="Strategy D from-scratch training curves"/>
+  <br>
+  <sub><b>Figure 11.</b> Strategy D training curves. From-scratch achieves val SSIM 0.826 in only 17 epochs — faster convergence than fine-tuning strategies, suggesting VI.A priors may actively conflict with VI.B's real telescope statistics.</sub>
+</div>
+
+<br>
+
+### Strategy Comparison
+
+<br>
+
+<div align="center">
+  <img src="assets/5_5_strategy_comparison.png" width="92%" alt="All four strategies val SSIM overlay"/>
+  <br>
+  <sub><b>Figure 12.</b> Val SSIM overlay for all four strategies. Strategy D wins on val (0.826), but val/test rank reversal occurs on the sealed test set. Strategies A, C, D are statistically indistinguishable given the 30-image val set noise floor (per-image SSIM std ≈ 0.20).</sub>
+</div>
+
+<br>
+
+| Strategy | Val SSIM | Best epoch | Epochs run |
+|---|---|---|---|
+| A — full fine-tune | 0.8220 | 27 | 42 |
+| B — head-only | 0.8042 | 10 | 25 |
+| C — progressive | 0.8237 | 7 (Stage 2) | 50 total |
+| **D — from-scratch** | **0.8263** | 17 | 32 |
+
+**Strategy D wins on val despite no pretraining.** Three explanations: VI.A priors (Gaussian PSF, near-zero background, bounded [0,1]) conflict with VI.B real telescope statistics; cross-instrument translation is a fundamentally different task from degradation SR; and at 30 val images, D and C are separated by only 0.003 SSIM — within sampling noise. **Model selection for § 6 ablations: Strategy D.**
+
+---
+
+## Ablations
+
+### Augmentation Ablation
+
+Strategy D retrained under 4 augmentation configs on val set only.
+
+<br>
+
+<div align="center">
+  <img src="assets/6_1_aug_ablation.png" width="85%" alt="Augmentation ablation val SSIM curves"/>
+  <br>
+  <sub><b>Figure 13.</b> Augmentation ablation — val SSIM curves for all four configs. All cluster within 0.002 SSIM. With only 240 training pairs, augmentation choice is not the binding constraint.</sub>
+</div>
+
+<br>
+
+| Config | Val SSIM | Best epoch |
+|---|---|---|
+| D4 only | 0.8273 | 9 |
+| D4 + patch | 0.8271 | 30 |
+| D4 + patch + jitter | **0.8289** | 17 |
+| D4 + patch + jitter + noise | 0.8271 | 30 |
+
+All four configs cluster within 0.002 SSIM — statistically indistinguishable on a 30-image val set. **D4 augmentation alone matches the full stack.** The 240-pair dataset is too small to overfit to specific noise patterns, making additional augmentation redundant.
+
+### Loss Function Ablation
+
+Strategy D retrained under 4 loss configs on val set only. Motivated by Pranath Reddy (GSoC 2023, perceptual loss) and Anirudh Shankar (GSoC 2024, VDL/TV loss).
+
+<br>
+
+<div align="center">
+  <img src="assets/6_2_loss_ablation.png" width="85%" alt="Loss function ablation val SSIM curves"/>
+  <br>
+  <sub><b>Figure 14.</b> Loss function ablation — val SSIM curves for L1, L1+SSIM, L1+SSIM+Perceptual, and L1+SSIM+TV. All four converge to identical val SSIM within 0.0004.</sub>
+</div>
+
+<br>
+
+| Loss config | Val SSIM | Best epoch |
+|---|---|---|
+| L1 only | 0.8271 | 30 |
+| L1 + SSIM | 0.8271 | 30 |
+| L1 + SSIM + Perceptual | **0.8275** | 30 |
+| L1 + SSIM + TV | 0.8271 | 30 |
+
+**Loss function choice is irrelevant at this dataset scale.** With 240 pairs the bottleneck is data quantity, not loss formulation. Pranath Reddy's +1% SSIM from perceptual loss (GSoC 2023) was observed on a larger simulated dataset — it does not transfer to the real data-limited regime. **Selected for § 7:** L1 + SSIM (default, simplest, identical performance).
+
+---
+
+## Final Test Results
+
+Sealed test set (30 images) evaluated once. All metrics include bootstrap 95% CIs (n=1,000).
+
+| Model | SSIM | 95% CI | PSNR (dB) | 95% CI | MSE |
+|:------|-----:|-------:|----------:|-------:|----:|
+| Bicubic | 0.4624 | [0.401, 0.532] | 25.871 | [24.41, 27.48] | 0.00395 |
+| Lanczos | 0.4595 | [0.398, 0.529] | 25.881 | [24.42, 27.50] | 0.00395 |
+| Richardson-Lucy | 0.4520 | [0.389, 0.522] | 25.049 | [23.75, 26.51] | 0.00446 |
+| Zero-shot EDSR | 0.4712 | [0.410, 0.538] | 26.322 | [24.77, 28.08] | 0.00372 |
+| Strategy B (head-only) | 0.8762 | [0.831, 0.912] | 32.054 | [31.30, 32.68] | 0.00070 |
+| Strategy D (from-scratch) | 0.8878 | [0.843, 0.926] | 34.350 | [33.24, 35.28] | 0.00047 |
+| Strategy A (full FT) | 0.8969 | [0.858, 0.929] | 35.742 | [34.56, 36.84] | 0.00036 |
+| **Strategy C (progressive)** | **0.8991** | **[0.862, 0.930]** | **35.959** | **[34.80, 37.05]** | **0.00034** |
+| VI.A EDSR-FullImg (simulated ref.) | 0.9768 | — | 41.840 | — | 0.00007 |
+
+**Three-point domain gap measurement:**
+
+| | SSIM | Δ |
+|---|---|---|
+| Simulated ceiling (VI.A) | 0.9768 | — |
+| Zero-shot collapse | 0.4712 | −0.5056 |
+| Fine-tuned recovery (Strategy C) | 0.8991 | +0.4279 |
+| Remaining gap to simulated | — | −0.0777 |
+
+**Key findings:**
+
+1. **Val/test rank reversal.** Strategy D won val (0.826) but ranks third on test (0.888). Strategy C wins test (0.899) despite ranking second on val. With 30-image splits, strategies A, C, D have overlapping CIs and are statistically indistinguishable.
+
+2. **All fine-tuned models escape the domain gap.** Jump from zero-shot (0.471) to the weakest fine-tuned model (Strategy B, 0.876) is +0.405 SSIM — 240 real pairs are sufficient to recover from catastrophic domain collapse.
+
+3. **Strategy C is the recommended model.** Progressive unfreezing provides the best regularisation on real limited data, achieving test SSIM 0.8991 and recovering 92% of the simulated performance ceiling.
+
+---
+
+## Qualitative Analysis
+
+<br>
+
+<div align="center">
+  <img src="assets/8_1_qualitative.png" width="100%" alt="Qualitative comparison: 4 test images across HR, LR, Bicubic, Zero-shot, Strategy C"/>
+  <br>
+  <sub><b>Figure 15.</b> Four test images selected by Strategy C SSIM rank (best, median, worst, random) × 5 columns: HR (HST) | LR (HSC) | Bicubic | Zero-shot | Strategy C. Strategy C produces near-clean HST-like images in the best and median cases. The worst case (SSIM=0.566) reveals a genuine astrometric misalignment — an extended diffuse arc visible in HR but absent in LR, which phase correlation cannot correct.</sub>
+</div>
+
+<br>
+
+<div align="center">
+  <img src="assets/8_2_difference_maps.png" width="92%" alt="Difference maps |HR - SR| for Zero-shot vs Strategy A vs Strategy C"/>
+  <br>
+  <sub><b>Figure 16.</b> Absolute difference |HR − SR| for Zero-shot, Strategy A, and Strategy C across the same 4 test images (hot colormap, bright = large error). Strategy C consistently achieves the lowest peak errors. Residual errors are spatially concentrated on source edges — not uniform noise.</sub>
+</div>
+
+<br>
+
+<div align="center">
+  <img src="assets/8_3_failure_cases.png" width="85%" alt="Failure cases where Strategy C underperforms Bicubic"/>
+  <br>
+  <sub><b>Figure 17.</b> Failure cases where Strategy C underperforms Bicubic on SSIM. The pattern is consistent: HR shows morphological structure (diffuse arcs, companion sources) that is entirely absent in the registered LR — the model cannot hallucinate physically real structure from near-noise input. These represent the hard performance floor of translation-only registration.</sub>
+</div>
+
+<br>
+
+---
+
+## Scientific Discussion
+
+### Sim-to-real gap decomposition
+
+The gap has two separable components. The dominant component is **distribution shift**: elevated HSC background (mean 0.0995 vs HST 0.0329), real telescope PSF, and uncalibrated intensity range drive the zero-shot SSIM collapse from 0.9768 to 0.4712 (Δ=−0.506). This is recoverable — all fine-tuning strategies escape it with 240 real pairs. The residual component is **astrometric misalignment**: phase correlation corrects rigid translation but not rotation, scale, or morphological differences. The worst test case (SSIM=0.566) exemplifies this irreducible hard floor.
+
+### Connection to DeepLense SR lineage
+
+**Anirudh Shankar (GSoC 2024)** achieved SSIM 0.819 on simulated HST-like data (Model 3) without any HR supervision. The VI.B supervised upper bound (SSIM 0.8991 from 240 real pairs) is the quantitative target that an unsupervised approach must approach on real data without paired supervision.
+
+**Atal Gupta (GSoC 2024)** achieved RCAN SSIM 0.890 on 2,834 simulated pairs (noise+blur degradation). VI.B matches this (SSIM 0.8991) on 240 real cross-instrument pairs — a harder task with **11.8× fewer training samples**.
+
+**Pranath Reddy (GSoC 2023)** showed perceptual loss gives ~+1% SSIM on simulated data. VI.B § 6b shows this does not transfer to the real data-limited regime.
+
+This work provides the **first three-point SR domain gap measurement within DeepLense:**
+
+| | SSIM |
+|---|---|
+| Simulated ceiling (VI.A) | 0.9768 |
+| Zero-shot collapse | 0.4712 (Δ = −0.506) |
+| Fine-tuned recovery (Strategy C) | 0.8991 (Δ = +0.428) |
+
+### Limitations
+
+1. **Registration is translation-only.** Phase correlation cannot correct rotation, scale, or optical distortion. 27/300 pairs received no correction; the worst test failures are dominated by morphological misalignment that survives registration.
+
+2. **Test set is 30 images.** Per-image SSIM std ≈ 0.20. Differences < 0.02 SSIM are not statistically reliable — the CI overlap between Strategies A, C, D confirms this.
+
+3. **Data quantity is the binding constraint.** Both augmentation and loss ablations (§ 6) show that no training protocol provides measurable benefit — 240 pairs saturate the learning signal.
+
+4. **Physical validity not evaluated.** Whether the HSC→HST mapping preserves arc positions, flux ratios, and Einstein ring geometry remains open.
+
+---
+
+## Reproducibility
+
+| | |
+|---|---|
+| Hardware | NVIDIA A100-SXM4-80GB (Google Colab) |
+| PyTorch | 2.10.0+cu128 |
+| CUDA | 12.8 |
+| Seed | 42 (fixed via `torch`, `numpy`, `np.random.default_rng`) |
+| Sealed split | `np.random.default_rng(42)` — deterministic, reproducible |
+
+**Strategy checkpoints:**
+
+| Checkpoint | Size | MD5 | Val SSIM | Description | Download |
+|---|---|---|---|---|---|
+| `edsr_vib_stratC_s2.pth` | 5.5 MB | 05447a50ba | 0.8237 | **Recommended** — Strategy C Stage 2 | — |
+| `edsr_vib_stratA.pth` | 5.5 MB | 1befedd194 | 0.8220 | Strategy A — full fine-tune | — |
+| `edsr_vib_stratD.pth` | 5.5 MB | e14478f028 | 0.8263 | Strategy D — from-scratch | — |
+| `edsr_vib_stratB.pth` | 5.5 MB | 842c16ee14 | 0.8042 | Strategy B — head-only | — |
+| `edsr_vib_stratC_s1.pth` | 5.5 MB | — | — | Strategy C Stage 1 (tail only) | — |
+| `edsr_vib_stratC.pth` | 5.5 MB | — | — | Strategy C Stage 3 (full network) | — |
+
+**Augmentation ablation checkpoints (Strategy D, from-scratch):**
+
+| Checkpoint | Config | Val SSIM | Download |
+|---|---|---|---|
+| `edsr_vib_aug_D4_plus_patch_plus_jitter.pth` | D4 + patch + jitter | **0.8289** | — |
+| `edsr_vib_aug_D4_only.pth` | D4 only | 0.8273 | — |
+| `edsr_vib_aug_D4_plus_patch.pth` | D4 + patch | 0.8271 | — |
+| `edsr_vib_aug_D4_plus_patch_plus_jitter_plus_noise.pth` | D4 + patch + jitter + noise | 0.8271 | — |
+
+**Loss ablation checkpoints (Strategy D, from-scratch):**
+
+| Checkpoint | Loss config | Val SSIM | Download |
+|---|---|---|---|
+| `edsr_vib_loss_L1_plus_SSIM_plus_Percept.pth` | L1 + SSIM + Perceptual | **0.8275** | — |
+| `edsr_vib_loss_L1_only.pth` | L1 only | 0.8271 | — |
+| `edsr_vib_loss_L1_plus_SSIM.pth` | L1 + SSIM | 0.8271 | — |
+| `edsr_vib_loss_L1_plus_SSIM_plus_TV.pth` | L1 + SSIM + TV | 0.8271 | — |
+
+---
+
+## References
+
+- Lim, B., Son, S., Kim, H., Nah, S., & Lee, K. M. (2017). "Enhanced Deep Residual Networks for Single Image Super-Resolution." *CVPRW*.
+- Richardson, W. H. (1972). "Bayesian-Based Iterative Method of Image Restoration." *JOSA*.
+- Shankar, A. (2024). "Physics-Informed Unsupervised Super-Resolution of Strong Lensing Images." *GSoC 2024, ML4SCI*.
+- Gupta, A. (2024). "Single Image Super-Resolution with Diffusion Models." *GSoC 2024, ML4SCI*.
+- Reddy, P. (2023). "Super-Resolution for Strong Gravitational Lensing." *GSoC 2023, ML4SCI*.
+- Alexander, S., Gleyzer, S., McDonough, E., Toomey, M. W., & Usai, E. (2020). "Deep Learning the Morphology of Dark Matter Substructure." *The Astrophysical Journal*.
+
+---
+
+<div align="center">
+<sub>ML4SCI DeepLense · GSoC 2026 · Rafiqus Salehin</sub>
+</div>
+
