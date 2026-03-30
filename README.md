@@ -27,7 +27,7 @@ Each test is self-contained with its own notebook, assets, and requirements.*
 |:----:|:------|:-------------|:-------------------|:------:|
 | [**I**](Test_I_Classification/) | Multi-Class Classification | Classify strong lensing images into three dark matter substructure classes | ROC · AUC | ✅ |
 | [**V**](Test_V_Lens_Finding/) | Lens Finding & Data Pipelines | Binary classification of lensed vs non-lensed galaxies from observational data | ROC · AUC | ✅ |
-| [**VI**](Test_VI_Super_Resolution/) | Image Super-Resolution | Upscale low-resolution lensing images; adapt to real HSC/HST data | MSE · SSIM · PSNR | 🔄 |
+| [**VI**](Test_VI_Image_Super-resolution/) | Image Super-Resolution | Upscale low-resolution lensing images; adapt to real HSC/HST data | MSE · SSIM · PSNR | 🔄 |
 
 ---
 
@@ -135,7 +135,7 @@ HSC baseline (AUC-ROC 0.816) by more than 0.16 AUC points.
 
 Deep learning super-resolution pipeline (e.g. EDSR, SRGAN, or SwinIR backbone). Task VI.B explores domain adaptation from simulated to real telescope data with limited labelled pairs.
 
-→ [Full details](Test_VI_Super_Resolution/README.md)
+→ [Full details](Test_VI_Image_Super-resolution/)
 
 
 ---
@@ -156,9 +156,7 @@ All experiments were run on **Google Colab (NVIDIA A100 GPU, high-memory runtime
 
 ##  Submission
 
-Submitted via the [ML4SCI Google Form](https://forms.gle/) · Deadline: **April 1, 2026**
-
-For project enquiries: [ml4-sci@cern.ch](mailto:ml4-sci@cern.ch) — *please include Project Title in subject*
+Submitted via the [ML4SCI Google Form](https://forms.gle/) 
 
 ---
 
