@@ -115,14 +115,14 @@ post-hoc Platt scaling calibration, GradCAM interpretability,
 and algebraic equivariance verification. Three silent `escnn`
 implementation errors identified and corrected.
 
-| Rank | Model | Params | AUC-ROC | AUC-PR | Sens@τ* |
-|:----:|:------|-------:|:-------:|:------:|:-------:|
-| 1 | Soft-Ensemble | — | **0.9905** | **0.8233** | 0.9487 |
-| 2 | ResNet-34 | 21.3M | 0.9881 | 0.7851 | 0.9026 |
-| 3 | EqDenseNet-C8 | 0.18M | 0.9872 | 0.7728 | **0.9641** |
-| 4 | DenseNet-121 | 6.95M | 0.9844 | 0.7632 | 0.9282 |
-| 5 | E-ResNet D₄ | 0.51M | 0.9840 | 0.6963 | 0.9333 |
-| 6 | EfficientNet-B2 | 7.70M | 0.9790 | 0.7087 | 0.9179 |
+| Rank | Architecture | Pretrained | Params (M) | AUC-ROC ↑ | AUC-PR ↑ | Sens@τ* | Spec@τ* | Prec@τ* | FP | FN | FP:TP |
+|:----:|:-------------|:----------:|:----------:|:---------:|:--------:|:-------:|:-------:|:-------:|---:|---:|------:|
+| 1 | **Soft-Ensemble** | Mixed | N/A | **0.9905** | **0.8233** | 0.9487 | 0.9805 | **0.328** | 379 | 10 | **2.0** |
+| 2 | ResNet-34 | ✅ | 21.29 | 0.9881 | 0.7851 | 0.9026 | **0.9808** | 0.320 | **374** | 19 | 2.1 |
+| 3 | EqDenseNet-C8 | ❌ | **0.183** | 0.9872 | 0.7728 | **0.9641** | 0.9430 | 0.145 | 1,109 | **7** | 5.9 |
+| 4 | DenseNet-121 | ✅ | 6.95 | 0.9844 | 0.7632 | 0.9282 | 0.9670 | 0.220 | 642 | 14 | 3.5 |
+| 5 | E-ResNet D₄ | ❌ | 0.513 | 0.9840 | 0.6963 | 0.9333 | 0.9451 | 0.146 | 1,068 | 13 | 5.9 |
+| 6 | EfficientNet-B2 | ✅ | 7.70 | 0.9790 | 0.7087 | 0.9179 | 0.9600 | 0.187 | 778 | 16 | 4.3 |
 
 **Best ensemble:** AUC-ROC **0.9905**, AUC-PR **0.8233**
 (83× above the random PR baseline of 0.010).
