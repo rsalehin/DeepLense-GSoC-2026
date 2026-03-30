@@ -87,7 +87,7 @@ Train a deep learning super-resolution model to upscale low-resolution (LR) stro
 <br>
 
 <div align="center">
-  <img src="assets/figures/2_3_sample_grid.png" width="92%" alt="Sample grid: HR · LR · Bicubic upsampled · Difference"/>
+  <img src="assets/2_3_sample_grid.png" width="92%" alt="Sample grid: HR · LR · Bicubic upsampled · Difference"/>
   <br>
   <sub><b>Figure 1.</b> Four randomly sampled HR/LR pairs with bicubic ×2 upsampling and pixel-wise difference HR − bicubic. Einstein ring and arc morphology vary across samples; residuals are concentrated on ring edges.</sub>
 </div>
@@ -111,7 +111,7 @@ A 1 px systematic shift in the reconstructed θ_E corresponds to a ~4% bias in �
 <br>
 
 <div align="center">
-  <img src="assets/figures/2_6_radial_profiles.png" width="92%" alt="Einstein ring radial profiles for 6 sample images"/>
+  <img src="assets/2_6_radial_profiles.png" width="92%" alt="Einstein ring radial profiles for 6 sample images"/>
   <br>
   <sub><b>Figure 2.</b> Azimuthally averaged radial intensity profiles for 6 HR images with bicubic upsampled LR overlaid. Gold vertical lines mark the HR ring peak θ_E. Mean θ_E = 24.61 px, std = 4.61 px across the dataset (range 13.5–37.5 px).</sub>
 </div>
@@ -227,7 +227,7 @@ All models evaluated on the **sealed test set (1,000 images)**. EDSR-FullImg use
 <br>
 
 <div align="center">
-  <img src="assets/figures/12_2_val_ssim_overlay.png" width="92%" alt="Validation SSIM training curves for all models"/>
+  <img src="assets/12_2_val_ssim_overlay.png" width="92%" alt="Validation SSIM training curves for all models"/>
   <br>
   <sub><b>Figure 3.</b> Validation SSIM training curves overlaid for all five architectures. CNN models (SRCNN, EDSR, RCAN) reach near-final SSIM within the first 5 epochs. UNet-SR and SwinIR start significantly lower and improve gradually — the cost of training skip-connected and attention-based architectures from scratch on this dataset.</sub>
 </div>
@@ -235,7 +235,7 @@ All models evaluated on the **sealed test set (1,000 images)**. EDSR-FullImg use
 <br>
 
 <div align="center">
-  <img src="assets/figures/12_3_psnr_ssim_scatter.png" width="68%" alt="PSNR vs SSIM scatter across all models"/>
+  <img src="assets/12_3_psnr_ssim_scatter.png" width="68%" alt="PSNR vs SSIM scatter across all models"/>
   <br>
   <sub><b>Figure 4.</b> PSNR vs SSIM scatter for all models on the test set. Rankings are broadly consistent. UNet-SR is the notable outlier — it ranks 2nd on SSIM but 5th on PSNR, indicating structurally faithful but slightly over-smoothed reconstructions.</sub>
 </div>
@@ -258,7 +258,7 @@ Conducted on EDSR-baseline. All runs: seed=42, Adam lr=1e-4, CosineAnnealingLR.
 <br>
 
 <div align="center">
-  <img src="assets/figures/13_2_loss_ablation.png" width="85%" alt="Loss function ablation: val SSIM curves for L2, L1, L1+SSIM, L1+SSIM+Perceptual"/>
+  <img src="assets/13_2_loss_ablation.png" width="85%" alt="Loss function ablation: val SSIM curves for L2, L1, L1+SSIM, L1+SSIM+Perceptual"/>
   <br>
   <sub><b>Figure 5.</b> Validation SSIM training curves for four loss configurations on EDSR-baseline. Differences are small but consistent — L1+SSIM achieves the highest final SSIM and most stable convergence.</sub>
 </div>
@@ -279,7 +279,7 @@ L1+SSIM achieves the highest SSIM and smallest ring shift, directly optimising t
 <br>
 
 <div align="center">
-  <img src="assets/figures/14_1_fullimage_curves.png" width="80%" alt="Patch vs full-image training: val SSIM and PSNR curves"/>
+  <img src="assets/14_1_fullimage_curves.png" width="80%" alt="Patch vs full-image training: val SSIM and PSNR curves"/>
   <br>
   <sub><b>Figure 6.</b> Patch (blue) vs full-image (orange) training for EDSR. Full-image training converges more slowly (best epoch 95 vs 56) but reaches higher final SSIM and substantially better radial MSE. The complete Einstein ring in every forward pass preserves ring-scale spatial context that 64×64 patches cannot capture.</sub>
 </div>
@@ -311,7 +311,7 @@ Standard image metrics (MSE, PSNR, SSIM) do not capture physically relevant stru
 <br>
 
 <div align="center">
-  <img src="assets/figures/15_1_radial_profiles.png" width="92%" alt="Radial profile comparison across models for 6 test images"/>
+  <img src="assets/15_1_radial_profiles.png" width="92%" alt="Radial profile comparison across models for 6 test images"/>
   <br>
   <sub><b>Figure 7.</b> Azimuthally averaged radial intensity profiles for 6 test images. HR in black; all SR models overlaid. Gold vertical lines mark the HR ring peak. All SR models preserve ring position accurately. The dominant discrepancy is <b>ring amplitude underestimation</b> — all models slightly smooth the peak intensity, most visibly at high-contrast arcs.</sub>
 </div>
@@ -323,7 +323,7 @@ Standard image metrics (MSE, PSNR, SSIM) do not capture physically relevant stru
 <br>
 
 <div align="center">
-  <img src="assets/figures/15_2_ring_shift_distributions.png" width="92%" alt="Ring peak shift distributions for all models across 1,000 test images"/>
+  <img src="assets/15_2_ring_shift_distributions.png" width="92%" alt="Ring peak shift distributions for all models across 1,000 test images"/>
   <br>
   <sub><b>Figure 8.</b> Ring peak shift distributions across 1,000 test images for all models. Distributions are structurally identical — the non-zero mean is driven by a small fraction of images where the ring peak falls between 1 px bins. EDSR (full) achieves the lowest mean (0.190 px) and highest zero-shift fraction (87.0%).</sub>
 </div>
@@ -346,7 +346,7 @@ Standard image metrics (MSE, PSNR, SSIM) do not capture physically relevant stru
 <br>
 
 <div align="center">
-  <img src="assets/figures/15_3_radial_mse_distributions.png" width="92%" alt="Radial profile MSE distributions for all models"/>
+  <img src="assets/15_3_radial_mse_distributions.png" width="92%" alt="Radial profile MSE distributions for all models"/>
   <br>
   <sub><b>Figure 9.</b> Radial profile MSE distributions across 1,000 test images. All deep models achieve ~55–65% improvement over bicubic. EDSR (full) achieves the best median and mean. SRCNN at 8,129 parameters performs nearly identically to patch-trained EDSR at 1.37M — diminishing returns from scale are pronounced.</sub>
 </div>
@@ -373,7 +373,7 @@ Standard image metrics (MSE, PSNR, SSIM) do not capture physically relevant stru
 <br>
 
 <div align="center">
-  <img src="assets/figures/16_1_full_comparison_grid.png" width="100%" alt="Full qualitative comparison grid: 4 images × 10 models"/>
+  <img src="assets/16_1_full_comparison_grid.png" width="100%" alt="Full qualitative comparison grid: 4 images × 10 models"/>
   <br>
   <sub><b>Figure 10.</b> Four test images × 10 columns: HR | LR | Bicubic | Lanczos | SRCNN | EDSR (patch) | RCAN | UNet-SR | SwinIR | EDSR (full). Morphologies span two-node arcs, high-contrast elliptical rings, near-circular uniform rings, and strongly asymmetric arcs. At 2× scale, all SR outputs are visually close to HR; differences are concentrated on arc peak amplitude and edge sharpness.</sub>
 </div>
@@ -385,7 +385,7 @@ Standard image metrics (MSE, PSNR, SSIM) do not capture physically relevant stru
 <br>
 
 <div align="center">
-  <img src="assets/figures/16_2_difference_maps.png" width="92%" alt="Absolute difference maps |HR - SR| for top-3 models"/>
+  <img src="assets/16_2_difference_maps.png" width="92%" alt="Absolute difference maps |HR - SR| for top-3 models"/>
   <br>
   <sub><b>Figure 11.</b> Absolute difference |HR − SR| (hot colormap, bright = large error) for EDSR (patch), SwinIR, and EDSR (full) across 4 test images. Errors are spatially concentrated on the ring — not uniform noise. The background is reconstructed near-perfectly by all models. EDSR (full) achieves consistently lower mean absolute difference across all samples.</sub>
 </div>
@@ -404,7 +404,7 @@ Standard image metrics (MSE, PSNR, SSIM) do not capture physically relevant stru
 <br>
 
 <div align="center">
-  <img src="assets/figures/16_3_failure_cases.png" width="92%" alt="Failure cases where EDSR (full) underperforms Lanczos on SSIM"/>
+  <img src="assets/16_3_failure_cases.png" width="92%" alt="Failure cases where EDSR (full) underperforms Lanczos on SSIM"/>
   <br>
   <sub><b>Figure 12.</b> Images where EDSR (full) underperforms Lanczos on SSIM (7/1,000 test images, 0.7%). All failure cases share the same pattern: ring amplitude underestimation at the brightest arc nodes. No systematic morphological failure mode by ellipticity or θ_E was identified.</sub>
 </div>
@@ -426,7 +426,7 @@ EDSR (full) underperforms Lanczos on SSIM in **7/1,000 test images (0.7%)**. The
 <br>
 
 <div align="center">
-  <img src="assets/figures/9_4_attention_weights.png" width="68%" alt="RCAN channel attention weight heatmap across 12 test images"/>
+  <img src="assets/9_4_attention_weights.png" width="68%" alt="RCAN channel attention weight heatmap across 12 test images"/>
   <br>
   <sub><b>Figure 13.</b> RCAN channel attention weights across 64 channels for 12 test images. Std across images = 0.0000 for every channel — weights are completely input-independent. The channel attention module provides no selectivity benefit on this single-class single-channel dataset.</sub>
 </div>
@@ -479,16 +479,28 @@ Test VI.B asks: how much of this performance survives when the domain shifts fro
 | Seed | 42 (fixed via `torch`, `numpy`, `cudnn.deterministic=True`) |
 | Determinism check | Two independent runs produce identical outputs ✓ |
 
-All checkpoints saved to `checkpoints_via/`:
+All checkpoints available on Google Drive:
 
-| Checkpoint | Val SSIM |
-|---|---|
-| `srcnn_best.pth` | 0.97289 |
-| `edsr_best.pth` | 0.97398 |
-| `rcan_best.pth` | 0.97384 |
-| `unetsr_best.pth` | 0.97397 |
-| `swinir_best.pth` | 0.97431 |
-| `edsr_fullimage.pth` | **0.97680** |
+**Best model checkpoints:**
+
+| Checkpoint | Val SSIM | Size | Description | Download |
+|---|---|---|---|---|
+| `edsr_fullimage.pth` | **0.97680** | 16.5 MB | EDSR full-image training — best overall model | [↓ Drive](https://drive.google.com/file/d/1ls2Mxi3DjTR9zMfiRvn_nA-idpkW0fNr/view?usp=sharing) |
+| `swinir_best.pth` | 0.97431 | 17.9 MB | SwinIR — best patch-trained model | [↓ Drive](https://drive.google.com/file/d/1xkL12yxieCIPESeGrATUamQeu9ZN4gmS/view?usp=sharing) |
+| `edsr_best.pth` | 0.97398 | 16.5 MB | EDSR patch training | [↓ Drive](https://drive.google.com/file/d/1nJKTpZ4_cs6KgTkSyfdWaq3N4hWrPR4t/view?usp=sharing) |
+| `unetsr_best.pth` | 0.97397 | 94.8 MB | UNet-SR | [↓ Drive](https://drive.google.com/file/d/1gkfzuAHEf6kXkHuoh54txW1LqHPtxdhy/view?usp=sharing) |
+| `rcan_best.pth` | 0.97384 | 49.6 MB | RCAN | [↓ Drive](https://drive.google.com/file/d/1Lcx4k38FzNoMXfqAykvnce-8hCojU1Cu/view?usp=sharing) |
+| `srcnn_best.pth` | 0.97289 | 0.1 MB | SRCNN | [↓ Drive](https://drive.google.com/file/d/1pExADHiBg87HFSdaPWZtERG6jT1OBe8n/view?usp=sharing) |
+
+**Ablation checkpoints (EDSR-baseline, § 13 loss ablation):**
+
+| Checkpoint | Val SSIM | Loss config | Download |
+|---|---|---|---|
+| `edsr_ablation_L1_SSIM.pth` | 0.97393 | L1 + 0.1·SSIM (default) | [↓ Drive](https://drive.google.com/file/d/1sAVHIuUArlN9bjs7KVE6aXy7UY1--qz_/view?usp=sharing) |
+| `edsr_ablation_L1_SSIM_Percept.pth` | 0.97371 | L1 + 0.1·SSIM + Perceptual | [↓ Drive](https://drive.google.com/file/d/1mGI3sAV1jcV5WDT4oZFreYnOM1eiev1e/view?usp=sharing) |
+| `edsr_ablation_L1.pth` | 0.97327 | L1 only | [↓ Drive](https://drive.google.com/file/d/10y20ko0heHQcGRtPDx2YhOPuJyfwNEWt/view?usp=sharing) |
+| `edsr_ablation_L2.pth` | 0.97268 | L2 only | [↓ Drive](https://drive.google.com/file/d/13XEsyC5HLVZgnOpSXUc-c7uRvL1gdt1L/view?usp=sharing) |
+| `swinir_ablation_L2.pth` | — | SwinIR L2 ablation | [↓ Drive](https://drive.google.com/file/d/1E_N5UxpaUYphRFGheXLUrnFhEj6-xoYb/view?usp=sharing) |
 
 ---
 
