@@ -1045,14 +1045,16 @@ This work provides the **first three-point SR domain gap measurement within Deep
 
 **Strategy checkpoints:**
 
+**Strategy checkpoints:**
+
 | Checkpoint | Size | Val SSIM | Description | Download |
-|---|---|---|---|---|---|
+|---|---:|---:|---|---|
 | `edsr_vib_stratC_s2.pth` | 5.5 MB | 0.8237 | **Recommended** — Strategy C Stage 2 | [↓ Drive](https://drive.google.com/file/d/1tn8bzFWDIWKz7NETzc4pZZ07gUZcKnDU/view?usp=sharing) |
 | `edsr_vib_stratA.pth` | 5.5 MB | 0.8220 | Strategy A — full fine-tune | [↓ Drive](https://drive.google.com/file/d/1-_iVZprqLhnUwxt1PrE1gC0WVKyt13wt/view?usp=sharing) |
-| `edsr_vib_stratD.pth` | 5.5 MB |  0.8263 | Strategy D — from-scratch | [↓ Drive](https://drive.google.com/file/d/1QdL00t9r1hLowx2w9iVqlnhKjPf4k9GD/view?usp=sharing) |
-| `edsr_vib_stratB.pth` | 5.5 MB |  0.8042 | Strategy B — head-only | [↓ Drive](https://drive.google.com/file/d/1CcAyGfzTR0-ml3MZhQkhmFgZNECiuN5f/view?usp=sharing) |
-| `edsr_vib_stratC_s1.pth` | 5.5 MB | — |  Strategy C Stage 1 (tail only) | [↓ Drive](https://drive.google.com/file/d/1Rlw3uoTL5pdt1_EMG8zXPIBoBEQVtc_a/view?usp=sharing) |
-| `edsr_vib_stratC.pth` | 5.5 MB | — |  Strategy C Stage 3 (full network) | [↓ Drive](https://drive.google.com/file/d/1A-wEW6Has8__Bnol6zq0tOq3xCGxSPTU/view?usp=sharing) |
+| `edsr_vib_stratD.pth` | 5.5 MB | 0.8263 | Strategy D — from-scratch | [↓ Drive](https://drive.google.com/file/d/1QdL00t9r1hLowx2w9iVqlnhKjPf4k9GD/view?usp=sharing) |
+| `edsr_vib_stratB.pth` | 5.5 MB | 0.8042 | Strategy B — head-only | [↓ Drive](https://drive.google.com/file/d/1CcAyGfzTR0-ml3MZhQkhmFgZNECiuN5f/view?usp=sharing) |
+| `edsr_vib_stratC_s1.pth` | 5.5 MB | — | Strategy C Stage 1 (tail only) | [↓ Drive](https://drive.google.com/file/d/1Rlw3uoTL5pdt1_EMG8zXPIBoBEQVtc_a/view?usp=sharing) |
+| `edsr_vib_stratC.pth` | 5.5 MB | — | Strategy C Stage 3 (full network) | [↓ Drive](https://drive.google.com/file/d/1A-wEW6Has8__Bnol6zq0tOq3xCGxSPTU/view?usp=sharing) |
 
 **Augmentation ablation checkpoints (Strategy D, from-scratch):**
 
@@ -1066,11 +1068,11 @@ This work provides the **first three-point SR domain gap measurement within Deep
 **Loss ablation checkpoints (Strategy D, from-scratch):**
 
 | Checkpoint | Loss config | Val SSIM | Download |
-|---|---|---|---|
-| `edsr_vib_loss_L1_plus_SSIM_plus_Percept.pth` | L1 + SSIM + Perceptual | **0.8275** | ↓ Drive](https://drive.google.com/file/d/1pSiyvqcQ8E_gBG74wlQqmM9D02sghciK/view?usp=drive_link) |
-| `edsr_vib_loss_L1_only.pth` | L1 only | 0.8271 | ↓ Drive](https://drive.google.com/file/d/1wWv1fFOih2nVRMDcS6FJMLOebeb2xQUv/view?usp=drive_link) |
-| `edsr_vib_loss_L1_plus_SSIM.pth` | L1 + SSIM | 0.8271 | ↓ Drive](https://drive.google.com/file/d/1OzYqoyy28gz84rLQtRE8vT1ne4tzBKUF/view?usp=sharing) |
-| `edsr_vib_loss_L1_plus_SSIM_plus_TV.pth` | L1 + SSIM + TV | 0.8271 | ↓ Drive](https://drive.google.com/file/d/1K-3_C4gLQ2yz5cr5M2FCGQotzqEuZHSG/view?usp=drive_link) |
+|---|---|---:|---|
+| `edsr_vib_loss_L1_plus_SSIM_plus_Percept.pth` | L1 + SSIM + Perceptual | **0.8275** | [↓ Drive](https://drive.google.com/file/d/1pSiyvqcQ8E_gBG74wlQqmM9D02sghciK/view?usp=drive_link) |
+| `edsr_vib_loss_L1_only.pth` | L1 only | 0.8271 | [↓ Drive](https://drive.google.com/file/d/1wWv1fFOih2nVRMDcS6FJMLOebeb2xQUv/view?usp=drive_link) |
+| `edsr_vib_loss_L1_plus_SSIM.pth` | L1 + SSIM | 0.8271 | [↓ Drive](https://drive.google.com/file/d/1OzYqoyy28gz84rLQtRE8vT1ne4tzBKUF/view?usp=sharing) |
+| `edsr_vib_loss_L1_plus_SSIM_plus_TV.pth` | L1 + SSIM + TV | 0.8271 | [↓ Drive](https://drive.google.com/file/d/1K-3_C4gLQ2yz5cr5M2FCGQotzqEuZHSG/view?usp=drive_link) |
 
 ---
 
