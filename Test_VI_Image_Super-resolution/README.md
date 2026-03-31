@@ -103,7 +103,7 @@ The dataset contains a single no-substructure population with controlled Gaussia
 The Einstein radius θ_E encodes the projected lens mass enclosed within the ring:
 
 ```
-$$M_E = (c² / 4G) × (D_s / D_l D_ls) × θ_E²$$
+$M_E = (c² / 4G) × (D_s / D_l D_ls) × θ_E²$
 ```
 
 A 1 px systematic shift in the reconstructed $θ_E$ corresponds to a ~4% bias in $θ_E$ (at mean θ_E ≈ 24.6 px) and an ~8% bias in inferred lens mass $M_E$ via the quadratic scaling. Super-resolution is therefore not merely a visual enhancement task — ring-structure preservation is the physically critical metric.
