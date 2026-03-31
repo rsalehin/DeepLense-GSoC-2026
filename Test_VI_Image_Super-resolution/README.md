@@ -1,6 +1,10 @@
 <div align="center">
 
-# Test VI — This page contains Test VIA: Gravitational Sim-Lens Image Super-Resolution & Test VI.B — Sim-to-Real Super-Resolution Transfer
+# Test VI 
+----
+## Test VIA: Gravitational Sim-Lens Image Super-Resolution 
+---
+## Test VI.B — Sim-to-Real Super-Resolution Transfer
 
 ### ML4SCI DeepLense · GSoC 2026
 
