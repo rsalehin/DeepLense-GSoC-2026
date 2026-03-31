@@ -27,7 +27,7 @@ Each test is self-contained with its own notebook, assets, and requirements.*
 |:----:|:------|:-------------|:-------------------|:------:|
 | [**I**](Test_I_Classification/) | Multi-Class Classification | Classify strong lensing images into three dark matter substructure classes | ROC · AUC | ✅ |
 | [**V**](Test_V_Lens_Finding/) | Lens Finding & Data Pipelines | Binary classification of lensed vs non-lensed galaxies from observational data | ROC · AUC | ✅ |
-| [**VI**](Test_VI_Image_Super-resolution/) | Image Super-Resolution | Upscale low-resolution lensing images; adapt to real HSC/HST data | MSE · SSIM · PSNR | 🔄 |
+| [**VI**](Test_VI_Image_Super-resolution/) | Image Super-Resolution | Upscale low-resolution lensing images; adapt to real HSC/HST data | MSE · SSIM · PSNR | ✅ |
 
 ---
 
