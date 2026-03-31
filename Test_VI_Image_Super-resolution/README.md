@@ -49,7 +49,7 @@
 
 ## Task Description
 
-Train a deep learning super-resolution model to upscale low-resolution (LR) strong lensing images to high-resolution (HR) using simulated paired samples as ground truth. The SR model must not only achieve strong pixel-level metrics (MSE, PSNR, SSIM) but also preserve the physically relevant Einstein ring structure — specifically the ring peak radius θ_E — since systematic bias in θ_E propagates directly to errors in inferred lens mass.
+Train a deep learning super-resolution model to upscale low-resolution (LR) strong lensing images to high-resolution (HR) using simulated paired samples as ground truth. The SR model must not only achieve strong pixel-level metrics (MSE, PSNR, SSIM) but also preserve the physically relevant Einstein ring structure — specifically the ring peak radius $θ_E$ — since systematic bias in $θ_E$ propagates directly to errors in inferred lens mass.
 
 **Evaluation metrics:** MSE ↓ · PSNR ↑ · SSIM ↑ · Ring peak shift ↓ · Radial profile MSE ↓
 
@@ -79,8 +79,8 @@ Train a deep learning super-resolution model to upscale low-resolution (LR) stro
 
 | | Value |
 |---|---|
-| Mean θ_E | 24.61 px (HR space) |
-| Std θ_E | 4.61 px |
+| Mean $θ_E$ | 24.61 px (HR space) |
+| Std $θ_E$ | 4.61 px |
 | Range | 13.5 – 37.5 px |
 | Mean SNR (HR ≈ LR) | 13.4 (Pearson r = 0.9989) |
 
@@ -103,10 +103,10 @@ The dataset contains a single no-substructure population with controlled Gaussia
 The Einstein radius θ_E encodes the projected lens mass enclosed within the ring:
 
 ```
-M_E = (c² / 4G) × (D_s / D_l D_ls) × θ_E²
+$$M_E = (c² / 4G) × (D_s / D_l D_ls) × θ_E²$$
 ```
 
-A 1 px systematic shift in the reconstructed θ_E corresponds to a ~4% bias in θ_E (at mean θ_E ≈ 24.6 px) and an ~8% bias in inferred lens mass M_E via the quadratic scaling. Super-resolution is therefore not merely a visual enhancement task — ring-structure preservation is the physically critical metric.
+A 1 px systematic shift in the reconstructed $θ_E$ corresponds to a ~4% bias in $θ_E$ (at mean θ_E ≈ 24.6 px) and an ~8% bias in inferred lens mass $M_E$ via the quadratic scaling. Super-resolution is therefore not merely a visual enhancement task — ring-structure preservation is the physically critical metric.
 
 <br>
 
@@ -303,7 +303,7 @@ Full-image training outperforms patch training across every metric. The largest 
 
 Standard image metrics (MSE, PSNR, SSIM) do not capture physically relevant structure. Two dedicated metrics evaluate ring preservation:
 
-- **Ring peak shift:** distance (px) between the peak of the azimuthally averaged radial profile of the SR output vs HR ground truth. 1 px shift at mean θ_E ≈ 24.6 px implies ~4% bias in θ_E and ~8% bias in inferred M_E.
+- **Ring peak shift:** distance (px) between the peak of the azimuthally averaged radial profile of the SR output vs HR ground truth. 1 px shift at mean $θ_E$ ≈ 24.6 px implies ~4% bias in $θ_E$ and ~8% bias in inferred $M_E$.
 - **Radial profile MSE:** mean squared error between the full azimuthally averaged profiles of SR and HR — captures both ring position and amplitude fidelity.
 
 ### Radial Profile Comparison
@@ -1042,32 +1042,32 @@ This work provides the **first three-point SR domain gap measurement within Deep
 
 **Strategy checkpoints:**
 
-| Checkpoint | Size | MD5 | Val SSIM | Description | Download |
+| Checkpoint | Size | Val SSIM | Description | Download |
 |---|---|---|---|---|---|
-| `edsr_vib_stratC_s2.pth` | 5.5 MB | 05447a50ba | 0.8237 | **Recommended** — Strategy C Stage 2 | — |
-| `edsr_vib_stratA.pth` | 5.5 MB | 1befedd194 | 0.8220 | Strategy A — full fine-tune | — |
-| `edsr_vib_stratD.pth` | 5.5 MB | e14478f028 | 0.8263 | Strategy D — from-scratch | — |
-| `edsr_vib_stratB.pth` | 5.5 MB | 842c16ee14 | 0.8042 | Strategy B — head-only | — |
-| `edsr_vib_stratC_s1.pth` | 5.5 MB | — | — | Strategy C Stage 1 (tail only) | — |
-| `edsr_vib_stratC.pth` | 5.5 MB | — | — | Strategy C Stage 3 (full network) | — |
+| `edsr_vib_stratC_s2.pth` | 5.5 MB | 0.8237 | **Recommended** — Strategy C Stage 2 | [↓ Drive](https://drive.google.com/file/d/1tn8bzFWDIWKz7NETzc4pZZ07gUZcKnDU/view?usp=sharing) |
+| `edsr_vib_stratA.pth` | 5.5 MB | 0.8220 | Strategy A — full fine-tune | [↓ Drive](https://drive.google.com/file/d/1-_iVZprqLhnUwxt1PrE1gC0WVKyt13wt/view?usp=sharing) |
+| `edsr_vib_stratD.pth` | 5.5 MB |  0.8263 | Strategy D — from-scratch | [↓ Drive](https://drive.google.com/file/d/1QdL00t9r1hLowx2w9iVqlnhKjPf4k9GD/view?usp=sharing) |
+| `edsr_vib_stratB.pth` | 5.5 MB |  0.8042 | Strategy B — head-only | [↓ Drive](https://drive.google.com/file/d/1CcAyGfzTR0-ml3MZhQkhmFgZNECiuN5f/view?usp=sharing) |
+| `edsr_vib_stratC_s1.pth` | 5.5 MB | — |  Strategy C Stage 1 (tail only) | [↓ Drive](https://drive.google.com/file/d/1Rlw3uoTL5pdt1_EMG8zXPIBoBEQVtc_a/view?usp=sharing) |
+| `edsr_vib_stratC.pth` | 5.5 MB | — |  Strategy C Stage 3 (full network) | [↓ Drive](https://drive.google.com/file/d/1A-wEW6Has8__Bnol6zq0tOq3xCGxSPTU/view?usp=sharing) |
 
 **Augmentation ablation checkpoints (Strategy D, from-scratch):**
 
 | Checkpoint | Config | Val SSIM | Download |
 |---|---|---|---|
-| `edsr_vib_aug_D4_plus_patch_plus_jitter.pth` | D4 + patch + jitter | **0.8289** | — |
-| `edsr_vib_aug_D4_only.pth` | D4 only | 0.8273 | — |
-| `edsr_vib_aug_D4_plus_patch.pth` | D4 + patch | 0.8271 | — |
-| `edsr_vib_aug_D4_plus_patch_plus_jitter_plus_noise.pth` | D4 + patch + jitter + noise | 0.8271 | — |
+| `edsr_vib_aug_D4_plus_patch_plus_jitter.pth` | D4 + patch + jitter | **0.8289** | [↓ Drive](https://drive.google.com/file/d/1rep9H3S93WKE9qtp1PSOGHNECRFZHJ-z/view?usp=sharing) |
+| `edsr_vib_aug_D4_only.pth` | D4 only | 0.8273 | [↓ Drive](https://drive.google.com/file/d/1lNXi1GCmVjGvvxJFiwj6XyZk0IZXiUm4/view?usp=sharing) |
+| `edsr_vib_aug_D4_plus_patch.pth` | D4 + patch | 0.8271 | [↓ Drive](https://drive.google.com/file/d/1JhXsljVYLnLXOD9mb8L-uiaucszWoPrM/view?usp=sharing)|
+| `edsr_vib_aug_D4_plus_patch_plus_jitter_plus_noise.pth` | D4 + patch + jitter + noise | 0.8271 | [↓ Drive](https://drive.google.com/file/d/1FMaaMWlC24IvpYLMxRpWzm0VrDh9ZboR/view?usp=sharing) |
 
 **Loss ablation checkpoints (Strategy D, from-scratch):**
 
 | Checkpoint | Loss config | Val SSIM | Download |
 |---|---|---|---|
-| `edsr_vib_loss_L1_plus_SSIM_plus_Percept.pth` | L1 + SSIM + Perceptual | **0.8275** | — |
-| `edsr_vib_loss_L1_only.pth` | L1 only | 0.8271 | — |
-| `edsr_vib_loss_L1_plus_SSIM.pth` | L1 + SSIM | 0.8271 | — |
-| `edsr_vib_loss_L1_plus_SSIM_plus_TV.pth` | L1 + SSIM + TV | 0.8271 | — |
+| `edsr_vib_loss_L1_plus_SSIM_plus_Percept.pth` | L1 + SSIM + Perceptual | **0.8275** | ↓ Drive](https://drive.google.com/file/d/1pSiyvqcQ8E_gBG74wlQqmM9D02sghciK/view?usp=drive_link) |
+| `edsr_vib_loss_L1_only.pth` | L1 only | 0.8271 | ↓ Drive](https://drive.google.com/file/d/1wWv1fFOih2nVRMDcS6FJMLOebeb2xQUv/view?usp=drive_link) |
+| `edsr_vib_loss_L1_plus_SSIM.pth` | L1 + SSIM | 0.8271 | ↓ Drive](https://drive.google.com/file/d/1OzYqoyy28gz84rLQtRE8vT1ne4tzBKUF/view?usp=sharing) |
+| `edsr_vib_loss_L1_plus_SSIM_plus_TV.pth` | L1 + SSIM + TV | 0.8271 | ↓ Drive](https://drive.google.com/file/d/1K-3_C4gLQ2yz5cr5M2FCGQotzqEuZHSG/view?usp=drive_link) |
 
 ---
 
