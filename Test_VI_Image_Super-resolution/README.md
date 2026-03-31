@@ -1,6 +1,6 @@
 <div align="center">
 
-# Test VI.A — Gravitational Lens Image Super-Resolution
+# Test VI — This page contains Test VIA: Gravitational Sim-Lens Image Super-Resolution & Test VI.B — Sim-to-Real Super-Resolution Transfer
 
 ### ML4SCI DeepLense · GSoC 2026
 
@@ -433,7 +433,7 @@ EDSR (full) underperforms Lanczos on SSIM in **7/1,000 test images (0.7%)**. The
 
 <br>
 
-**Connection to prior DeepLense SR work.** Pranath Reddy (GSoC 2023) benchmarked EDSR and RCAN on Model-I simulated data (~2,300 pairs), achieving SSIM ~0.574 and PSNR ~30.5 dB. Atal Gupta (GSoC 2024) achieved RCAN SSIM 0.890 on 2,834 simulated pairs (noise+blur degradation). The present work achieves SSIM 0.9768 with 8,000 pairs and full-image training, establishing the simulated-data supervised ceiling for the DeepLense SR task.
+**Connection to prior DeepLense SR work.** Pranath Reddy (GSoC 2023) benchmarked EDSR and RCAN on Model-I simulated data (~2,300 pairs), achieving SSIM ~0.574 and PSNR ~30.5 dB. Atal Gupta (GSoC 2024) achieved RCAN SSIM 0.890 on 2,834 simulated pairs (noise+blur degradation). The present work achieves SSIM 0.9768 with 8,000 pairs (~3x time more training data than previous benchmarks) and full-image training.
 
 ---
 
@@ -463,7 +463,8 @@ Test VI.A establishes the **supervised SR ceiling under idealised simulation con
 | Key finding | Training procedure > architecture choice |
 | Dominant error mode | Ring amplitude underestimation |
 
-Test VI.B asks: how much of this performance survives when the domain shifts from simulated Gaussian-PSF images to real HSC (LR) / HST (HR) telescope pairs, with only 300 paired examples? The `edsr_fullimage.pth` checkpoint from this task is the starting point for VI.B transfer learning — SSIM collapses from 0.977 to 0.471 zero-shot, then recovers to 0.899 via progressive fine-tuning on 240 real pairs.
+Test VI.B asks: how much of this performance survives when the domain shifts from simulated Gaussian-PSF images to real HSC (LR) / HST (HR) telescope pairs, with only 300 paired examples? 
+SSIM collapses from 0.977 to 0.471 zero-shot, then recovers to 0.899 via progressive fine-tuning on 240 real pairs.
 
 → [Test VI.B — Sim-to-Real SR Transfer](../Test_VIB/)
 
