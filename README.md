@@ -137,9 +137,17 @@ HSC baseline (AUC-ROC 0.816) by more than 0.16 AUC points.
 ---
 
 ### Test VI — Image Super-Resolution
-> **Task VI.A:** Simulated HR/LR lensing image pairs. **Task VI.B:** 300 real HSC/HST HR/LR pairs — few-shot / transfer learning from VI.A.
+> **Task VI.A:** Super-resolution on simulated HR/LR lensing pairs.  
+> **Task VI.B:** Sim-to-real adaptation on 300 real HSC/HST pairs.
 
-Deep learning super-resolution pipeline (e.g. EDSR, SRGAN, or SwinIR backbone). Task VI.B explores domain adaptation from simulated to real telescope data with limited labelled pairs.
+This test studies gravitational lens image super-resolution across two regimes: supervised reconstruction on simulated data and few-shot transfer to real telescope observations. Test VI.A benchmarks multiple SR architectures on simulated paired data; Test VI.B measures the sim-to-real domain gap and evaluates fine-tuning strategies on real HSC/HST pairs.
+
+| Part | Best Model | Setting | MSE ↓ | PSNR ↑ | SSIM ↑ | Key Result |
+|:----:|:-----------|:--------|------:|-------:|-------:|:-----------|
+| **VI.A** | **EDSR-FullImg** | Simulated paired data | **0.67 × 10⁻⁴** | **41.840 dB** | **0.97678** | Best overall result on simulated lensing SR; full-image training outperformed all patch-trained variants |
+| **VI.B** | **Strategy C (Progressive Unfreezing)** | Real HSC/HST pairs | **0.00034** | **35.959 dB** | **0.8991** | Best test-set point estimate on real data; sim-to-real fine-tuning recovers most of the zero-shot performance drop |
+
+**Domain-gap summary:** simulated reference **SSIM 0.9768** → zero-shot real-data **0.4712** → fine-tuned real-data **0.8991**.
 
 → [Full details](Test_VI_Image_Super-resolution/)
 
